@@ -67,12 +67,36 @@ function EncoderWidgetInner({
     if (onDoubleClick) { e.stopPropagation(); onDoubleClick(kleKey, kleKey.encoderDir, e.currentTarget.getBoundingClientRect(), false) }
   }
 
+  // Add triangle indicator for rotation direction
+  const renderDirectionIndicator = () => {
+    const borderColor = outerBorderActive ? KEY_SELECTED_COLOR : KEY_BORDER_COLOR;
+    const triangleSize = 4 * scale;
+    const triangleX = cx - r; // Left edge of the circle
+    const triangleY = cy; // Middle of the circle
+    
+    // Determine triangle points based on encoder direction
+    let points;
+    if (kleKey.encoderDir === 1) { // CW (clockwise) - triangle pointing up
+      points = `${triangleX},${triangleY - triangleSize} ${triangleX - triangleSize},${triangleY + triangleSize} ${triangleX + triangleSize},${triangleY + triangleSize}`;
+    } else { // CCW (counter-clockwise) - triangle pointing down
+      points = `${triangleX},${triangleY + triangleSize} ${triangleX - triangleSize},${triangleY - triangleSize} ${triangleX + triangleSize},${triangleY - triangleSize}`;
+    }
+    
+    return (
+      <polygon
+        points={points}
+        fill={borderColor}
+      />
+    );
+  };
+
   if (!masked) {
     const labelLines = keycodeLabel(keycode).split('\n')
     return (
       <g transform={groupTransform} onClick={handleClick} onDoubleClick={handleDoubleClick} style={{ cursor: handleClick ? 'pointer' : 'default' }}>
         <circle cx={cx} cy={cy} r={r} fill={fillColor}
           stroke={outerBorderActive ? KEY_SELECTED_COLOR : KEY_BORDER_COLOR} strokeWidth={outerBorderActive ? 2 : 1} />
+        {renderDirectionIndicator()}
         {labelLines.map((line, i) => (
           <text key={i} x={cx} y={cy + (i - (labelLines.length - 1) / 2) * (fontSize + 2)}
             textAnchor="middle" dominantBaseline="central" fill={labelColor} fontSize={fontSize} fontFamily="sans-serif">
@@ -120,6 +144,7 @@ function EncoderWidgetInner({
       {/* Outer circle */}
       <circle cx={cx} cy={cy} r={r} fill={fillColor}
         stroke={outerBorderActive ? KEY_SELECTED_COLOR : KEY_BORDER_COLOR} strokeWidth={outerBorderActive ? 2 : 1} />
+      {renderDirectionIndicator()}
       {/* Inner rect clipped to circle — same style as KeyWidget (stroke-only selection) */}
       <rect x={innerRectX} y={innerRectY} width={innerRectW} height={innerRectH}
         rx={innerCorner} ry={innerCorner}

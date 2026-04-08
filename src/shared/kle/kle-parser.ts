@@ -108,60 +108,63 @@ export function parseKle(rows: unknown[][]): KeyboardLayout {
 
       if (typeof item === 'string') {
         // String item = key label. Create a new key.
-        const width2 = currentWidth2 === 0 ? currentWidth : currentWidth2
-        const height2 = currentHeight2 === 0 ? currentHeight : currentHeight2
+        // Skip if this is a decal (d: true) - decals are placeholders without keys
+        if (!currentDecal) {
+          const width2 = currentWidth2 === 0 ? currentWidth : currentWidth2
+          const height2 = currentHeight2 === 0 ? currentHeight : currentHeight2
 
-        const labels = reorderLabels(item.split('\n'), align)
-        const textSize = reorderLabels(currentTextSize, align)
+          const labels = reorderLabels(item.split('\n'), align)
+          const textSize = reorderLabels(currentTextSize, align)
 
-        // Clean up: null out text properties where there is no label
-        const cleanTextColor: (string | null)[] = [...currentTextColor]
-        const cleanTextSize: (number | null)[] = [...textSize]
-        for (let i = 0; i < 12; i++) {
-          if (labels[i] === null || labels[i] === undefined) {
-            cleanTextSize[i] = null
-            cleanTextColor[i] = null
+          // Clean up: null out text properties where there is no label
+          const cleanTextColor: (string | null)[] = [...currentTextColor]
+          const cleanTextSize: (number | null)[] = [...textSize]
+          for (let i = 0; i < 12; i++) {
+            if (labels[i] === null || labels[i] === undefined) {
+              cleanTextSize[i] = null
+              cleanTextColor[i] = null
+            }
+            if (cleanTextSize[i] === defaultTextSize) {
+              cleanTextSize[i] = null
+            }
+            if (cleanTextColor[i] === defaultTextColor) {
+              cleanTextColor[i] = null
+            }
           }
-          if (cleanTextSize[i] === defaultTextSize) {
-            cleanTextSize[i] = null
+
+          const newKey: KleKey = {
+            x: currentX,
+            y: currentY,
+            width: currentWidth,
+            height: currentHeight,
+            x2: currentX2,
+            y2: currentY2,
+            width2,
+            height2,
+            rotation: currentRotation,
+            rotationX: currentRotationX,
+            rotationY: currentRotationY,
+            color: currentColor,
+            labels,
+            textColor: cleanTextColor,
+            textSize: cleanTextSize,
+            row: 0,
+            col: 0,
+            encoderIdx: -1,
+            encoderDir: -1,
+            layoutIndex: -1,
+            layoutOption: -1,
+            decal: currentDecal,
+            nub: currentNub,
+            stepped: currentStepped,
+            ghost: currentGhost,
           }
-          if (cleanTextColor[i] === defaultTextColor) {
-            cleanTextColor[i] = null
-          }
+
+          // Parse key labels for row/col, encoder, and layout info
+          parseKeyLabels(newKey)
+
+          keys.push(newKey)
         }
-
-        const newKey: KleKey = {
-          x: currentX,
-          y: currentY,
-          width: currentWidth,
-          height: currentHeight,
-          x2: currentX2,
-          y2: currentY2,
-          width2,
-          height2,
-          rotation: currentRotation,
-          rotationX: currentRotationX,
-          rotationY: currentRotationY,
-          color: currentColor,
-          labels,
-          textColor: cleanTextColor,
-          textSize: cleanTextSize,
-          row: 0,
-          col: 0,
-          encoderIdx: -1,
-          encoderDir: -1,
-          layoutIndex: -1,
-          layoutOption: -1,
-          decal: currentDecal,
-          nub: currentNub,
-          stepped: currentStepped,
-          ghost: currentGhost,
-        }
-
-        // Parse key labels for row/col, encoder, and layout info
-        parseKeyLabels(newKey)
-
-        keys.push(newKey)
 
         // Advance x position and reset transient properties
         currentX += currentWidth
