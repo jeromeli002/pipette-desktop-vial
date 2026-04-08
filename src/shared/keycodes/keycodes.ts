@@ -1009,6 +1009,29 @@ export const KEYCODES_MACRO_BASE: Keycode[] = [
   K('DYN_MACRO_PLAY2', 'DM2\nPlay', 'Dynamic Macro 2 Play', { alias: ['DM_PLY2'], cExportId: 'DM_PLY2' }),
 ]
 
+export const KEYCODES_JLKB_DIAL: Keycode[] = [
+  K('DIAL_L', 'DIAL\nL', 'DIAL_L', { alias: ['DIAL_L'], cExportId: 'DIAL_L' }),
+  K('DIAL_BUT', 'DIAL\nBUT', 'DIAL_BUT', { alias: ['DIAL_BUT'], cExportId: 'DIAL_BUT' }),
+  K('DIAL_R', 'DIAL\nR', 'DIAL_R', { alias: ['DIAL_R'], cExportId: 'DIAL_R' }),
+  K('DIAL_LC', 'DIAL\nLC', 'Dial anticlockwise', { alias: ['DIAL_LC'], cExportId: 'DIAL_LC' }),
+  K('DIAL_RC', 'DIAL\nRC', 'Dial clockwise', { alias: ['DIAL_RC'], cExportId: 'DIAL_RC' }),
+]
+
+export const KEYCODES_JLKB_NEWKEYS: Keycode[] = [
+  K('BLE_SW1', 'BLE\n1', 'BLE1', { alias: ['BLE_SW1'], cExportId: 'BLE_SW1' }),
+  K('BLE_SW2', 'BLE\n2', 'BLE2', { alias: ['BLE_SW2'], cExportId: 'BLE_SW2' }),
+  K('BLE_SW3', 'BLE\n3', 'BLE3', { alias: ['BLE_SW3'], cExportId: 'BLE_SW3' }),
+  K('RF_TOG', '2.4G\nTOG', '2.4G', { alias: ['2.4G'], cExportId: '2.4G' }),
+  K('USB_TOG', 'USB\nTOG', 'USB', { alias: ['USB'], cExportId: 'USB' }),
+  K('BLE_TOG', 'BLE\nTOG', 'BLE', { alias: ['BLE'], cExportId: 'BLE' }),
+  K('BLE_RST', 'BLE\nRST', 'BLE RESET', { alias: ['BLE RESET'], cExportId: 'BLE RESET' }),
+  K('BLE_OFF', 'BLE\nOFF', 'BLE OFF', { alias: ['BLE_OFF'], cExportId: 'BLE_OFF' }),
+]
+export const KEYCODES_JLKB: Keycode[] = [
+  ...KEYCODES_JLKB_DIAL,
+  ...KEYCODES_JLKB_NEWKEYS,
+]
+
 export const KEYCODES_MIDI_BASIC: Keycode[] = [
   K('MI_C', 'MI\nC', 'Midi send note C'),
   K('MI_Cs', 'MI\nC#/Db', 'Midi send note C#/Db', { alias: ['MI_Db'] }),

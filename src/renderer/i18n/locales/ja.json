@@ -333,6 +333,7 @@
     "tapDance": "Tap-Hold / Tap Dance",
     "macro": "Macro",
     "combo": "Combo",
+    "jlkb": "dial/newkeys",
     "keyOverride": "Key Override",
     "altRepeatKey": "Alt Repeat Key",
     "settingsNote": "この機能はキーボード全体に適用され、個別のキーに割り当てることはできません。",
@@ -398,7 +399,9 @@
       "swapHands": "Swap Hands",
       "sequencer": "Sequencer",
       "joystick": "Joystick",
-      "ledMatrix": "LED Matrix"
+      "ledMatrix": "LED Matrix",
+      "dial": "ローラー",
+      "newKeys": "新規キー"
     }
   },
   "unlock": {

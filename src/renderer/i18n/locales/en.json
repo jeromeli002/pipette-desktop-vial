@@ -333,6 +333,7 @@
     "system": "System",
     "tapDance": "Tap-Hold / Tap Dance",
     "macro": "Macro",
+    "jlkb": "dial/nekeys",
     "combo": "Combo",
     "keyOverride": "Key Override",
     "altRepeatKey": "Alt Repeat Key",
@@ -399,7 +400,9 @@
       "swapHands": "Swap Hands",
       "sequencer": "Sequencer",
       "joystick": "Joystick",
-      "ledMatrix": "LED Matrix"
+      "ledMatrix": "LED Matrix",
+      "dial": "dial",
+      "newKeys": "newksys"
     }
   },
   "unlock": {

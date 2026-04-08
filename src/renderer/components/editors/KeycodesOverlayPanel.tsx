@@ -8,6 +8,8 @@ import type { BasicViewType, SplitKeyMode } from '../../../shared/types/app-conf
 import type { LayoutOption } from '../../../shared/layout-options'
 import { LayoutOptionsPanel } from './LayoutOptionsPanel'
 import { ROW_CLASS, toggleTrackClass, toggleKnobClass } from './modal-controls'
+import { useAppConfig } from '../../hooks/useAppConfig'
+import i18n, { SUPPORTED_LANGUAGES } from '../../i18n'
 
 type OverlayTab = 'layout' | 'tools' | 'data'
 
@@ -79,6 +81,7 @@ export function KeycodesOverlayPanel({
   onExportLayoutPdfCurrent,
 }: Props) {
   const { t } = useTranslation()
+  const appConfig = useAppConfig()
   const hasData = dataPanel != null
   const [activeTab, setActiveTab] = useState<OverlayTab>(hasLayoutOptions ? 'layout' : hasData ? 'data' : 'tools')
 
@@ -189,6 +192,29 @@ export function KeycodesOverlayPanel({
                 </select>
               </div>
             )}
+
+            {/* Language selector */}
+            <div className={ROW_CLASS} data-testid="overlay-language-row">
+              <label htmlFor="overlay-language-selector" className="text-[13px] font-medium text-content">
+                {t('settings.language')}
+              </label>
+              <select
+                id="overlay-language-selector"
+                value={appConfig.config.language ?? 'en'}
+                onChange={(e) => {
+                  appConfig.set('language', e.target.value)
+                  void i18n.changeLanguage(e.target.value)
+                }}
+                className="rounded border border-edge bg-surface px-2.5 py-1.5 text-[13px] text-content focus:border-accent focus:outline-none"
+                data-testid="overlay-language-selector"
+              >
+                {SUPPORTED_LANGUAGES.map((lang) => (
+                  <option key={lang.id} value={lang.id}>
+                    {lang.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
             {/* Keyboard layout selector */}
             <div className={ROW_CLASS} data-testid="overlay-layout-row">

@@ -333,6 +333,7 @@
     "tapDance": "點按-長按 / 點按舞蹈",
     "macro": "巨集",
     "combo": "組合鍵",
+    "jlkb": "滾輪/新增鍵",
     "keyOverride": "按鍵覆寫",
     "altRepeatKey": "交替重複鍵",
     "settingsNote": "這些功能適用於整個鍵盤，不能指派給個別按鍵。",
@@ -398,7 +399,9 @@
       "swapHands": "換手",
       "sequencer": "音序器",
       "joystick": "搖桿",
-      "ledMatrix": "LED 矩陣"
+      "ledMatrix": "LED 矩陣",
+      "dial": "滾輪",
+      "newKeys": "新增鍵"
     }
   },
   "unlock": {
