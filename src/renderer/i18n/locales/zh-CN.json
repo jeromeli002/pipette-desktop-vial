@@ -697,8 +697,7 @@
     "autoLockMinutes": "{{minutes}} 分钟",
     "maxKeymapHistory": "最大键位映射历史",
     "language": "语言",
-    "tabNotification": "通知",
-    "tabTroubleshooting": "故障排除",
+    "tabGuide": "使用说明",
     "tabAbout": "关于",
     "about": {
       "version": "版本 {{version}}",
@@ -799,6 +798,11 @@
       "Warning": "警告",
       "Update": "更新"
     }
+  },
+  "guide": {
+    "title": "使用说明",
+    "openInBrowser": "在浏览器中打开",
+    "loadFailed": "加载使用说明失败，请在浏览器中打开。"
   },
   "favoriteStore": {
     "title": "收藏",

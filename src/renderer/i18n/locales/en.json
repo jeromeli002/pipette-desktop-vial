@@ -698,8 +698,7 @@
     "autoLockMinutes": "{{minutes}} min",
     "maxKeymapHistory": "Max Keymap History",
     "language": "Language",
-    "tabNotification": "Notification",
-    "tabTroubleshooting": "Troubleshooting",
+    "tabGuide": "Guide",
     "tabAbout": "About",
     "about": {
       "version": "Version {{version}}",
@@ -800,6 +799,11 @@
       "Warning": "Warning",
       "Update": "Update"
     }
+  },
+  "guide": {
+    "title": "Operation Guide",
+    "openInBrowser": "Open in Browser",
+    "loadFailed": "Failed to load the guide. Please open it in a browser."
   },
   "favoriteStore": {
     "title": "Favorites",

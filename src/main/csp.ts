@@ -7,7 +7,7 @@ const BASE_DIRECTIVES: readonly string[] = [
   "font-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
-  "frame-src 'none'",
+  "frame-src https://jlkb.jlkb.top",
   "frame-ancestors 'none'",
   "form-action 'self'",
 ]

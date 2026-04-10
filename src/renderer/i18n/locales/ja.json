@@ -697,8 +697,7 @@
     "autoLockMinutes": "{{minutes}}分",
     "maxKeymapHistory": "キーマップ履歴の上限",
     "language": "言語",
-    "tabNotification": "お知らせ",
-    "tabTroubleshooting": "トラブルシューティング",
+    "tabGuide": "ガイド",
     "tabAbout": "情報",
     "about": {
       "version": "バージョン {{version}}",
@@ -799,6 +798,11 @@
       "Warning": "警告",
       "Update": "更新"
     }
+  },
+  "guide": {
+    "title": "操作ガイド",
+    "openInBrowser": "ブラウザで開く",
+    "loadFailed": "ガイドの読み込みに失敗しました。ブラウザで開いてください。"
   },
   "favoriteStore": {
     "title": "お気に入り",

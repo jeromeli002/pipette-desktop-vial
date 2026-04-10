@@ -7,7 +7,7 @@ import type { SettingsModalProps } from './settings-modal-shared'
 import { useSettingsSync } from './useSettingsSync'
 import { SettingsToolsTab } from './SettingsToolsTab'
 import { SettingsDataTab } from './SettingsDataTab'
-import { SettingsNotificationTab } from './SettingsNotificationTab'
+import { SettingsGuideTab } from './SettingsGuideTab'
 import { ModalCloseButton } from '../editors/ModalCloseButton'
 import { ModalTabBar, ModalTabPanel } from '../editors/modal-tabs'
 import { AboutTabContent } from '../AboutTabContent'
@@ -142,11 +142,8 @@ export function SettingsModal({
               handleAutoSyncToggle={syncState.handleAutoSyncToggle}
             />
           )}
-          {activeTab === 'notification' && (
-            <SettingsNotificationTab
-              recentNotifications={syncState.recentNotifications}
-              notificationLoading={syncState.notificationLoading}
-            />
+          {activeTab === 'guide' && (
+            <SettingsGuideTab />
           )}
           {activeTab === 'about' && <AboutTabContent />}
         </ModalTabPanel>

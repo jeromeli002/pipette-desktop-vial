@@ -113,6 +113,24 @@ export function StatusBar({
         )}
       </div>
       <div className="flex items-center gap-3">
+        {onDisconnect && (
+          <button
+            type="button"
+            data-testid="guide-button"
+            aria-label={t('guide.title')}
+            className="flex items-center justify-center gap-1 rounded border border-edge px-2.5 py-1 text-xs leading-none text-content-secondary transition-colors hover:text-content"
+            onClick={() => {
+              const GUIDE_URL = 'https://jlkb.jlkb.top/tools/guide/'
+              if (window.vialAPI && window.vialAPI.openExternal) {
+                window.vialAPI.openExternal(GUIDE_URL)
+              } else {
+                window.open(GUIDE_URL, '_blank')
+              }
+            }}
+          >
+            {t('guide.title')}
+          </button>
+        )}
         {onViewOnlyChange && hasMatrixTester && !typingTestMode && (
           <button
             type="button"

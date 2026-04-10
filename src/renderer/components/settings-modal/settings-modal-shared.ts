@@ -41,7 +41,7 @@ export const TIME_STEPS = [10, 20, 30, 40, 50, 60] as const
 export const TABS = [
   { id: 'tools' as const, labelKey: 'settings.tabTools' },
   { id: 'data' as const, labelKey: 'settings.tabData' },
-  { id: 'notification' as const, labelKey: 'settings.tabNotification' },
+  { id: 'guide' as const, labelKey: 'settings.tabGuide' },
   { id: 'about' as const, labelKey: 'settings.tabAbout' },
 ]
 
