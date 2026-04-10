@@ -123,5 +123,6 @@ export const IpcChannels = {
   WINDOW_SET_ASPECT_RATIO: 'window:set-aspect-ratio',
   WINDOW_SET_ALWAYS_ON_TOP: 'window:set-always-on-top',
   WINDOW_SET_MIN_SIZE: 'window:set-min-size',
+  WINDOW_SET_TITLE: 'window:set-title',
   WINDOW_IS_ALWAYS_ON_TOP_SUPPORTED: 'window:is-always-on-top-supported',
 } as const

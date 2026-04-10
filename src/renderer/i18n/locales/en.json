@@ -30,7 +30,8 @@
     "imported": "Imported"
   },
   "app": {
-    "title": "Pipette",
+    "name": "Pipette-JL",
+    "title": "Pipette-JL",
     "deviceNotConnected": "No keyboard connected",
     "connecting": "Connecting{{dots}}",
     "selectDevices": "Select Device",

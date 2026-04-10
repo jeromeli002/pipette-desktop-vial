@@ -30,7 +30,8 @@
     "imported": "已导入"
   },
   "app": {
-    "title": "Pipette",
+    "name": "Pipette-JL",
+    "title": "Pipette-JL",
     "deviceNotConnected": "未连接键盘",
     "connecting": "连接中{{dots}}",
     "selectDevices": "选择设备",

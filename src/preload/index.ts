@@ -316,6 +316,8 @@ const vialAPI = {
     ipcRenderer.invoke(IpcChannels.WINDOW_SET_ALWAYS_ON_TOP, enabled),
   setWindowMinSize: (width: number, height: number): Promise<void> =>
     ipcRenderer.invoke(IpcChannels.WINDOW_SET_MIN_SIZE, width, height),
+  setWindowTitle: (title: string): Promise<void> =>
+    ipcRenderer.invoke(IpcChannels.WINDOW_SET_TITLE, title),
   isAlwaysOnTopSupported: (): Promise<boolean> =>
     ipcRenderer.invoke(IpcChannels.WINDOW_IS_ALWAYS_ON_TOP_SUPPORTED),
 }

@@ -243,6 +243,15 @@ function setupWindowIpc(): void {
     },
   )
 
+  secureHandle(
+    IpcChannels.WINDOW_SET_TITLE,
+    (event, title: string) => {
+      const win = BrowserWindow.fromWebContents(event.sender)
+      if (!win) return
+      win.setTitle(title)
+    },
+  )
+
   // Always-on-top is not supported on Wayland (compositor controls stacking)
   secureHandle(
     IpcChannels.WINDOW_IS_ALWAYS_ON_TOP_SUPPORTED,

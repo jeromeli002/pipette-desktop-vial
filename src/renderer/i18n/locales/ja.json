@@ -30,7 +30,8 @@
     "imported": "インポート済み"
   },
   "app": {
-    "title": "Pipette",
+    "name": "Pipette-JL",
+    "title": "Pipette-JL",
     "deviceNotConnected": "キーボードが接続されていません",
     "connecting": "接続中{{dots}}",
     "selectDevices": "デバイスを選択",

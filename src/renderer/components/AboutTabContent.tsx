@@ -21,7 +21,7 @@ export function AboutTabContent() {
           className="text-lg font-bold text-content"
           data-testid="about-app-name"
         >
-          Pipette
+          {t('app.name')}
         </h3>
         <span
           className="text-sm text-content-muted"

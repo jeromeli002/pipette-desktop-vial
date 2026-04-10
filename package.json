@@ -71,7 +71,7 @@
   },
   "build": {
     "appId": "app.pipette.desktop",
-    "productName": "Pipette",
+    "productName": "Pipette-JL",
     "npmRebuild": false,
     "directories": {
       "output": "dist"

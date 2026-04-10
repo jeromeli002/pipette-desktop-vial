@@ -61,6 +61,13 @@ export function App() {
   const sync = useSync()
   const startupNotification = useStartupNotification()
 
+  // Set window title using internationalized app name
+  useEffect(() => {
+    if (window.vialAPI && window.vialAPI.setWindowTitle) {
+      window.vialAPI.setWindowTitle(t('app.name'))
+    }
+  }, [t])
+
   const effectiveIsDummy = device.isDummy && !device.isPipetteFile
 
   const deserializedMacros = useMemo(
