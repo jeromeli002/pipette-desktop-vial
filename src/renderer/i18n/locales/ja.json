@@ -139,7 +139,7 @@
       "down": "押下",
       "up": "解放",
       "delay": "遅延",
-      "record": "録音",
+      "record": "記録",
       "stopRecording": "停止",
       "editTitle": "M{{index}}",
       "textEditor": "テキストエディタ",
@@ -166,7 +166,6 @@
       "value": "明度",
       "hex": "HEX",
       "noLighting": "このキーボードはライティング制御をサポートしていません。",
-      "unsavedPreview": "プレビュー中 — まだキーボードに保存されていません",
       "colorPicker": {
         "label": "カラーピッカー",
         "palette": "パレット",
