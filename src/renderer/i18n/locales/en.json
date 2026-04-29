@@ -35,7 +35,6 @@
   },
   "app": {
     "name": "Pipette-JL",
-    "title": "Pipette-JL",
     "deviceNotConnected": "No keyboard connected",
     "connecting": "Connecting{{dots}}",
     "selectDevices": "Select Device",
@@ -462,7 +461,7 @@
     "system": "System",
     "tapDance": "Tap-Hold / Tap Dance",
     "macro": "Macro",
-    "jlkb": "dial/nekeys",
+    "jlkb": "dial/newkeys",
     "combo": "Combo",
     "keyOverride": "Key Override",
     "altRepeatKey": "Alt Repeat Key",
@@ -763,6 +762,8 @@
     "maxKeymapHistory": "Max Keymap History",
     "language": "Language",
     "tabGuide": "Guide",
+    "tabNotification": "Notification",
+    "tabTroubleshooting": "Troubleshooting",
     "tabAbout": "About",
     "about": {
       "version": "Version {{version}}",

@@ -35,7 +35,6 @@
   },
   "app": {
     "name": "Pipette-JL",
-    "title": "Pipette-JL",
     "deviceNotConnected": "キーボードが接続されていません",
     "connecting": "接続中{{dots}}",
     "selectDevices": "デバイスを選択",
@@ -761,6 +760,8 @@
     "maxKeymapHistory": "キーマップ履歴の上限",
     "language": "言語",
     "tabGuide": "ガイド",
+    "tabNotification": "お知らせ",
+    "tabTroubleshooting": "トラブルシューティング",
     "tabAbout": "情報",
     "about": {
       "version": "バージョン {{version}}",
