@@ -34,6 +34,7 @@
     "synced": "已同步"
   },
   "app": {
+    "title": "Pipette-JL",
     "name": "Pipette-JL",
     "deviceNotConnected": "未連接鍵盤",
     "connecting": "正在連接{{dots}}",

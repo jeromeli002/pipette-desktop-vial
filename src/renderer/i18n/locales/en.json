@@ -34,6 +34,7 @@
     "synced": "Synced"
   },
   "app": {
+    "title": "Pipette-JL",
     "name": "Pipette-JL",
     "deviceNotConnected": "No keyboard connected",
     "connecting": "Connecting{{dots}}",

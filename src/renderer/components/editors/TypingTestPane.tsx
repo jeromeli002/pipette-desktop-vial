@@ -332,6 +332,10 @@ export function TypingTestPane({
       <div
         className={viewOnly ? 'flex min-h-0 w-full flex-1 cursor-pointer items-center justify-center overflow-hidden' : 'flex items-start justify-center overflow-auto'}
         onClick={viewOnly ? () => setViewOnlyControlsOpen((v) => !v) : undefined}
+        onContextMenu={viewOnly ? (e) => {
+          e.preventDefault()
+          setViewOnlyControlsOpen(true)
+        } : undefined}
       >
         <div className="relative" style={viewOnly && paneNaturalSizeRef.current.w > 0 ? { width: paneNaturalSizeRef.current.w * cssScale, height: paneNaturalSizeRef.current.h * cssScale, overflow: 'hidden' } : undefined}>
           {viewOnly && <div className="absolute inset-0 z-10" />}

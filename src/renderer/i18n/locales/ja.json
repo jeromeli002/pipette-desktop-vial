@@ -34,6 +34,7 @@
     "synced": "同期データ"
   },
   "app": {
+    "title": "Pipette-JL",
     "name": "Pipette-JL",
     "deviceNotConnected": "キーボードが接続されていません",
     "connecting": "接続中{{dots}}",
