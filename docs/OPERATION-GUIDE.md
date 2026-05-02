@@ -7,6 +7,61 @@ Screenshots were taken using a GPK60-63R keyboard unless otherwise noted.
 
 ---
 
+## Table of Contents
+
+- [1. Device Connection](#1-device-connection)
+  - [1.1 Device Selection Screen](#11-device-selection-screen)
+  - [1.2 Connecting a Keyboard](#12-connecting-a-keyboard)
+  - [1.3 Data](#13-data)
+  - [1.4 Analyze](#14-analyze)
+- [2. Keymap Editor](#2-keymap-editor)
+  - [2.1 Screen Layout](#21-screen-layout)
+  - [2.2 Changing Keys](#22-changing-keys)
+  - [2.3 Layer Switching](#23-layer-switching)
+  - [2.4 Key Popover](#24-key-popover)
+  - [2.5 Layout Options](#25-layout-options)
+- [3. Keycode Palette](#3-keycode-palette)
+  - [3.1 Basic](#31-basic)
+  - [3.2 Layers](#32-layers)
+  - [3.3 Modifiers](#33-modifiers)
+  - [3.4 System](#34-system)
+  - [3.5 Lighting](#35-lighting)
+  - [3.6 Tap-Hold / Tap Dance](#36-tap-hold--tap-dance)
+  - [3.7 Macro](#37-macro)
+  - [3.8 Combo](#38-combo)
+  - [3.9 Key Override](#39-key-override)
+  - [3.10 Alt Repeat Key](#310-alt-repeat-key)
+  - [3.11 Behavior](#311-behavior)
+  - [3.12 User](#312-user)
+  - [3.13 Keyboard (Device Picker)](#313-keyboard-device-picker)
+  - [3.14 Keycodes Overlay Panel](#314-keycodes-overlay-panel)
+- [4. Toolbar](#4-toolbar)
+  - [4.1 Zoom](#41-zoom)
+  - [4.2 Undo / Redo (Keymap History)](#42-undo--redo-keymap-history)
+  - [4.3 Typing Test](#43-typing-test)
+- [5. Detail Setting Editors](#5-detail-setting-editors)
+  - [5.1 Lighting Settings](#51-lighting-settings)
+  - [5.2 Combo](#52-combo)
+  - [5.3 Key Override](#53-key-override)
+  - [5.4 Alt Repeat Key](#54-alt-repeat-key)
+  - [5.5 Favorites](#55-favorites)
+  - [5.6 JSON Editor](#56-json-editor)
+- [6. Editor Settings Panel](#6-editor-settings-panel)
+  - [6.1 Cloud Sync (Google Drive appDataFolder)](#61-cloud-sync-google-drive-appdatafolder)
+  - [6.2 Key Labels Manage](#62-key-labels-manage)
+- [7. Pipette Hub](#7-pipette-hub)
+  - [7.1 Hub Setup](#71-hub-setup)
+  - [7.2 Uploading a Keymap](#72-uploading-a-keymap)
+  - [7.3 Uploading Favorite Entries](#73-uploading-favorite-entries)
+  - [7.4 Hub Website](#74-hub-website)
+- [8. Modal Interactions](#8-modal-interactions)
+  - [Escape to Close](#escape-to-close)
+  - [Unlock Dialog Protection](#unlock-dialog-protection)
+  - [Escape Suppression During Busy Flows](#escape-suppression-during-busy-flows)
+- [9. Status Bar](#9-status-bar)
+
+---
+
 ## 1. Device Connection
 
 ### 1.1 Device Selection Screen
@@ -1284,6 +1339,59 @@ QWERTY shows no Hub actions and cannot be deleted, but it can be reordered like 
 ![Key Labels — Find on Hub](screenshots/key-labels-hub.png)
 
 Searches Pipette Hub for label sets. Type 2 or more characters to start an automatic search (debounced); the **Search** button and **Enter** still work as manual triggers. Results show the label name, the uploader, and either a **Download** action or an **Installed** marker when the same name is already present locally. Re-importing a file with a name that already exists overwrites the local entry in place (`.json` content replaced, the Hub link is preserved).
+
+**Authoring a Key Label**
+
+A Key Label `.json` file is a small JSON object with three fields:
+
+```json
+{
+  "name": "Brazilian (QWERTY)",
+  "map": {
+    "KC_2": "2\n@",
+    "KC_3": "3\n#",
+    "KC_LBRC": "´\n`",
+    "KC_QUOT": "ç",
+    "KC_GRAVE": "KC_LALT"
+  },
+  "compositeLabels": {
+    "LSFT(KC_2)": "@",
+    "LALT(KC_L)": "KC_LALT"
+  }
+}
+```
+
+In the example above, `"KC_GRAVE": "KC_LALT"` makes the editor render whichever cap is currently bound to `KC_GRAVE` with the canonical "LAlt" legend — the value is a keycode id, so `keycodeLabel()` resolves it on the fly.
+
+| Field | Required | Purpose |
+|------|:--:|---------|
+| `name` | Yes | Display name shown in the modal, in the Settings → Defaults dropdown, and in the Keycodes Overlay Panel |
+| `map` | Yes | `QMK keycode id → label string`. Used as the keycap legend in the Keymap Editor whenever this label set is active |
+| `compositeLabels` | No | Same shape as `map`, but for composite keycodes (e.g. `LSFT(KC_2)`, `LT(0,KC_A)`, `MT(MOD_LCTL,KC_ESC)`). Used to override the inner / outer text of the composite key. Omit the field if you don't need any composite override |
+
+A value can also be a plain QMK keycode id — the editor passes it through `keycodeLabel()` so something like `"LALT(KC_L)": "KC_LALT"` resolves to the canonical "LAlt" label without you having to spell the legend out by hand. The same shortcut works in `map`, so `"KC_8": "KC_LALT"` would render the cap as "LAlt".
+
+The label string controls how the legend is rendered. Lines are separated by `\n` and the layout is chosen by part count:
+
+| Parts | Layout | Example |
+|------|--------|---------|
+| 1 | Centred (existing behaviour) | `"8"` |
+| 2 | Stacked top / bottom | `"(\n8"` → `(` over `8` |
+| 3 | Three horizontal slices (top / middle / bottom) | `"a\nb\nc"` |
+| 4 | 2 × 2 quadrants — top-left, top-right, bottom-left, bottom-right | `"1\n2\n3\n4"` →`1\|2 / 3\|4` |
+| 5+ | Excess parts beyond 4 are dropped |  |
+
+An empty string between separators leaves the corresponding slot blank, so `"1\n2\n\n4"` renders as:
+
+```
+1 | 2
+-----
+  | 4
+```
+
+Composite keycodes (LT, MT, modifier+key, …) render the inner key inside an inset rectangle that occupies the lower half of the cap, so only the first two `\n` parts of the outer label are honoured. Parts 3 and 4 are silently dropped to avoid colliding with the inner rect.
+
+`name` is also the uniqueness key inside the local store: importing a `.json` whose name already exists overwrites the matching entry in place (the Hub post link, if any, is preserved). To start a brand-new entry, change the `name` before importing.
 
 ---
 
