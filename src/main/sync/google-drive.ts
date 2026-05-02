@@ -22,13 +22,29 @@ async function authHeaders(): Promise<Record<string, string>> {
   return { Authorization: `Bearer ${token}` }
 }
 
-export async function listFiles(): Promise<DriveFile[]> {
+export interface ListFilesOptions {
+  /** Drive `q` substring filter on the `name` field. The value is wrapped
+   * in single quotes and any embedded quotes are backslash-escaped per the
+   * Drive search-query language. Use it to keep the response narrow when
+   * the caller only cares about a known filename prefix (e.g. analytics
+   * sync only needs files for one keyboard uid).
+   *
+   * Omit (or pass an empty string) to list every file in `appDataFolder`. */
+  nameContains?: string
+}
+
+export async function listFiles(options?: ListFilesOptions): Promise<DriveFile[]> {
   const headers = await authHeaders()
   const params = new URLSearchParams({
     spaces: 'appDataFolder',
     fields: 'files(id, name, modifiedTime)',
     pageSize: '1000',
   })
+  const filter = options?.nameContains
+  if (filter) {
+    const escaped = filter.replace(/'/g, "\\'")
+    params.set('q', `name contains '${escaped}'`)
+  }
 
   const response = await fetch(`${DRIVE_API}/files?${params}`, { headers })
   if (!response.ok) {
@@ -139,24 +155,25 @@ export function driveFileName(syncUnit: string): string {
   // "keyboards/0x1234/settings" -> "keyboards_0x1234_settings.enc"
   // "keyboards/0x1234/snapshots" -> "keyboards_0x1234_snapshots.enc"
   // "keyboards/0x1234/devices/{hash}" -> "keyboards_0x1234_devices_{hash}.enc"
-  return syncUnit.replaceAll('/', '_') + '.enc'
+  return driveFilenamePrefix(syncUnit) + '.enc'
+}
+
+/** Drive filename prefix for a given sync-unit path prefix (no `.enc`
+ * suffix). Pair with `listFiles({ nameContains })` so a single sync-unit
+ * subtree is the only thing returned by the Drive listing. Shares its
+ * encoding with `driveFileName` so the two stay in lockstep if the
+ * filename scheme ever changes. */
+export function driveFilenamePrefix(syncUnitPrefix: string): string {
+  return syncUnitPrefix.replaceAll('/', '_')
 }
 
 export function syncUnitFromFileName(fileName: string): string | null {
   // "keyboards_0x1234_devices_{hash}_days_{YYYY-MM-DD}.enc"
   //   → "keyboards/0x1234/devices/{hash}/days/{YYYY-MM-DD}"
-  // Matched first so the trailing `_days_{date}` segment isn't eaten
-  // by the broader v6 `devices_(.+)` pattern below. The day regex
-  // pins to exactly `YYYY-MM-DD` so machineHash strings containing
-  // `_days_...` shaped substrings can't false-match.
+  // The day regex pins to exactly `YYYY-MM-DD` so machineHash strings
+  // containing `_days_...` shaped substrings can't false-match.
   const dayMatch = fileName.match(/^keyboards_(.+?)_devices_(.+?)_days_(\d{4}-\d{2}-\d{2})\.enc$/)
   if (dayMatch) return `keyboards/${dayMatch[1]}/devices/${dayMatch[2]}/days/${dayMatch[3]}`
-
-  // "keyboards_0x1234_devices_{hash}.enc" → "keyboards/0x1234/devices/{hash}"
-  // Matched before the 3-part pattern so machineHash segments with
-  // underscores don't get mis-split by the shorter regex.
-  const deviceMatch = fileName.match(/^keyboards_(.+?)_devices_(.+)\.enc$/)
-  if (deviceMatch) return `keyboards/${deviceMatch[1]}/devices/${deviceMatch[2]}`
 
   // "keyboards_0x1234_settings.enc" → "keyboards/0x1234/settings"
   // "keyboards_0x1234_snapshots.enc" → "keyboards/0x1234/snapshots"
