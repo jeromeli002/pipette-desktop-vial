@@ -1632,6 +1632,7 @@
     "time_between_wheel_movements": "ホイール移動のステップ間隔",
     "maximum_number_of_scroll_steps_per_scroll_action": "1回のスクロールアクションあたりの最大ステップ数",
     "time_until_maximum_scroll_speed_is_reached": "最大スクロール速度に達するまでの時間"
+  },
   "keyLabels": {
     "title": "Key Labels",
     "manageRow": "Key Labels 管理",
