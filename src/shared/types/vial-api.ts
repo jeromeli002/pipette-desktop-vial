@@ -17,7 +17,7 @@ import type { SnapshotMeta } from './snapshot-store'
 import type { AnalyzeFilterSnapshotMeta } from './analyze-filter-store'
 import type { FavoriteType, SavedFavoriteMeta, FavoriteImportResult } from './favorite-store'
 import type { KeyLabelMeta, KeyLabelRecord, KeyLabelStoreResult } from './key-label-store'
-import type { HubKeyLabelItem, HubKeyLabelListResponse, HubKeyLabelListParams } from './hub-key-label'
+import type { HubKeyLabelItem, HubKeyLabelListResponse, HubKeyLabelListParams, HubKeyLabelTimestampsResponse } from './hub-key-label'
 import type { AppConfig } from './app-config'
 import type { DeviceScope } from './analyze-filters'
 import type { SyncAuthStatus, SyncProgress, PasswordStrength, SyncResetTargets, LocalResetTargets, UndecryptableFile, SyncScope, SyncDataScanResult, StoredKeyboardInfo, SyncOperationResult } from './sync'
@@ -45,7 +45,7 @@ import type {
   TypingBigramAggregateView,
 } from './typing-analytics'
 import type { LanguageListEntry } from './language-store'
-import type { HubUploadPostParams, HubUpdatePostParams, HubPatchPostParams, HubUploadResult, HubDeleteResult, HubFetchMyPostsResult, HubFetchMyKeyboardPostsResult, HubFetchMyPostsParams, HubUserResult, HubUploadFavoritePostParams, HubUpdateFavoritePostParams } from './hub'
+import type { HubUploadPostParams, HubUpdatePostParams, HubPatchPostParams, HubUploadResult, HubDeleteResult, HubFetchMyPostsResult, HubFetchMyKeyboardPostsResult, HubFetchMyPostsParams, HubUserResult, HubUploadFavoritePostParams, HubUpdateFavoritePostParams, HubUploadAnalyticsPostParams, HubUpdateAnalyticsPostParams, HubPreviewAnalyticsPostParams, HubAnalyticsPreview } from './hub'
 import type { NotificationFetchResult } from './notification'
 
 export interface VialAPI {
@@ -174,6 +174,8 @@ export interface VialAPI {
   keyLabelHubDownload(hubPostId: string): Promise<KeyLabelStoreResult<KeyLabelMeta>>
   keyLabelHubUpload(localId: string): Promise<KeyLabelStoreResult<KeyLabelMeta>>
   keyLabelHubUpdate(localId: string): Promise<KeyLabelStoreResult<KeyLabelMeta>>
+  keyLabelHubSync(localId: string): Promise<KeyLabelStoreResult<KeyLabelMeta>>
+  keyLabelHubTimestamps(ids: string[]): Promise<KeyLabelStoreResult<HubKeyLabelTimestampsResponse>>
   keyLabelHubDelete(localId: string): Promise<KeyLabelStoreResult<void>>
 
   // Pipette Settings Store
@@ -312,8 +314,16 @@ export interface VialAPI {
   hubUploadFavoritePost(params: HubUploadFavoritePostParams): Promise<HubUploadResult>
   hubUpdateFavoritePost(params: HubUpdateFavoritePostParams): Promise<HubUploadResult>
 
+  // Hub Analytics posts
+  hubUploadAnalyticsPost(params: HubUploadAnalyticsPostParams): Promise<HubUploadResult>
+  hubUpdateAnalyticsPost(params: HubUpdateAnalyticsPostParams): Promise<HubUploadResult>
+  hubPreviewAnalyticsPost(params: HubPreviewAnalyticsPostParams): Promise<{ success: boolean; preview?: HubAnalyticsPreview; error?: string }>
+
   // Favorite Store extensions
   favoriteStoreSetHubPostId(type: FavoriteType, entryId: string, hubPostId: string | null): Promise<{ success: boolean; error?: string }>
+
+  // Analyze Filter Store extensions
+  analyzeFilterStoreSetHubPostId(uid: string, entryId: string, hubPostId: string | null): Promise<{ success: boolean; error?: string }>
 
   // Window management
   setWindowCompactMode(enabled: boolean, compactSize?: { width: number; height: number }): Promise<{ width: number; height: number } | null>

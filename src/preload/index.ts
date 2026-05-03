@@ -13,7 +13,7 @@ import type { SnapshotMeta } from '../shared/types/snapshot-store'
 import type { AnalyzeFilterSnapshotMeta } from '../shared/types/analyze-filter-store'
 import type { SavedFavoriteMeta, FavoriteImportResult } from '../shared/types/favorite-store'
 import type { KeyLabelMeta, KeyLabelRecord, KeyLabelStoreResult } from '../shared/types/key-label-store'
-import type { HubKeyLabelItem, HubKeyLabelListResponse, HubKeyLabelListParams } from '../shared/types/hub-key-label'
+import type { HubKeyLabelItem, HubKeyLabelListResponse, HubKeyLabelListParams, HubKeyLabelTimestampsResponse } from '../shared/types/hub-key-label'
 import type { AppConfig } from '../shared/types/app-config'
 import type { DeviceScope } from '../shared/types/analyze-filters'
 import type { SyncAuthStatus, SyncProgress, PasswordStrength, SyncResetTargets, LocalResetTargets, UndecryptableFile, SyncDataScanResult, SyncScope, StoredKeyboardInfo, SyncOperationResult } from '../shared/types/sync'
@@ -43,7 +43,7 @@ import type {
   TypingBigramAggregateView,
 } from '../shared/types/typing-analytics'
 import type { LanguageListEntry } from '../shared/types/language-store'
-import type { HubUploadPostParams, HubUpdatePostParams, HubPatchPostParams, HubUploadResult, HubDeleteResult, HubFetchMyPostsResult, HubFetchMyPostsParams, HubFetchMyKeyboardPostsResult, HubUserResult, HubUploadFavoritePostParams, HubUpdateFavoritePostParams } from '../shared/types/hub'
+import type { HubUploadPostParams, HubUpdatePostParams, HubPatchPostParams, HubUploadResult, HubDeleteResult, HubFetchMyPostsResult, HubFetchMyPostsParams, HubFetchMyKeyboardPostsResult, HubUserResult, HubUploadFavoritePostParams, HubUpdateFavoritePostParams, HubUploadAnalyticsPostParams, HubUpdateAnalyticsPostParams, HubPreviewAnalyticsPostParams, HubAnalyticsPreview } from '../shared/types/hub'
 import type { NotificationFetchResult } from '../shared/types/notification'
 
 /**
@@ -262,6 +262,10 @@ const vialAPI = {
     ipcRenderer.invoke(IpcChannels.KEY_LABEL_HUB_UPLOAD, localId),
   keyLabelHubUpdate: (localId: string): Promise<KeyLabelStoreResult<KeyLabelMeta>> =>
     ipcRenderer.invoke(IpcChannels.KEY_LABEL_HUB_UPDATE, localId),
+  keyLabelHubSync: (localId: string): Promise<KeyLabelStoreResult<KeyLabelMeta>> =>
+    ipcRenderer.invoke(IpcChannels.KEY_LABEL_HUB_SYNC, localId),
+  keyLabelHubTimestamps: (ids: string[]): Promise<KeyLabelStoreResult<HubKeyLabelTimestampsResponse>> =>
+    ipcRenderer.invoke(IpcChannels.KEY_LABEL_HUB_TIMESTAMPS, ids),
   keyLabelHubDelete: (localId: string): Promise<KeyLabelStoreResult<void>> =>
     ipcRenderer.invoke(IpcChannels.KEY_LABEL_HUB_DELETE, localId),
 
@@ -531,6 +535,18 @@ const vialAPI = {
   // --- Favorite Store extensions ---
   favoriteStoreSetHubPostId: (type: string, entryId: string, hubPostId: string | null): Promise<{ success: boolean; error?: string }> =>
     ipcRenderer.invoke(IpcChannels.FAVORITE_STORE_SET_HUB_POST_ID, type, entryId, hubPostId),
+
+  // --- Hub Analytics posts ---
+  hubUploadAnalyticsPost: (params: HubUploadAnalyticsPostParams): Promise<HubUploadResult> =>
+    ipcRenderer.invoke(IpcChannels.HUB_UPLOAD_ANALYTICS_POST, params),
+  hubUpdateAnalyticsPost: (params: HubUpdateAnalyticsPostParams): Promise<HubUploadResult> =>
+    ipcRenderer.invoke(IpcChannels.HUB_UPDATE_ANALYTICS_POST, params),
+  hubPreviewAnalyticsPost: (params: HubPreviewAnalyticsPostParams): Promise<{ success: boolean; preview?: HubAnalyticsPreview; error?: string }> =>
+    ipcRenderer.invoke(IpcChannels.HUB_PREVIEW_ANALYTICS_POST, params),
+
+  // --- Analyze Filter Store extensions ---
+  analyzeFilterStoreSetHubPostId: (uid: string, entryId: string, hubPostId: string | null): Promise<{ success: boolean; error?: string }> =>
+    ipcRenderer.invoke(IpcChannels.ANALYZE_FILTER_STORE_SET_HUB_POST_ID, uid, entryId, hubPostId),
 
   // --- Snapshot Store extensions ---
   snapshotStoreSetHubPostId: (uid: string, entryId: string, hubPostId: string | null): Promise<{ success: boolean; error?: string }> =>
