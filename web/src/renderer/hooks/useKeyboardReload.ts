@@ -70,18 +70,15 @@ export function useKeyboardReload(
         console.error('[KB] definition fetch failed:', err)
       }
 
-      // Phase 2.5: Try to proceed even without definition (web version fallback)
+      // Phase 2.5 guard: definition is required to continue
       if (!newState.definition) {
-        console.warn('[KB] definition load failed — proceeding without full keyboard definition')
-        // Set reasonable defaults
-        newState.rows = 4
-        newState.cols = 12
-        newState.encoderCount = 0
-        newState.layout = []
+        console.error('[KB] definition load failed — aborting reload')
+        setState((s) => ({ ...s, loading: false }))
+        return null
       }
 
       // Phase 2.6: Lighting data load
-      const lt = newState.definition?.lighting
+      const lt = newState.definition.lighting
       try {
         if (lt === 'vialrgb') {
           const info = await api.getVialRGBInfo()
@@ -250,8 +247,8 @@ export function useKeyboardReload(
         layers: newState.layers,
         macroCount: newState.macroCount,
         tapDanceCount: newState.dynamicCounts.tapDance,
-        customKeycodes: newState.definition?.customKeycodes ?? null,
-        midi: newState.definition?.vial?.midi ?? '',
+        customKeycodes: newState.definition.customKeycodes ?? null,
+        midi: newState.definition.vial?.midi ?? '',
         supportedFeatures,
       })
 

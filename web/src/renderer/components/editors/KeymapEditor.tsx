@@ -114,6 +114,7 @@ export const KeymapEditor = forwardRef<import('./keymap-editor-types').KeymapEdi
   onViewAnalytics,
   tappingTermMs,
   deviceName, isDummy, onExportLayoutPdfAll, onExportLayoutPdfCurrent,
+  hubDisplayName, hubCanWrite,
   favHubOrigin, favHubNeedsDisplayName, favHubUploading, favHubUploadResult,
   onFavUploadToHub, onFavUpdateOnHub, onFavRemoveFromHub, onFavRenameOnHub,
   devices, connectedDevice, onDeviceListActiveChange,
@@ -833,24 +834,24 @@ export const KeymapEditor = forwardRef<import('./keymap-editor-types').KeymapEdi
           </button>
         </div>
         <div className={`flex items-center gap-1 ${pickerBrowseMode ? 'invisible' : ''}`}>
-          <Tooltip content={t('editor.keymap.zoomIn')}>
-            <button type="button" aria-label={t('editor.keymap.zoomIn')}
-              className="rounded-md p-1 text-content-muted transition-colors hover:bg-surface-dim hover:text-content disabled:opacity-30 disabled:pointer-events-none"
-              disabled={pickerEffectiveScale >= MAX_SCALE}
-              onClick={() => { if (pickerFileData) setPickerScale(Math.min(MAX_SCALE, +(pickerEffectiveScale + 0.1).toFixed(1))); else onScaleChange?.(0.1) }}>
-              <ZoomIn size={14} aria-hidden="true" />
-            </button>
-          </Tooltip>
-          <ScaleInput scale={pickerEffectiveScale} onScaleChange={(delta) => {
-            if (pickerFileData) setPickerScale(Math.max(MIN_SCALE, Math.min(MAX_SCALE, +(pickerEffectiveScale + delta).toFixed(1))))
-            else onScaleChange?.(delta)
-          }} />
           <Tooltip content={t('editor.keymap.zoomOut')}>
             <button type="button" aria-label={t('editor.keymap.zoomOut')}
               className="rounded-md p-1 text-content-muted transition-colors hover:bg-surface-dim hover:text-content disabled:opacity-30 disabled:pointer-events-none"
               disabled={pickerEffectiveScale <= MIN_SCALE}
               onClick={() => { if (pickerFileData) setPickerScale(Math.max(MIN_SCALE, +(pickerEffectiveScale - 0.1).toFixed(1))); else onScaleChange?.(-0.1) }}>
               <ZoomOut size={14} aria-hidden="true" />
+            </button>
+          </Tooltip>
+          <ScaleInput scale={pickerEffectiveScale} onScaleChange={(delta) => {
+            if (pickerFileData) setPickerScale(Math.max(MIN_SCALE, Math.min(MAX_SCALE, +(pickerEffectiveScale + delta).toFixed(1))))
+            else onScaleChange?.(delta)
+          }} />
+          <Tooltip content={t('editor.keymap.zoomIn')}>
+            <button type="button" aria-label={t('editor.keymap.zoomIn')}
+              className="rounded-md p-1 text-content-muted transition-colors hover:bg-surface-dim hover:text-content disabled:opacity-30 disabled:pointer-events-none"
+              disabled={pickerEffectiveScale >= MAX_SCALE}
+              onClick={() => { if (pickerFileData) setPickerScale(Math.min(MAX_SCALE, +(pickerEffectiveScale + 0.1).toFixed(1))); else onScaleChange?.(0.1) }}>
+              <ZoomIn size={14} aria-hidden="true" />
             </button>
           </Tooltip>
         </div>
@@ -1013,7 +1014,7 @@ export const KeymapEditor = forwardRef<import('./keymap-editor-types').KeymapEdi
             }
             panelOverlay={
               <div id="keycodes-overlay-panel" ref={layoutPanelRef}
-                className={`absolute inset-y-0 right-0 z-10 w-fit min-w-[320px] rounded-l-lg rounded-r-[10px] border-l border-edge-subtle bg-surface-alt shadow-lg transition-transform duration-200 ease-out ${layoutPanelOpen ? 'translate-x-0' : 'translate-x-full'}`}
+                className={`absolute inset-y-0 right-0 z-10 w-fit min-w-[360px] rounded-l-lg rounded-r-[10px] border-l border-edge-subtle bg-surface-alt shadow-lg transition-transform duration-200 ease-out ${layoutPanelOpen ? 'translate-x-0' : 'translate-x-full'}`}
                 inert={!layoutPanelOpen || undefined}
               >
                 <KeycodesOverlayPanel
@@ -1027,6 +1028,7 @@ export const KeymapEditor = forwardRef<import('./keymap-editor-types').KeymapEdi
                   unlocked={unlocked ?? false} onLock={onLock} isDummy={isDummy}
                   toolsExtra={toolsExtra} dataPanel={dataPanel}
                   onExportLayoutPdfAll={onExportLayoutPdfAll} onExportLayoutPdfCurrent={onExportLayoutPdfCurrent}
+                  hubDisplayName={hubDisplayName} hubCanWrite={hubCanWrite}
                 />
               </div>
             }

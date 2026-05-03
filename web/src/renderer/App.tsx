@@ -21,6 +21,7 @@ import { useSnapshotMigration } from './hooks/useSnapshotMigration'
 import { useDeviceLifecycle } from './hooks/useDeviceLifecycle'
 import { useMissingKeyLabelNotice } from './hooks/useMissingKeyLabelNotice'
 import { MissingKeyLabelDialog } from './components/key-labels/MissingKeyLabelDialog'
+import { HelpButton } from './components/ui/WelcomeDialog'
 import { formatDeviceId } from './app-types'
 import { DeviceSelector } from './components/DeviceSelector'
 import { SettingsModal } from './components/SettingsModal'
@@ -560,6 +561,7 @@ export function App() {
             onClose={startupNotification.dismiss}
           />
         )}
+        <HelpButton />
       </>
     )
   }
@@ -827,6 +829,8 @@ export function App() {
             isDummy={effectiveIsDummy}
             onExportLayoutPdfAll={fileHandlers.handleExportLayoutPdfAll}
             onExportLayoutPdfCurrent={fileHandlers.handleExportLayoutPdfCurrent}
+            hubDisplayName={hub.hubDisplayName}
+            hubCanWrite={hub.hubCanUpload}
             favHubOrigin={hub.hubReady ? hub.hubOrigin : undefined}
             favHubNeedsDisplayName={hub.hubReady && !hub.hubCanUpload}
             favHubUploading={hub.favHubUploading}
@@ -1064,6 +1068,7 @@ export function App() {
           devicePrefs.setLayout('qwerty')
         }}
       />
+      <HelpButton />
     </div>
   )
 }

@@ -48,7 +48,8 @@
     "loadPipetteFile": ".pipetteファイルを読み込み…",
     "loadPipetteFileDescription": ".pipetteファイルをオフラインで編集できます。ライティングとマトリクステスター以外の全機能が利用可能です。",
     "selectKeyboard": "ローカル保存ファイルを選択",
-    "fileCount": "{{count}} 件"
+    "fileCount": "{{count}} 件",
+    "connectDevice": "デバイスに接続"
   },
   "loading": {
     "protocol": "デバイス情報を読み取り中",
@@ -1512,6 +1513,8 @@
     "updating": "更新中...",
     "updateSuccess": "更新しました",
     "updateFailed": "更新に失敗しました",
+    "syncSuccess": "同期しました",
+    "syncFailed": "同期に失敗しました",
     "removeFromHub": "削除",
     "removing": "削除中...",
     "removeSuccess": "削除しました",
@@ -1547,7 +1550,25 @@
     "displayNameRequired": "Hub へのアップロードに必要です",
     "authDisplayNameConflict": "Googleアカウント名が既存の投稿者名と重複しています。別の投稿者名を設定してください。",
     "accountDeactivated": "アカウントが無効化されています。サポートにお問い合わせください。",
-    "rateLimited": "リクエストが多すぎます。しばらくしてからもう一度お試しください。"
+    "rateLimited": "リクエストが多すぎます。しばらくしてからもう一度お試しください。",
+    "error": {
+      "keystrokesBelow": "この期間の打鍵数が足りません（100 打鍵以上が必要です）。",
+      "rangeExceeds": "選択した期間が 30 日を超えています。期間を短くして条件を保存し直してください。",
+      "unsupportedVersion": "新しいバージョンの Pipette で書き出されたデータのため Hub が読み込めません。Hub をアップデートしてください。",
+      "kindMismatch": "ペイロードが analytics 投稿ではありません。",
+      "invalidPayload": "ペイロードが不正なため Hub にアップロードできませんでした。",
+      "malformedPayload": "チャートデータの一部が欠けているか不正な形式のため Hub にアップロードできませんでした。",
+      "entryNotFound": "保存された条件が見つかりません。パネルを更新してから再試行してください。",
+      "malformedSavedPayload": "保存された条件ファイルが壊れているためアップロードできません。",
+      "unsupportedSavedVersion": "新しいバージョンの Pipette で保存された条件のためアップロードできません。",
+      "noRange": "保存された条件に期間情報がありません。Analyze 画面から保存し直してください。",
+      "noSnapshot": "この期間に対応するキーマップスナップショットがありません。少しキーボードを使ってから再試行してください。",
+      "invalidId": "保存された条件を特定できませんでした。パネルを更新してから再試行してください。",
+      "titleEmpty": "タイトルは必須です。",
+      "titleTooLong": "タイトルが長すぎます（200 文字以内）。",
+      "authFailed": "Hub の認証に失敗しました。一度サインアウトして再度サインインしてください。",
+      "payloadTooLarge": "ペイロードが大きすぎてアップロードできません。送信するチャートを減らすか期間を短くしてください。"
+    }
   },
   "notification": {
     "title": "お知らせ",
@@ -1649,10 +1670,12 @@
     "empty": "Key Label がまだありません。検索または Import で追加してください。",
     "actionUpload": "アップロード",
     "actionUpdate": "更新",
+    "actionSync": "同期",
     "actionRemove": "削除",
     "actionDownload": "ダウンロード",
     "actionDelete": "削除",
     "actionExport": ".json",
+    "hubRemoved": "(削除済み)",
     "errorDuplicate": "同じ名前のラベルがすでに存在します",
     "errorImportFailed": "Key Label のインポートに失敗しました",
     "errorInvalidName": "ラベル名が不正です",
@@ -1660,7 +1683,23 @@
     "errorGeneric": "操作に失敗しました",
     "missingTitle": "Key Label が見つかりません",
     "missingMessage": "Key Label「{{name}}」がインストールされていないため、QWERTY ラベルで表示します。",
-    "missingHint": "「{{name}}」は {{settings}} > {{tools}} > {{keyLabels}} からダウンロードできます。",
+    "missingHint": "「{{name}}」は {{settings}} > {{tools}} > {{keyLabels}}、またはキーピッカー右上の Edit ボタンからダウンロードできます。",
     "missingClose": "閉じる"
+  },
+  "welcome": {
+    "title": "Pipette-JL へようこそ",
+    "subtitle": "以下のクイックステップで始めましょう：",
+    "ok": "OK",
+    "helpButton": "ヘルプ",
+    "steps": {
+      "step1Title": "キーボードを接続する",
+      "step1Desc": "USB でキーボードを接続するか、「デバイスに接続」ボタンを使用して WebHID 接続をリクエストします。",
+      "step2Title": "キーマップを選択",
+      "step2Desc": "右側のレイヤーPanelから編集するレイヤーを選択します。",
+      "step3Title": "キーを編集",
+      "step3Desc": "任意のキーをクリックしてキーピッカーを開き、新しいキーコードや機能を選択します。",
+      "step4Title": "変更を保存",
+      "step4Desc": "「適用」をクリックしてデバイスに変更を保存するか、後で使用するためにファイルに保存します。"
+    }
   }
 }

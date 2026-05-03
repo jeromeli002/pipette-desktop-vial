@@ -49,7 +49,8 @@
     "loadPipetteFileDescription": "打开 .pipette 文件进行离线编辑。除灯光和矩阵测试外的所有功能均可用。",
     "noSavedFiles": "无保存的文件",
     "selectKeyboard": "选择本地保存的文件",
-    "fileCount": "{{count}} 个保存"
+    "fileCount": "{{count}} 个保存",
+    "connectDevice": "连接设备"
   },
   "loading": {
     "protocol": "正在读取设备信息",
@@ -1633,5 +1634,53 @@
     "time_between_wheel_movements": "滚轮移动间隔",
     "maximum_number_of_scroll_steps_per_scroll_action": "每次滚动操作的最大滚动步数",
     "time_until_maximum_scroll_speed_is_reached": "达到最大滚动速度所需时间"
+  },
+  "keyLabels": {
+    "title": "按键标签",
+    "manageRow": "管理按键标签",
+    "edit": "编辑",
+    "tabInstalled": "已安装",
+    "tabHub": "从 Hub 查找",
+    "alreadyInstalled": "已安装",
+    "hubInitial": "输入 2 个或更多字符并按“搜索”，即可在 <hub>Pipette Hub</hub> 中查找标签。",
+    "hubEmpty": "未在 Hub 中找到匹配的标签",
+    "searchPlaceholder": "搜索 Pipette Hub (输入至少 2 个字符)...",
+    "search": "搜索",
+    "searching": "正在搜索...",
+    "import": "导入",
+    "empty": "暂无按键标签。请通过“搜索”发现新标签，或通过“导入”添加 .json 文件。",
+    "actionUpload": "上传",
+    "actionUpdate": "更新",
+    "actionSync": "同步",
+    "actionRemove": "移除",
+    "actionDownload": "下载",
+    "actionDelete": "删除",
+    "actionExport": ".json",
+    "hubRemoved": "(已移除)",
+    "errorDuplicate": "已存在同名标签",
+    "errorImportFailed": "导入按键标签失败",
+    "errorInvalidName": "标签名称无效",
+    "errorSearchFailed": "搜索 Pipette Hub 失败",
+    "errorGeneric": "操作失败",
+    "missingTitle": "未找到按键标签",
+    "missingMessage": "未安装按键标签“{{name}}”。将以 QWERTY 标签显示键位图。",
+    "missingHint": "您可以从 {{settings}} > {{tools}} > {{keyLabels}}，或从选键器浮层的“编辑”按钮下载“{{name}}”。",
+    "missingClose": "关闭"
+  },
+  "welcome": {
+    "title": "欢迎使用 Pipette-JL",
+    "subtitle": "按照以下快速步骤开始：",
+    "ok": "确定",
+    "helpButton": "帮助",
+    "steps": {
+      "step1Title": "连接您的键盘",
+      "step1Desc": "通过 USB 连接您的键盘，或使用「连接设备」按钮来请求 WebHID 连接。",
+      "step2Title": "选择您的键位图",
+      "step2Desc": "从右侧的层选择面板中选择要编辑的层。",
+      "step3Title": "编辑按键",
+      "step3Desc": "点击任意按键打开选键器，选择新的键码或功能。",
+      "step4Title": "保存您的更改",
+      "step4Desc": "点击「应用」保存更改到设备，或保存到文件以供以后使用。"
+    }
   }
 }

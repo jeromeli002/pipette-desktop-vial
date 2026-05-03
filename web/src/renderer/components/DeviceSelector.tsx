@@ -225,7 +225,7 @@ export function DeviceSelector({
                 onClick={onRequestDevice}
                 disabled={connecting}
               >
-                连接设备
+                {t('app.connectDevice')}
               </button>
             )}
 
