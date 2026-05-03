@@ -22,7 +22,7 @@ i18n.use(initReactI18next).init({
     zhTW: { translation: zhTW },
   },
   lng: undefined,
-  fallbackLng: 'en',
+  fallbackLng: 'zhCN',
   keySeparator: '.',
   interpolation: {
     escapeValue: false,
