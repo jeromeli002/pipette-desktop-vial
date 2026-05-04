@@ -131,6 +131,56 @@ export function useAnalyzeFilterStore({ uid }: UseAnalyzeFilterStoreOptions) {
     }
   }, [uid, refreshEntries, t])
 
+  /** Overwrite an existing entry while preserving its `hubPostId` so
+   * the user's Hub link stays valid after the rewrite. Implemented as
+   * delete + re-save to mirror the keymap save panel
+   * (`useHubState.handleOverwriteSave`) — that approach refreshes
+   * `summary` + `savedAt` automatically and lets us re-stamp the
+   * postId on the freshly created entry. */
+  const overwriteSnapshot = useCallback(async (
+    entryId: string,
+    label: string,
+    payload: AnalyzeFilterSnapshotPayload,
+    summary?: string,
+  ): Promise<string | null> => {
+    if (!uid) return null
+    setError(null)
+    const previous = entries.find((e) => e.id === entryId)
+    const previousHubPostId = previous?.hubPostId
+    setSaving(true)
+    try {
+      const deleteResult = await window.vialAPI.analyzeFilterStoreDelete(uid, entryId)
+      if (!deleteResult.success) {
+        setError(t('analyzeFilterStore.saveFailed'))
+        return null
+      }
+      const json = JSON.stringify(payload, null, 2)
+      const saveResult = await window.vialAPI.analyzeFilterStoreSave(uid, json, label, summary)
+      if (!saveResult.success || !saveResult.entry) {
+        setError(saveResult.error === ANALYZE_FILTER_STORE_ERROR_MAX_ENTRIES
+          ? t('analyzeFilterStore.maxEntriesReached', { max: ANALYZE_FILTER_STORE_MAX_ENTRIES_PER_KEYBOARD })
+          : t('analyzeFilterStore.saveFailed'))
+        return null
+      }
+      const newEntryId = saveResult.entry.id
+      // Re-stamp the hubPostId so the Hub row keeps showing the same
+      // post id after the in-place overwrite. Best-effort: a failure
+      // here just downgrades to "row reverts to Upload affordance",
+      // not a save failure.
+      if (previousHubPostId) {
+        await window.vialAPI.analyzeFilterStoreSetHubPostId(uid, newEntryId, previousHubPostId)
+          .catch(() => { /* leave the row without a hub link rather than block the save */ })
+      }
+      await refreshEntries()
+      return newEntryId
+    } catch {
+      setError(t('analyzeFilterStore.saveFailed'))
+      return null
+    } finally {
+      setSaving(false)
+    }
+  }, [uid, entries, refreshEntries, t])
+
   const loadSnapshot = useCallback(async (
     entryId: string,
   ): Promise<AnalyzeFilterSnapshotPayload | null> => {
@@ -177,14 +227,20 @@ export function useAnalyzeFilterStore({ uid }: UseAnalyzeFilterStoreOptions) {
     if (!uid) return false
     setError(null)
     try {
-      const result = await window.vialAPI.analyzeFilterStoreDelete(uid, entryId)
+      const entry = entries.find((e) => e.id === entryId)
+      const [, result] = await Promise.all([
+        entry?.hubPostId
+          ? window.vialAPI.hubDeletePost(entry.hubPostId).catch(() => {})
+          : Promise.resolve(),
+        window.vialAPI.analyzeFilterStoreDelete(uid, entryId),
+      ])
       if (!result.success) return false
       await refreshEntries()
       return true
     } catch {
       return false
     }
-  }, [uid, refreshEntries])
+  }, [uid, entries, refreshEntries])
 
   const uploadEntryToHub = useCallback(async (input: UploadAnalyticsToHubInput): Promise<{ ok: boolean }> => {
     if (!uid || hubInflightRef.current) return { ok: false }
@@ -273,27 +329,28 @@ export function useAnalyzeFilterStore({ uid }: UseAnalyzeFilterStoreOptions) {
     return { ok }
   }, [uid, entries, refreshEntries, t, flashHubResult])
 
-  // Local-only "remove from Hub" — clears the saved entry's hubPostId
-  // metadata so the row reverts to the upload state. We don't issue a
-  // Hub DELETE here today (the Hub-side delete endpoint is the user's
-  // responsibility on the Hub site); this matches the analyze panel's
-  // narrower scope vs. the keymap save panel.
+  // Remove from Hub — deletes the post on the Hub server, then clears
+  // the local hubPostId so the row reverts to the upload state.
   const removeEntryFromHub = useCallback(async (entryId: string): Promise<void> => {
     if (!uid || hubInflightRef.current) return
+    const entry = entries.find((e) => e.id === entryId)
+    const postId = entry?.hubPostId
+    if (!entry || !postId) return
     hubInflightRef.current = true
     setHubUploading(entryId)
     try {
-      const result = await window.vialAPI.analyzeFilterStoreSetHubPostId(uid, entryId, null)
-      if (result.success) {
-        flashHubResult({ kind: 'success', message: t('hub.removeSuccess'), entryId })
-        await refreshEntries()
-      } else {
+      const deleteResult = await window.vialAPI.hubDeletePost(postId)
+      if (!deleteResult.success) {
         flashHubResult({
           kind: 'error',
-          message: localizeHubError(result.error, 'hub.removeFailed', t),
+          message: localizeHubError(deleteResult.error, 'hub.removeFailed', t),
           entryId,
         })
+        return
       }
+      await window.vialAPI.analyzeFilterStoreSetHubPostId(uid, entryId, null).catch(() => {})
+      flashHubResult({ kind: 'success', message: t('hub.removeSuccess'), entryId })
+      await refreshEntries()
     } catch (err) {
       flashHubResult({
         kind: 'error',
@@ -304,7 +361,7 @@ export function useAnalyzeFilterStore({ uid }: UseAnalyzeFilterStoreOptions) {
       hubInflightRef.current = false
       setHubUploading(null)
     }
-  }, [uid, refreshEntries, t, flashHubResult])
+  }, [uid, entries, refreshEntries, t, flashHubResult])
 
   return {
     entries,
@@ -313,6 +370,7 @@ export function useAnalyzeFilterStore({ uid }: UseAnalyzeFilterStoreOptions) {
     loading,
     refreshEntries,
     saveSnapshot,
+    overwriteSnapshot,
     loadSnapshot,
     renameEntry,
     deleteEntry,
