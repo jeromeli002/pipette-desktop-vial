@@ -59,8 +59,8 @@ export const ANALYTICS_MIN_KEYSTROKES = 100
 /** Bigram fan-out caps. Fixed (not user-configurable on upload) so the
  * payload size and the privacy surface stay predictable across users.
  * Top / Slow rankings ship the desktop default for the analyze panel. */
-export const ANALYTICS_BIGRAM_TOP_LIMIT = 10
-export const ANALYTICS_BIGRAM_SLOW_LIMIT = 10
+export const ANALYTICS_BIGRAM_TOP_LIMIT = 100
+export const ANALYTICS_BIGRAM_SLOW_LIMIT = 100
 /** Minimum sample count for the slow ranking — drops one-off outliers
  * the same way the live chart does. */
 export const ANALYTICS_BIGRAM_SLOW_MIN_SAMPLE = 5
@@ -177,7 +177,7 @@ async function collectData(
   // - matrixCellsByDay only Ergonomics learning curve
   // - layerUsage only Layer keystrokes
   // - sessions only Activity (sessions metric) + Summary
-  // - bksMinute only Activity Backspace overlay
+  // - bksMinute Activity Backspace overlay + WPM Bksp % line
   // - bigrams only Bigrams tab
   // - layoutComparison only Layout Comparison tab
   // PeakRecords + appUsage + wpmByApp aren't surfaced as modal
@@ -193,7 +193,7 @@ async function collectData(
   const needsMatrixCellsByDay = isSectionEnabled(cats, 'ergonomics')
   const needsLayerUsage = isSectionEnabled(cats, 'layer')
   const needsSessions = isSectionEnabled(cats, 'activity')
-  const needsBksMinute = isSectionEnabled(cats, 'activity')
+  const needsBksMinute = isSectionEnabled(cats, 'activity') || isSectionEnabled(cats, 'wpm')
   const needsBigrams = isSectionEnabled(cats, 'bigrams')
   const needsLayoutComparison = isSectionEnabled(cats, 'layoutComparison')
 
