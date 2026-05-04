@@ -95,7 +95,7 @@ export interface BuildAnalyticsExportInput {
    * comparison and ships `data.layoutComparison: null`. */
   layoutComparisonInputs: {
     source: LayoutComparisonInputLayout
-    target: LayoutComparisonInputLayout
+    targets: LayoutComparisonInputLayout[]
     metrics: LayoutComparisonMetric[]
     /** KleKey geometry parsed from `snapshot.layout`. The renderer is
      * better positioned to do this — it already does it for the live
@@ -331,15 +331,41 @@ async function computeLayoutComparisonForExport(
     machineHash,
     appScopes,
   )
-  return computeLayoutComparison({
+  const result = computeLayoutComparison({
     matrixCounts,
     snapshot,
     kleKeys: inputs.kleKeys,
     source: inputs.source,
-    targets: [inputs.target],
+    targets: inputs.targets,
     metrics: inputs.metrics,
     layer,
   })
+  const nameById = new Map(inputs.targets.map((t) => [t.id, t.name]))
+  for (const target of result.targets) {
+    const name = nameById.get(target.layoutId)
+    if (name) target.layoutName = name
+    if (target.fingerLoad) {
+      target.fingerLoad = remapFingerKeys(target.fingerLoad)
+    }
+  }
+  return result
+}
+
+const FINGER_KEY_TO_HUB: Record<string, string> = {
+  'left-pinky': 'pinkyL', 'left-ring': 'ringL', 'left-middle': 'middleL',
+  'left-index': 'indexL', 'left-thumb': 'thumbL',
+  'right-thumb': 'thumbR', 'right-index': 'indexR', 'right-middle': 'middleR',
+  'right-ring': 'ringR', 'right-pinky': 'pinkyR',
+}
+
+function remapFingerKeys(
+  src: Partial<Record<string, number>>,
+): Partial<Record<string, number>> {
+  const out: Partial<Record<string, number>> = {}
+  for (const [k, v] of Object.entries(src)) {
+    if (v !== undefined) out[FINGER_KEY_TO_HUB[k] ?? k] = v
+  }
+  return out
 }
 
 export type AnalyticsValidationResult =
