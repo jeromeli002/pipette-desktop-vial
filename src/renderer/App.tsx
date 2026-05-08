@@ -38,6 +38,7 @@ import { AnalyzePage } from './components/analyze/AnalyzePage'
 import { buildKeymapSnapshot } from './components/analyze/keymap-snapshot-builder'
 import { LayoutStoreContent } from './components/editors/LayoutStoreModal'
 import { ROW_CLASS } from './components/editors/modal-controls'
+import { RGBIndicatorConfigurator } from './components/editors/RGBIndicatorConfigurator'
 import { ModalCloseButton } from './components/editors/ModalCloseButton'
 import { decodeLayoutOptions } from '../shared/kle/layout-options'
 import { generateKeymapC } from '../shared/keymap-export'
@@ -762,6 +763,7 @@ export function App() {
             onLock={lifecycle.handleLock}
             onMatrixModeChange={editorUI.handleMatrixModeChange}
             onOpenLighting={editorUI.lightingSupported ? () => editorUI.setShowLightingModal(true) : undefined}
+            onOpenRGBIndicator={() => editorUI.setShowRGBIndicatorModal(true)}
             comboEntries={editorUI.comboSupported ? keyboard.comboEntries : undefined}
             onOpenCombo={editorUI.comboSupported ? (index: number) => editorUI.setComboInitialIndex(index) : undefined}
             onSetComboEntry={editorUI.comboSupported ? keyboard.setComboEntry : undefined}
@@ -960,6 +962,25 @@ export function App() {
               onSetVialRGBHSV={keyboard.setVialRGBHSV}
               onSave={api.saveLighting}
             />
+          </div>
+        </div>
+      )}
+
+      {editorUI.showRGBIndicatorModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          data-testid="rgb-indicator-modal-backdrop"
+          onClick={() => editorUI.setShowRGBIndicatorModal(false)}
+        >
+          <div
+            className="w-[600px] max-w-[90vw] max-h-[80vh] overflow-y-auto rounded-lg bg-surface-alt p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-lg font-semibold">{t('editor.rgbIndicator.title')}</h3>
+              <ModalCloseButton testid="rgb-indicator-modal-close" onClick={() => editorUI.setShowRGBIndicatorModal(false)} />
+            </div>
+            <RGBIndicatorConfigurator layerCount={keyboard.layers} />
           </div>
         </div>
       )}

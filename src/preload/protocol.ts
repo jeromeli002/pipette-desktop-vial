@@ -60,6 +60,15 @@ import {
   ECHO_RETRY_COUNT,
   ECHO_RETRY_DELAY_MS,
   ECHO_DETECTED_MSG,
+  RGB_INDICATOR_PREFIX,
+  RGB_INDICATOR_SAVE,
+  RGB_INDICATOR_LAYER,
+  RGB_INDICATOR_CAPS,
+  RGB_INDICATOR_NUM,
+  RGB_INDICATOR_SCR,
+  RGB_INDICATOR_SLEEP_TIME,
+  RGB_INDICATOR_ALL,
+  RGB_INDICATOR_OFF,
 } from '../shared/constants/protocol'
 import type {
   KeyboardId,
@@ -723,4 +732,112 @@ export async function qmkSettingsSet(qsid: number, data: number[]): Promise<void
 /** Reset all QMK settings to defaults. */
 export async function qmkSettingsReset(): Promise<void> {
   await sendReceive(cmd(CMD_VIA_VIAL_PREFIX, CMD_VIAL_QMK_SETTINGS_RESET))
+}
+
+// =====================================================================
+// RGB Indicator Commands (0xAB prefix)
+// =====================================================================
+
+export interface LedConfig {
+  index: number
+  count: number
+  h: number
+  s: number
+  v: number
+}
+
+export interface RGBIndicatorConfig {
+  caps: LedConfig
+  num: LedConfig
+  scrl: LedConfig
+  layers: LedConfig[]
+  rgbTimeout: number
+}
+
+function buildRgbIndicatorPacket(command: number, ...args: number[]): Uint8Array {
+  const pkt = new Uint8Array(MSG_LEN)
+  pkt[0] = RGB_INDICATOR_PREFIX
+  pkt[1] = command
+  for (let i = 0; i < args.length && i + 2 < MSG_LEN; i++) {
+    pkt[i + 2] = args[i]
+  }
+  return pkt
+}
+
+export async function setRgbIndicatorCaps(config: LedConfig): Promise<void> {
+  const pkt = buildRgbIndicatorPacket(
+    RGB_INDICATOR_CAPS,
+    0,
+    config.index,
+    config.count,
+    config.h,
+    config.s,
+    config.v,
+  )
+  await sendReceive(pkt)
+}
+
+export async function setRgbIndicatorNum(config: LedConfig): Promise<void> {
+  const pkt = buildRgbIndicatorPacket(
+    RGB_INDICATOR_NUM,
+    0,
+    config.index,
+    config.count,
+    config.h,
+    config.s,
+    config.v,
+  )
+  await sendReceive(pkt)
+}
+
+export async function setRgbIndicatorScrl(config: LedConfig): Promise<void> {
+  const pkt = buildRgbIndicatorPacket(
+    RGB_INDICATOR_SCR,
+    0,
+    config.index,
+    config.count,
+    config.h,
+    config.s,
+    config.v,
+  )
+  await sendReceive(pkt)
+}
+
+export async function setRgbIndicatorLayer(layerIndex: number, config: LedConfig): Promise<void> {
+  const pkt = buildRgbIndicatorPacket(
+    RGB_INDICATOR_LAYER,
+    layerIndex,
+    config.index,
+    config.count,
+    config.h,
+    config.s,
+    config.v,
+  )
+  await sendReceive(pkt)
+}
+
+export async function setRgbIndicatorSleepTime(seconds: number): Promise<void> {
+  const pkt = new Uint8Array(MSG_LEN)
+  pkt[0] = RGB_INDICATOR_PREFIX
+  pkt[1] = RGB_INDICATOR_SLEEP_TIME
+  pkt[2] = (seconds >> 24) & 0xff
+  pkt[3] = (seconds >> 16) & 0xff
+  pkt[4] = (seconds >> 8) & 0xff
+  pkt[5] = seconds & 0xff
+  await sendReceive(pkt)
+}
+
+export async function saveRgbIndicatorConfig(): Promise<void> {
+  const pkt = buildRgbIndicatorPacket(RGB_INDICATOR_SAVE)
+  await sendReceive(pkt)
+}
+
+export async function testRgbIndicatorAll(): Promise<void> {
+  const pkt = buildRgbIndicatorPacket(RGB_INDICATOR_ALL)
+  await sendReceive(pkt)
+}
+
+export async function testRgbIndicatorOff(): Promise<void> {
+  const pkt = buildRgbIndicatorPacket(RGB_INDICATOR_OFF)
+  await sendReceive(pkt)
 }

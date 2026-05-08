@@ -95,6 +95,7 @@ export interface KeymapEditorProps {
   onLock?: () => void
   onMatrixModeChange?: (matrixMode: boolean, hasMatrixTester: boolean) => void
   onOpenLighting?: () => void
+  onOpenRGBIndicator?: () => void
   comboEntries?: ComboEntry[]
   onOpenCombo?: (index: number) => void
   onSetComboEntry?: (index: number, entry: ComboEntry) => Promise<void>
