@@ -112,7 +112,7 @@ function LedConfigEditor({
   const previewColor = rgbToHex(...hsvToRgb(config.h, config.s, config.v))
 
   const indexInputRef = useNumberInputWheel(0, maxLedIndex, (value) => onChange({ ...config, index: value }))
-  const countInputRef = useNumberInputWheel(0, 20, (value) => onChange({ ...config, count: value }))
+  const countInputRef = useNumberInputWheel(0, 255, (value) => onChange({ ...config, count: value }))
 
   const handleHueChange = (h: number) => onChange({ ...config, h })
   const handleSaturationChange = (s: number) => onChange({ ...config, s })
@@ -156,9 +156,9 @@ function LedConfigEditor({
             ref={countInputRef}
             type="number"
             min={0}
-            max={20}
+            max={255}
             value={config.count}
-            onChange={(e) => onChange({ ...config, count: Math.max(0, Math.min(20, parseInt(e.target.value) || 0)) })}
+            onChange={(e) => onChange({ ...config, count: Math.max(0, Math.min(255, parseInt(e.target.value) || 0)) })}
             className={INPUT_CLASS}
             disabled={!enabled}
           />
@@ -250,7 +250,7 @@ export function RGBIndicatorConfigurator({ layerCount, initialConfig, onConfigCh
     }))
   }, [layerCount])
 
-  const sendIndicatorConfig = useCallback(async (indicator: string, index: number, ledConfig: LedConfig, enabled: boolean) => {
+  const sendIndicatorConfig = useCallback(async (indicator: string, index: number, ledConfig: LedConfig, enabled: boolean, save = true) => {
     const sendConfig = enabled ? ledConfig : { ...ledConfig, count: 0 }
 
     try {
@@ -268,7 +268,9 @@ export function RGBIndicatorConfigurator({ layerCount, initialConfig, onConfigCh
           await vialAPI.setRgbIndicatorLayer(index, sendConfig)
           break
       }
-      await vialAPI.saveRgbIndicatorConfig()
+      if (save) {
+        await vialAPI.saveRgbIndicatorConfig()
+      }
     } catch (err) {
       console.error('[RGBIndicator] Send failed:', err)
     }
@@ -304,7 +306,7 @@ export function RGBIndicatorConfigurator({ layerCount, initialConfig, onConfigCh
     onConfigChange?.({ ...config, caps })
     
     if (realTimeSync) {
-      sendIndicatorConfig('caps', 0, caps, enabledIndicators.caps)
+      sendIndicatorConfig('caps', 0, caps, enabledIndicators.caps, false)
     }
   }, [config, onConfigChange, realTimeSync, enabledIndicators.caps, sendIndicatorConfig])
 
@@ -313,7 +315,7 @@ export function RGBIndicatorConfigurator({ layerCount, initialConfig, onConfigCh
     onConfigChange?.({ ...config, num })
     
     if (realTimeSync) {
-      sendIndicatorConfig('num', 0, num, enabledIndicators.num)
+      sendIndicatorConfig('num', 0, num, enabledIndicators.num, false)
     }
   }, [config, onConfigChange, realTimeSync, enabledIndicators.num, sendIndicatorConfig])
 
@@ -322,7 +324,7 @@ export function RGBIndicatorConfigurator({ layerCount, initialConfig, onConfigCh
     onConfigChange?.({ ...config, scrl })
     
     if (realTimeSync) {
-      sendIndicatorConfig('scrl', 0, scrl, enabledIndicators.scrl)
+      sendIndicatorConfig('scrl', 0, scrl, enabledIndicators.scrl, false)
     }
   }, [config, onConfigChange, realTimeSync, enabledIndicators.scrl, sendIndicatorConfig])
 
@@ -334,7 +336,7 @@ export function RGBIndicatorConfigurator({ layerCount, initialConfig, onConfigCh
       onConfigChange?.(newConfig)
       
       if (realTimeSync) {
-        sendIndicatorConfig('layer', index, layer, enabledIndicators.layers[index])
+        sendIndicatorConfig('layer', index, layer, enabledIndicators.layers[index], false)
       }
       
       return newConfig
@@ -359,7 +361,7 @@ export function RGBIndicatorConfigurator({ layerCount, initialConfig, onConfigCh
     
     if (realTimeSync) {
       const indicatorConfig = config[type]
-      sendIndicatorConfig(type, 0, indicatorConfig, enabled)
+      sendIndicatorConfig(type, 0, indicatorConfig, enabled, false)
     }
   }, [config, realTimeSync, sendIndicatorConfig])
 
@@ -371,7 +373,7 @@ export function RGBIndicatorConfigurator({ layerCount, initialConfig, onConfigCh
     
     if (realTimeSync) {
       const layerConfig = config.layers[index]
-      sendIndicatorConfig('layer', index, layerConfig, enabled)
+      sendIndicatorConfig('layer', index, layerConfig, enabled, false)
     }
   }, [config, realTimeSync, sendIndicatorConfig])
 
@@ -466,7 +468,7 @@ export function RGBIndicatorConfigurator({ layerCount, initialConfig, onConfigCh
               ledKey="caps"
               config={config.caps}
               onChange={updateCaps}
-              maxLedIndex={207}
+              maxLedIndex={255}
               enabled={enabledIndicators.caps}
               onEnabledChange={(enabled) => toggleIndicator('caps', enabled)}
               testLabel={t('editor.rgbIndicator.capsLockDesc')}
@@ -477,7 +479,7 @@ export function RGBIndicatorConfigurator({ layerCount, initialConfig, onConfigCh
               ledKey="num"
               config={config.num}
               onChange={updateNum}
-              maxLedIndex={207}
+              maxLedIndex={255}
               enabled={enabledIndicators.num}
               onEnabledChange={(enabled) => toggleIndicator('num', enabled)}
               testLabel={t('editor.rgbIndicator.numLockDesc')}
@@ -488,7 +490,7 @@ export function RGBIndicatorConfigurator({ layerCount, initialConfig, onConfigCh
               ledKey="scrl"
               config={config.scrl}
               onChange={updateScrl}
-              maxLedIndex={207}
+              maxLedIndex={255}
               enabled={enabledIndicators.scrl}
               onEnabledChange={(enabled) => toggleIndicator('scrl', enabled)}
               testLabel={t('editor.rgbIndicator.scrollLockDesc')}
@@ -507,7 +509,7 @@ export function RGBIndicatorConfigurator({ layerCount, initialConfig, onConfigCh
                 ledKey={`layer-${index}`}
                 config={config.layers[index] || DEFAULT_LED_CONFIG}
                 onChange={(newConfig) => updateLayer(index, newConfig)}
-                maxLedIndex={207}
+                maxLedIndex={255}
                 enabled={enabledIndicators.layers[index] || false}
                 onEnabledChange={(enabled) => toggleLayerIndicator(index, enabled)}
                 onApply={() => applyLayer(index)}

@@ -62,11 +62,6 @@ import {
   ECHO_DETECTED_MSG,
   RGB_INDICATOR_PREFIX,
   RGB_INDICATOR_SAVE,
-  RGB_INDICATOR_LAYER,
-  RGB_INDICATOR_CAPS,
-  RGB_INDICATOR_NUM,
-  RGB_INDICATOR_SCR,
-  RGB_INDICATOR_SLEEP_TIME,
   RGB_INDICATOR_ALL,
   RGB_INDICATOR_OFF,
 } from '../shared/constants/protocol'
@@ -765,65 +760,66 @@ function buildRgbIndicatorPacket(command: number, ...args: number[]): Uint8Array
 }
 
 export async function setRgbIndicatorCaps(config: LedConfig): Promise<void> {
-  const pkt = buildRgbIndicatorPacket(
-    RGB_INDICATOR_CAPS,
-    0,
-    config.index,
-    config.count,
-    config.h,
-    config.s,
-    config.v,
-  )
+  const pkt = new Uint8Array(MSG_LEN)
+  pkt[0] = RGB_INDICATOR_PREFIX
+  pkt[1] = 0x82
+  pkt[2] = 0x00
+  pkt[3] = config.index
+  pkt[4] = config.count
+  pkt[5] = config.h
+  pkt[6] = config.s
+  pkt[7] = config.v
   await sendReceive(pkt)
 }
 
 export async function setRgbIndicatorNum(config: LedConfig): Promise<void> {
-  const pkt = buildRgbIndicatorPacket(
-    RGB_INDICATOR_NUM,
-    0,
-    config.index,
-    config.count,
-    config.h,
-    config.s,
-    config.v,
-  )
+  const pkt = new Uint8Array(MSG_LEN)
+  pkt[0] = RGB_INDICATOR_PREFIX
+  pkt[1] = 0x82
+  pkt[2] = 0x01
+  pkt[3] = config.index
+  pkt[4] = config.count
+  pkt[5] = config.h
+  pkt[6] = config.s
+  pkt[7] = config.v
   await sendReceive(pkt)
 }
 
 export async function setRgbIndicatorScrl(config: LedConfig): Promise<void> {
-  const pkt = buildRgbIndicatorPacket(
-    RGB_INDICATOR_SCR,
-    0,
-    config.index,
-    config.count,
-    config.h,
-    config.s,
-    config.v,
-  )
+  const pkt = new Uint8Array(MSG_LEN)
+  pkt[0] = RGB_INDICATOR_PREFIX
+  pkt[1] = 0x82
+  pkt[2] = 0x02
+  pkt[3] = config.index
+  pkt[4] = config.count
+  pkt[5] = config.h
+  pkt[6] = config.s
+  pkt[7] = config.v
   await sendReceive(pkt)
 }
 
 export async function setRgbIndicatorLayer(layerIndex: number, config: LedConfig): Promise<void> {
-  const pkt = buildRgbIndicatorPacket(
-    RGB_INDICATOR_LAYER,
-    layerIndex,
-    config.index,
-    config.count,
-    config.h,
-    config.s,
-    config.v,
-  )
+  const pkt = new Uint8Array(MSG_LEN)
+  pkt[0] = RGB_INDICATOR_PREFIX
+  pkt[1] = 0x82
+  pkt[2] = 0x10 + layerIndex
+  pkt[3] = config.index
+  pkt[4] = config.count
+  pkt[5] = config.h
+  pkt[6] = config.s
+  pkt[7] = config.v
   await sendReceive(pkt)
 }
 
 export async function setRgbIndicatorSleepTime(seconds: number): Promise<void> {
   const pkt = new Uint8Array(MSG_LEN)
   pkt[0] = RGB_INDICATOR_PREFIX
-  pkt[1] = RGB_INDICATOR_SLEEP_TIME
-  pkt[2] = (seconds >> 24) & 0xff
-  pkt[3] = (seconds >> 16) & 0xff
-  pkt[4] = (seconds >> 8) & 0xff
-  pkt[5] = seconds & 0xff
+  pkt[1] = 0x82
+  pkt[2] = 0x03
+  pkt[3] = (seconds >> 24) & 0xff
+  pkt[4] = (seconds >> 16) & 0xff
+  pkt[5] = (seconds >> 8) & 0xff
+  pkt[6] = seconds & 0xff
   await sendReceive(pkt)
 }
 
