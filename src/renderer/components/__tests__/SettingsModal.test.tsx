@@ -21,6 +21,7 @@ vi.mock('../../i18n', () => ({
     { id: 'en', name: 'English' },
     { id: 'ja', name: '日本語' },
     { id: 'zh', name: '简体中文' },
+    { id: 'builtin:en', name: 'English' },
   ],
 }))
 
@@ -725,18 +726,10 @@ describe('SettingsModal', () => {
   })
 
   describe('Language selector (Tools tab)', () => {
-    it('renders the language selector', () => {
+    it('renders the language row with edit button', () => {
       renderAndSwitchToTools()
-      expect(screen.getByTestId('settings-language-selector')).toBeInTheDocument()
-    })
-
-    it('calls appConfig.set and i18n.changeLanguage when language is changed', async () => {
-      const { default: i18nMock } = await import('../../i18n')
-      renderAndSwitchToTools()
-
-      fireEvent.change(screen.getByTestId('settings-language-selector'), { target: { value: 'ja' } })
-      expect(mockAppConfigSet).toHaveBeenCalledWith('language', 'ja')
-      expect(i18nMock.changeLanguage).toHaveBeenCalledWith('ja')
+      expect(screen.getByTestId('settings-language-row')).toBeInTheDocument()
+      expect(screen.getByTestId('settings-language-packs-button')).toBeInTheDocument()
     })
   })
 

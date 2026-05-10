@@ -21,6 +21,7 @@ import { useSnapshotMigration } from './hooks/useSnapshotMigration'
 import { useDeviceLifecycle } from './hooks/useDeviceLifecycle'
 import { useMissingKeyLabelNotice } from './hooks/useMissingKeyLabelNotice'
 import { MissingKeyLabelDialog } from './components/key-labels/MissingKeyLabelDialog'
+import { JaRemovedBanner } from './components/i18n-packs/JaRemovedBanner'
 import { formatDeviceId } from './app-types'
 import { DeviceSelector } from './components/DeviceSelector'
 import { SettingsModal } from './components/SettingsModal'
@@ -553,6 +554,7 @@ export function App() {
             onClose={startupNotification.dismiss}
           />
         )}
+        <JaRemovedBanner />
       </>
     )
   }
@@ -1079,6 +1081,7 @@ export function App() {
           devicePrefs.setLayout('qwerty')
         }}
       />
+      <JaRemovedBanner />
     </div>
   )
 }

@@ -12,6 +12,12 @@ export const SUPPORTED_LANGUAGES = [
   { id: 'ja', name: '日本語' },
   { id: 'zhCN', name: '简体中文' },
   { id: 'zhTW', name: '繁體中文' },
+import english from './locales/english.json'
+
+const { name: _name, version: _version, ...englishTranslations } = english as Record<string, unknown>
+
+export const SUPPORTED_LANGUAGES = [
+  { id: 'builtin:en', name: 'English' },
 ] as const
 
 i18n.use(initReactI18next).init({
@@ -23,6 +29,10 @@ i18n.use(initReactI18next).init({
   },
   lng: undefined,
   fallbackLng: 'zhCN',
+    'builtin:en': { translation: englishTranslations },
+  },
+  lng: 'builtin:en',
+  fallbackLng: 'builtin:en',
   keySeparator: '.',
   interpolation: {
     escapeValue: false,
