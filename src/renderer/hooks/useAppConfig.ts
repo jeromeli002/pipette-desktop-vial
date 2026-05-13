@@ -21,7 +21,6 @@ export function AppConfigProvider({ children }: { children: ReactNode }): ReactN
     window.vialAPI.appConfigGetAll().then((loaded) => {
       setConfig(loaded)
       void i18n.changeLanguage(loaded.language ?? 'zhCN')
-      void i18n.changeLanguage(loaded.language ?? 'builtin:en')
       setLoading(false)
     }).catch(() => {
       setLoading(false)

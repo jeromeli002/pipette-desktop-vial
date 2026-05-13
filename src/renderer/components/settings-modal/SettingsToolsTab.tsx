@@ -1,23 +1,25 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { THEME_OPTIONS, TIME_STEPS } from './settings-modal-shared'
+import { TIME_STEPS } from './settings-modal-shared'
 import { ROW_CLASS, toggleTrackClass, toggleKnobClass } from '../editors/modal-controls'
-import { KEYBOARD_LAYOUTS } from '../../data/keyboard-layouts'
 import { useAppConfig } from '../../hooks/useAppConfig'
-import { SUPPORTED_LANGUAGES } from '../../i18n'
 import { useKeyLabels } from '../../hooks/useKeyLabels'
 import { useI18nPackStore } from '../../hooks/useI18nPackStore'
+import { useThemePackStore } from '../../hooks/useThemePackStore'
+import { useLayoutOptions } from '../../hooks/useLayoutOptions'
+import { useLanguageOptions } from '../../hooks/useLanguageOptions'
 import { KeyLabelsModal } from '../key-labels/KeyLabelsModal'
 import { LanguagePacksModal } from '../i18n-packs/LanguagePacksModal'
-import type { ThemeMode } from '../../hooks/useTheme'
+import { ThemePacksModal } from '../theme-packs/ThemePacksModal'
+import { isPackTheme, extractPackId, type ThemeSelection } from '../../hooks/useTheme'
 import type { KeyboardLayoutId, AutoLockMinutes } from '../../hooks/useDevicePrefs'
-import type { BasicViewType, SplitKeyMode } from '../../../shared/types/app-config'
+import { ZOOM_FACTOR_MIN, ZOOM_FACTOR_MAX, ZOOM_FACTOR_DEFAULT, clampZoomFactor, type BasicViewType, type SplitKeyMode } from '../../../shared/types/app-config'
 
 export interface SettingsToolsTabProps {
-  theme: ThemeMode
-  onThemeChange: (mode: ThemeMode) => void
+  theme: ThemeSelection
+  onThemeChange: (mode: ThemeSelection) => void
   defaultLayout: KeyboardLayoutId
   onDefaultLayoutChange: (layout: KeyboardLayoutId) => void
   defaultAutoAdvance: boolean
@@ -66,17 +68,44 @@ export function SettingsToolsTab({
   const appConfig = useAppConfig()
   const [keyLabelsOpen, setKeyLabelsOpen] = useState(false)
   const [languagePacksOpen, setLanguagePacksOpen] = useState(false)
+  const [themePacksOpen, setThemePacksOpen] = useState(false)
   const keyLabels = useKeyLabels()
   const i18nPacks = useI18nPackStore()
+  const themePacks = useThemePackStore()
 
-  const languageOptions = useMemo(() => {
-    const opts: { id: string; name: string }[] = SUPPORTED_LANGUAGES.map((l) => ({ id: l.id, name: l.name }))
-    for (const meta of i18nPacks.metas) {
-      if (meta.deletedAt || !meta.enabled) continue
-      opts.push({ id: `pack:${meta.id}`, name: meta.name })
+  const [zoomInput, setZoomInput] = useState(String(appConfig.config.zoomFactor ?? ZOOM_FACTOR_DEFAULT))
+
+  useEffect(() => {
+    setZoomInput(String(appConfig.config.zoomFactor ?? ZOOM_FACTOR_DEFAULT))
+  }, [appConfig.config.zoomFactor])
+
+  const commitZoomValue = useCallback((val: string) => {
+    const raw = Number(val)
+    if (Number.isNaN(raw)) {
+      setZoomInput(String(appConfig.config.zoomFactor ?? ZOOM_FACTOR_DEFAULT))
+      return
     }
-    return opts
-  }, [i18nPacks.metas])
+    const clamped = clampZoomFactor(raw)
+    setZoomInput(String(clamped))
+    if (clamped !== (appConfig.config.zoomFactor ?? ZOOM_FACTOR_DEFAULT)) {
+      appConfig.set('zoomFactor', clamped)
+    }
+  }, [appConfig])
+
+  const commitZoom = useCallback(() => {
+    commitZoomValue(zoomInput)
+  }, [zoomInput, commitZoomValue])
+
+  const activeThemeName = useMemo(() => {
+    if (isPackTheme(theme)) {
+      const packId = extractPackId(theme)
+      const meta = themePacks.metas.find((m) => m.id === packId)
+      return meta?.name ?? packId
+    }
+    return t(`theme.${theme}`)
+  }, [theme, themePacks.metas, t])
+
+  const languageOptions = useLanguageOptions(i18nPacks.metas)
 
   /**
    * Default-layout dropdown options. QWERTY is materialised as a Key
@@ -85,21 +114,7 @@ export function SettingsToolsTab({
    * Labels modal. `KEYBOARD_LAYOUTS` only serves as a safety net for
    * the brief window before `metas` has loaded.
    */
-  const layoutOptions = useMemo(() => {
-    const seen = new Set<string>()
-    const out: { id: string; name: string }[] = []
-    for (const meta of keyLabels.metas) {
-      if (seen.has(meta.id)) continue
-      seen.add(meta.id)
-      out.push({ id: meta.id, name: meta.name })
-    }
-    for (const def of KEYBOARD_LAYOUTS) {
-      if (seen.has(def.id)) continue
-      seen.add(def.id)
-      out.push({ id: def.id, name: def.name })
-    }
-    return out
-  }, [keyLabels.metas])
+  const layoutOptions = useLayoutOptions(keyLabels.metas)
 
   // Auto-heal an orphaned saved default layout. If the entry was
   // deleted from the Key Label store (locally or via sync) the saved
@@ -118,30 +133,6 @@ export function SettingsToolsTab({
   return (
     <>
     <div className="pt-4 space-y-6">
-      <section>
-        <h4 className="mb-2 text-sm font-medium text-content-secondary">
-          {t('theme.label')}
-        </h4>
-        <div className="flex rounded-lg border border-edge bg-surface p-1 gap-0.5">
-          {THEME_OPTIONS.map(({ mode, icon: Icon }) => (
-            <button
-              key={mode}
-              type="button"
-              className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                theme === mode
-                  ? 'bg-accent/15 text-accent'
-                  : 'text-content-secondary hover:text-content'
-              }`}
-              onClick={() => onThemeChange(mode)}
-              data-testid={`theme-option-${mode}`}
-            >
-              <Icon size={16} aria-hidden="true" />
-              {t(`theme.${mode}`)}
-            </button>
-          ))}
-        </div>
-      </section>
-
       <section>
         <div className="grid grid-cols-2 gap-3">
           <div className={ROW_CLASS} data-testid="settings-language-row">
@@ -181,6 +172,59 @@ export function SettingsToolsTab({
             >
               {t('keyLabels.edit')}
             </button>
+          </div>
+
+          <div className={ROW_CLASS} data-testid="settings-theme-packs-row">
+            <span className="text-sm font-medium text-content-secondary">
+              {t('themePacks.manageRow')}
+            </span>
+            <div className="flex items-center gap-2">
+              <span
+                className="text-[13px] text-content"
+                data-testid="settings-theme-pack-active-name"
+              >
+                {activeThemeName}
+              </span>
+              <button
+                type="button"
+                onClick={() => setThemePacksOpen(true)}
+                className="rounded border border-edge bg-surface px-2.5 py-1.5 text-[13px] text-content hover:bg-surface-hover focus:border-accent focus:outline-none"
+                data-testid="settings-theme-packs-button"
+              >
+                {t('i18n.edit')}
+              </button>
+            </div>
+          </div>
+
+          <div className={ROW_CLASS} data-testid="settings-zoom-factor-row">
+            <div className="flex flex-col gap-0.5">
+              <span className="text-sm font-medium text-content-secondary">
+                {t('settings.zoomLevel')}
+              </span>
+              <span className="text-xs text-content-muted">
+                {t('settings.zoomLevelWarning')}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <input
+                id="settings-zoom-factor-input"
+                type="number"
+                min={ZOOM_FACTOR_MIN}
+                max={ZOOM_FACTOR_MAX}
+                value={zoomInput}
+                onChange={(e) => {
+                  const val = e.target.value
+                  setZoomInput(val)
+                  // Spin-button clicks have empty inputType in Chromium
+                  if (!(e.nativeEvent as InputEvent).inputType) commitZoomValue(val)
+                }}
+                onBlur={commitZoom}
+                onKeyDown={(e) => { if (e.key === 'Enter') commitZoom() }}
+                className="zoom-factor-input w-20 rounded border border-edge bg-surface px-2.5 py-1.5 text-[13px] text-content text-right tabular-nums hover:bg-surface-hover focus:border-accent focus:outline-none"
+                data-testid="settings-zoom-factor-input"
+              />
+              <span className="text-[13px] text-content-muted">%</span>
+            </div>
           </div>
         </div>
       </section>
@@ -355,6 +399,12 @@ export function SettingsToolsTab({
       open={languagePacksOpen}
       onClose={() => setLanguagePacksOpen(false)}
       currentDisplayName={hubDisplayName}
+      hubCanWrite={hubCanWrite}
+    />
+    <ThemePacksModal
+      open={themePacksOpen}
+      onClose={() => setThemePacksOpen(false)}
+      onThemeChange={onThemeChange}
       hubCanWrite={hubCanWrite}
     />
     </>

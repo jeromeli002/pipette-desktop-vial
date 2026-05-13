@@ -70,7 +70,8 @@ export interface SplitKeyProps {
 function splitHalfClass(highlighted?: boolean, selected?: boolean, remapped?: boolean): string {
   const text = selected ? 'text-accent' : highlighted ? 'text-accent' : remapped ? 'text-key-label-remap' : 'text-picker-item-text'
   const bg = selected ? 'bg-accent/20' : highlighted ? 'bg-accent/10' : ''
-  return `${text} ${bg}`
+  const border = selected ? 'border-accent' : highlighted ? 'border-accent/50' : 'border-picker-item-border'
+  return `${text} ${bg} ${border}`
 }
 
 const SPLIT_HALF_BASE = 'flex-1 cursor-pointer flex items-center justify-center text-[10px] leading-tight whitespace-nowrap transition-colors hover:bg-picker-item-hover'

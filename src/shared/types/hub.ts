@@ -2,6 +2,7 @@
 // Shared types for Hub upload operations
 
 import type { FavoriteType } from './favorite-store'
+import type { ThemeColorScheme } from './theme-store'
 
 // --- i18n language pack posts -------------------------------------------------
 
@@ -75,6 +76,59 @@ export interface HubI18nPackTimestampsResponse {
 /** Per-request hard limit defined by `POST /api/i18n-packs/timestamps`.
  *  Callers must split larger id arrays themselves. */
 export const HUB_I18N_PACK_TIMESTAMPS_BATCH_LIMIT = 100
+
+// --- theme pack posts --------------------------------------------------------
+
+export interface HubThemePackBody {
+  name: string
+  version: string
+  colorScheme: ThemeColorScheme
+  colors: Record<string, string>
+}
+
+export interface HubUploadThemePostParams {
+  entryId: string
+  pack: HubThemePackBody
+}
+
+export interface HubUpdateThemePostParams extends HubUploadThemePostParams {
+  postId: string
+}
+
+export interface HubThemePostListItem {
+  id: string
+  name: string
+  version: string
+  uploadedBy?: string | null
+  uploaderName?: string | null
+  createdAt: string
+  updatedAt?: string
+}
+
+export interface HubThemeListParams {
+  q?: string
+  name?: string
+  page?: number
+  perPage?: number
+}
+
+export interface HubThemeListResponse {
+  items: HubThemePostListItem[]
+  total: number
+  page: number
+  perPage: number
+}
+
+export interface HubThemePackTimestamp {
+  id: string
+  updated_at: string
+}
+
+export interface HubThemePackTimestampsResponse {
+  items: HubThemePackTimestamp[]
+}
+
+export const HUB_THEME_PACK_TIMESTAMPS_BATCH_LIMIT = 100
 
 export interface HubUploadPostParams {
   title: string

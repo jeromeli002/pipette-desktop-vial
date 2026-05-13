@@ -61,7 +61,7 @@ Download the latest release for your platform:
 
 For complete instructions with screenshots:
 
--   [Operation Guide](docs/OPERATION-GUIDE.md)
+-   [Operation Guide](https://darakuneko.github.io/pipette-desktop/guide.html)
 
 ## Platform Setup
 
@@ -138,7 +138,7 @@ Without this permission, Monitor App silently records `null` for every minute on
 
 ### Keyboard Configuration
 
-- **Keymap Editor** — Layer-based key assignment with drag & drop, auto-advance, and a searchable keycode palette with Mod Mask/Mod-Tap wrapper modes. Basic tab supports ANSI, ISO, JIS, and List views with International (INT1–5) and Language (LANG1–5) keycode groups. Reorganized key picker tabs (System, Behavior, dedicated Combo/Key Override/Alt Repeat Key tabs) with instant key selection. Keymap change history with undo/redo via toolbar buttons, keyboard shortcuts (Ctrl/Cmd+Z, Ctrl+Y/Ctrl/Cmd+Shift+Z), and popover undo/redo
+- **Keymap Editor** — Layer-based key assignment with drag & drop, auto-advance, and a searchable keycode palette with Mod Mask/Mod-Tap wrapper modes. Basic tab supports ANSI, ISO, JIS, and List views with International (INT1–5) and Language (LANG1–5) keycode groups. Reorganized key picker tabs (System, Behavior, dedicated Combo/Key Override/Alt Repeat Key tabs) with instant key selection. Keymap change history with undo/redo via toolbar buttons, keyboard shortcuts (Ctrl/Cmd+Z, Ctrl+Y/Ctrl/Cmd+Shift+Z), and popover undo/redo. Key popover includes a layer switching sidebar for quick layer navigation without closing the popover
 - **Layout Editor** — Physical layout switching via slide-out panel (split backspace, bottom row variants, etc.)
 - **Tap Dance** — Multi-tap key behaviors (tap, hold, double-tap, tap+hold, custom tapping term) with inline favorites
 - **Combo** — Simultaneous key-press to trigger output keys; inline tile grid with detail editor modal and inline favorites
@@ -163,20 +163,20 @@ Without this permission, Monitor App silently records `null` for every minute on
 Sync your snapshots, favorites, and per-keyboard settings across devices via [Google Drive appDataFolder](https://developers.google.com/workspace/drive/api/guides/appdata).  \
 The appDataFolder is **not** regular Google Drive storage — it is a hidden, app-specific folder that only Pipette can access. Your personal Drive files are never touched.
 
-See [Data Guide](docs/Data.md) for details on what is synced and how your data is protected.
+See [Data Guide](https://darakuneko.github.io/pipette-desktop/guide.html#data) for details on what is synced and how your data is protected.
 
 ### Pipette Hub
 
 Upload and share your keymaps and favorite configurations on [Pipette Hub](https://pipette-hub-worker.keymaps.workers.dev), a community keymap gallery. Keyboard snapshots, tap dance, macro, combo, key override, and alt repeat key configurations can all be shared.
 
-See [Data Guide](docs/Data.md) for details on how Hub authentication works.
+See [Data Guide](https://darakuneko.github.io/pipette-desktop/guide.html#data) for details on how Hub authentication works.
 
 ### Utilities
 
 - **Typing Test** — Built-in typing test with WPM/accuracy tracking, downloadable language packs, and per-keyboard history
 - **Typing View** — View-only mode displaying only the keyboard layout in a compact, resizable window with always-on-top support — ideal for overlaying on other applications
 - **Multilingual UI** — Multiple languages supported via importable language packs; manage, import, and download packs from Pipette Hub in Settings → Tools → Language Packs
-- **Light / Dark / System theme**
+- **Light / Dark / System theme** with importable **Theme Packs** — download community colour schemes from Pipette Hub or author your own `.json` pack
 - **Keyboard layout override** (QWERTY, Dvorak, etc.) for correct label display
 - **Configurable panel side** (left / right)
 - **Auto-lock timer**
@@ -221,7 +221,7 @@ Shared              — Types, constants, IPC channels
 
 ## Data & Privacy
 
-See the [Data Guide](docs/Data.md) for a complete guide on what data Pipette stores, how cloud sync works, and the security measures in place for external services.
+See the [Data Guide](https://darakuneko.github.io/pipette-desktop/guide.html) for a complete guide on what data Pipette stores, how cloud sync works, and the security measures in place for external services.
 
 ## Donate
 
@@ -234,7 +234,9 @@ A cup of coffee keeps the commits coming ☕
 Contributions are welcome! In particular:
 
 - **Translations** — Create a language pack `.json` (use the built-in English pack as a template — export it from Settings → Tools → Language Packs) and share it on [Pipette Hub](https://pipette-hub-worker.keymaps.workers.dev) or submit a PR.
-  See `docs/OPERATION-GUIDE.md` §6.3 for the pack format and management workflow.
+  See the [Operation Guide](https://darakuneko.github.io/pipette-desktop/guide.html) §6.3 for the pack format and management workflow.
+- **Theme packs** — Design a colour theme `.json` and share it on Pipette Hub.
+  See the [Theme Pack Authoring Guide](https://darakuneko.github.io/pipette-desktop/guide.html#theme) for the full colour token reference and design tips.
 - **Keyboard layout composite labels** — `KeyboardLayoutDef.compositeLabels` in `src/renderer/data/keyboard-layouts.ts`
   lets a layout override the label of an individual composite keycode (e.g. `LALT(KC_L)` → "Cmd L" on macOS).
   Add the full qmkId → display string mapping to the relevant layout. Reviewers must check that the

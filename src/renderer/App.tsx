@@ -42,6 +42,7 @@ import { ROW_CLASS } from './components/editors/modal-controls'
 import { RGBIndicatorConfigurator } from './components/editors/RGBIndicatorConfigurator'
 import { ModalCloseButton } from './components/editors/ModalCloseButton'
 import { decodeLayoutOptions } from '../shared/kle/layout-options'
+import { ZOOM_FACTOR_DEFAULT } from '../shared/types/app-config'
 import { generateKeymapC } from '../shared/keymap-export'
 import { generateKeymapPdf } from '../shared/pdf-export'
 import { resolveTappingTermMs } from '../shared/qmk-settings-tapping-term'
@@ -377,6 +378,7 @@ export function App() {
   // Pending refs for deferred user intents (set while unlock dialog is open)
   const pendingViewOnlyRef = useRef(false)
   const pendingTypingTestSaveRef = useRef(false)
+  const prevZoomRef = useRef<number | null>(null)
 
   const { setViewMode } = devicePrefs
   const { resetUIState } = editorUI
@@ -454,6 +456,22 @@ export function App() {
     devicePrefs.viewMode,
     enterTypingViewOnly,
     editorUI.setShowUnlockDialog,
+  ])
+
+  useEffect(() => {
+    const appZoom = appConfig.config.zoomFactor ?? ZOOM_FACTOR_DEFAULT
+    const zoom = (device.connectedDevice && !device.isDummy && devicePrefs.viewMode === 'editor')
+      ? (devicePrefs.keyEditorZoom ?? appZoom)
+      : appZoom
+    if (prevZoomRef.current === zoom) return
+    prevZoomRef.current = zoom
+    window.vialAPI.setWindowZoom(zoom).catch(() => {})
+  }, [
+    device.connectedDevice,
+    device.isDummy,
+    devicePrefs.viewMode,
+    devicePrefs.keyEditorZoom,
+    appConfig.config.zoomFactor,
   ])
 
   const handleLoadEntry = useCallback(async (entryId: string) => {
@@ -784,6 +802,8 @@ export function App() {
             onLayerPanelOpenChange={devicePrefs.setLayerPanelOpen}
             scale={editorUI.keymapScale}
             onScaleChange={editorUI.adjustKeymapScale}
+            keyEditorZoom={devicePrefs.keyEditorZoom ?? (appConfig.config.zoomFactor ?? ZOOM_FACTOR_DEFAULT)}
+            onKeyEditorZoomChange={devicePrefs.setKeyEditorZoom}
             typingTestMode={editorUI.typingTestMode}
             onTypingTestModeChange={editorUI.handleTypingTestModeChange}
             onSaveTypingTestResult={devicePrefs.addTypingTestResult}
@@ -823,8 +843,6 @@ export function App() {
             isDummy={effectiveIsDummy}
             onExportLayoutPdfAll={fileHandlers.handleExportLayoutPdfAll}
             onExportLayoutPdfCurrent={fileHandlers.handleExportLayoutPdfCurrent}
-            hubDisplayName={hub.hubDisplayName}
-            hubCanWrite={hub.hubCanUpload}
             favHubOrigin={hub.hubReady ? hub.hubOrigin : undefined}
             favHubNeedsDisplayName={hub.hubReady && !hub.hubCanUpload}
             favHubUploading={hub.favHubUploading}
@@ -888,6 +906,13 @@ export function App() {
             keymapEditorRef.current?.toggleTypingTest()
           }}
           onDisconnect={editorUI.typingTestMode ? undefined : lifecycle.handleDisconnect}
+          quickSettings={{
+            onThemeChange: themeCtx.setTheme,
+            hubDisplayName: hub.hubDisplayName,
+            hubCanWrite: hub.hubCanUpload,
+            keyboardLayout: devicePrefs.layout,
+            onKeyboardLayoutChange: devicePrefs.setLayout,
+          }}
         />
       )}
 

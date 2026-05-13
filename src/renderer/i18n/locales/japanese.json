@@ -1,5 +1,5 @@
 {
-  "version": "0.1.2",
+  "version": "0.1.4",
   "name": "Japanese",
   "common": {
     "save": "保存",
@@ -30,6 +30,8 @@
     "labelPlaceholder": "ラベル",
     "noLabel": "（ラベルなし）",
     "synced": "同期しました",
+    "edit": "編集",
+    "done": "完了",
     "findOnHub": "Hub で探す",
     "findOnHubHint": "アップロードされたファイルを <hub>Pipette Hub</hub> で確認できます。",
     "installed": "インストール済み",
@@ -629,6 +631,16 @@
     "dark": "ダーク",
     "system": "システム"
   },
+  "themePacks": {
+    "manageRow": "テーマパック管理",
+    "title": "テーマパック",
+    "import": "テーマパックをインポート",
+    "parseError": "ファイルの解析に失敗しました",
+    "selectTheme": "{{name}} を選択",
+    "hubEmpty": "Hub に一致するテーマパックがありません",
+    "preview": "プレビュー",
+    "previewing": "プレビュー中"
+  },
   "layout": {
     "keyboardLayout": "キーラベル表示",
     "exportAllPdf": "全て",
@@ -751,7 +763,9 @@
       "version": "バージョン {{version}}",
       "license": "ライセンス: {{license}}",
       "licenseValue": "GPL-3.0-or-later"
-    }
+    },
+    "zoomLevel": "ズーム",
+    "zoomLevelWarning": "表示が崩れる場合があります。自己責任で変更してください。"
   },
   "analyze": {
     "noKeyboards": "まだ打鍵データがありません",
@@ -1454,7 +1468,8 @@
     "tabLayout": "レイアウト",
     "basicViewType": "Basic タブ表示",
     "splitKeyMode": "キーピッカーでShiftキーを分離",
-    "quickSelect": "キーの即時選択"
+    "quickSelect": "キーの即時選択",
+    "keyEditorZoom": "キーエディタ ズーム"
   },
   "hub": {
     "uploadToHub": "アップロード",
@@ -1633,13 +1648,13 @@
       "message": "バンドル版の日本語はダウンロード可能な言語パックとして配布されています。Pipette Hub から入手するか、設定 → ツール → 言語パック管理 から .json をインポートしてください。",
       "title": "日本語パックは Hub に移動しました"
     },
-    "manageRow": "言語管理",
+    "manageRow": "言語パック管理",
     "missingKeys": {
       "description": "翻訳が必要なキーだけを含む JSON テンプレートをダウンロードします。編集後に再インポートしてください。",
       "empty": "すべてのキーが設定されています",
       "title": "未設定のキー"
     },
-    "modalTitle": "言語",
+    "modalTitle": "言語パック",
     "notSetKeys": "未設定のキー",
     "selectLanguage": "{{name}}を選択",
     "preview": {

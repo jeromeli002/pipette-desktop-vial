@@ -39,16 +39,16 @@ function KeycodeButtonInner({ keycode, onClick, onDoubleClick, onHover, onHoverE
   const layout = useQuadrant
     ? 'grid grid-cols-2 grid-rows-2 place-items-center'
     : 'flex flex-col items-center justify-center'
-  const base = `${layout} rounded border border-transparent p-1 text-xs outline-none cursor-pointer ${hover} active:bg-accent/20 ${size} transition-colors`
+  const base = `${layout} rounded border border-picker-item-border p-1 text-xs outline-none cursor-pointer ${hover} active:bg-accent/20 ${size} transition-colors`
   let variant: string
   if (selected) {
-    variant = 'bg-accent/20 text-accent'
+    variant = 'bg-accent/20 text-accent border-accent'
   } else if (highlighted) {
-    variant = 'bg-accent/10 text-accent'
+    variant = 'bg-accent/10 text-accent border-accent/30'
   } else if (displayLabel != null) {
-    variant = 'bg-picker-item-bg text-key-label-remap'
+    variant = 'bg-picker-item-bg text-key-label-remap border-picker-item-border'
   } else {
-    variant = 'bg-picker-item-bg text-picker-item-text'
+    variant = 'bg-picker-item-bg text-picker-item-text border-picker-item-border'
   }
 
   return (

@@ -50,6 +50,8 @@ Screenshots were taken using a GPK60-63R keyboard unless otherwise noted.
   - [6.1 Cloud Sync (Google Drive appDataFolder)](#61-cloud-sync-google-drive-appdatafolder)
   - [6.2 Key Labels Manage](#62-key-labels-manage)
   - [6.3 Language Packs Manage](#63-language-packs-manage)
+  - [6.4 Theme Packs Manage](#64-theme-packs-manage)
+  - [6.5 Zoom (UI Scale)](#65-zoom-ui-scale)
 - [7. Pipette Hub](#7-pipette-hub)
   - [7.1 Hub Setup](#71-hub-setup)
   - [7.2 Uploading a Keymap](#72-uploading-a-keymap)
@@ -587,6 +589,12 @@ Click the collapse button (chevron) to minimize the layer panel to just numbers.
 
 Double-click a key on the keyboard layout to open the Key Popover — a quick way to search and assign keycodes without scrolling through the palette.
 
+**Layer Sidebar**
+
+![Key Popover — Layer Sidebar](screenshots/key-popover-layer-sidebar.png)
+
+A vertical layer sidebar appears on the left side of the popover, matching the layer panel buttons. Click a layer number to switch layers without closing the popover. If the number of layers exceeds the popover height, the sidebar scrolls independently.
+
 **Key Tab**
 
 ![Key Popover — Key Tab](screenshots/key-popover-key.png)
@@ -657,7 +665,7 @@ Select keycodes from different categories using the tabbed palette at the bottom
 
 ### 3.1 Basic
 
-Standard character keys, function keys, modifier keys, and navigation keys. The Basic tab supports four view types, selectable from the Keycodes Overlay Panel (§3.14):
+Standard character keys, function keys, modifier keys, and navigation keys. The Basic tab supports four view types, selectable from the view selector at the bottom of the Basic tab:
 
 **ANSI Keyboard View** (default)
 
@@ -894,8 +902,7 @@ The Keycodes Overlay Panel provides quick access to editor tools and save functi
 
 ![Overlay Panel — Settings](screenshots/overlay-tools.png)
 
-- **Basic View Type**: Switch between ANSI keyboard, ISO keyboard, JIS keyboard, and List views for the Basic tab
-- **Keyboard Layout**: Select the display layout for key labels. The dropdown reflects the installed Key Labels store (see §6.2); the **Edit** button next to it opens the same Key Labels Manage modal as Settings → Tools (so you can install / sync / reorder labels without leaving the editor)
+- **Key Editor Zoom**: Set the UI zoom level (50–200%) applied while in key editor mode. Defaults to the global UI zoom (§6.5) when not configured. Saved and synced per keyboard
 - **Auto Advance**: Toggle automatic advancement to the next key after assigning a keycode
 - **Instant Key Selection**: Toggle instant key selection mode (see §2.2 for behavior details)
 - **Separate Shift in Key Picker**: Toggle split display for combined keycodes (e.g., show Mod-Tap as two halves)
@@ -1229,7 +1236,7 @@ The editor settings panel now provides a single **Save** panel with the followin
 - **Synced Data**: List of saved snapshots. Click to load, rename, or delete entries
 - **Reset Keyboard Data**: Reset keyboard to factory defaults (use with caution)
 
-> **Note**: Tool settings (keyboard layout, auto advance, key tester, security) have moved to the Keycodes Overlay Panel (§3.14). Zoom is available in the toolbar (§4.1). Layer settings are now managed directly via the layer panel on the left side of the editor.
+> **Note**: Tool settings (auto advance, key tester, security) are in the Keycodes Overlay Panel (§3.14). Keyboard layout is available in the status bar quick settings (§9); Basic tab view type is selectable at the bottom of the Basic tab. Zoom is available in the toolbar (§4.1). Layer settings are managed directly via the layer panel on the left side of the editor.
 
 ### 6.1 Cloud Sync (Google Drive appDataFolder)
 
@@ -1470,7 +1477,113 @@ A language pack `.json` mirrors the structure of the built-in English pack. Expo
 | `version` | Yes | Semver string (e.g. `0.1.0`) |
 | (other keys) | Yes | Nested translation tree matching the English structure |
 
-Keys use dot-separated namespaces (e.g. `editor.keymap.title`). A pack that covers every key of the English baseline shows the version chip; partial packs show a "not set keys" link so translators can see what remains.
+Keys use dot-separated namespaces (e.g. `editor.keymap.title`). A pack that covers every key of the English baseline shows the version chip; partial packs show a "not set keys" link so translators can see what remains. Example language packs (including Japanese variants) are also available in the [`sample-packs/i18n/`](../sample-packs/i18n/) directory in the repository.
+
+### 6.4 Theme Packs Manage
+
+The Tools tab shows a **Theme Packs** row displaying the currently active theme pack (if any). Click **Edit** to open the Theme Packs modal.
+
+Theme packs override the application's colour palette. The built-in Light / Dark / System themes remain available; a theme pack layers its colours on top. Installed packs sync across devices via Cloud Sync.
+
+> **For theme pack authors:** See the [Theme Pack Authoring Guide](THEME-PACK-AUTHORING.html) for a complete colour token reference and design tips.
+
+**Installed section**
+
+![Theme Packs — Installed](screenshots/theme-packs-installed.png)
+
+Lists every theme pack on this device. Each row has a **radio circle** on the left — click it to apply that theme pack immediately. Click the active row again to deselect it and revert to the built-in theme. The three built-in options (Light / Dark / System) appear at the top.
+
+Each row shows:
+
+- **Name** (click to rename inline)
+- **Updated timestamp** (`YYYY-MM-DD HH:mm`)
+- **Version** chip
+- **.json** export shortcut and **Delete** button on the first line
+- **Open** / **Upload** / **Update** / **Sync** / **Remove** Hub actions on the second line (same pattern as Key Labels §6.2)
+
+A **pulsing green dot** next to the Sync button indicates that the Hub-side post is newer than the local copy (freshness check runs once per 5 minutes when the modal is open).
+
+The **Import** button in the toolbar opens a file dialog to import a `.json` theme pack. Re-importing a pack with the same `name` overwrites the existing entry.
+
+**Find on Hub tab**
+
+![Theme Packs — Find on Hub](screenshots/theme-packs-hub.png)
+
+Searches Pipette Hub for theme packs. Type 2 or more characters to start an automatic search (debounced). Each result shows the pack name, version, uploader, a **Preview** button, and either a **Download** action or an **Installed** marker.
+
+Click **Preview** to temporarily apply the theme's colours without installing. The preview resets when you close the modal, switch to the Installed tab, or click **Preview** again to toggle it off.
+
+**Authoring a Theme Pack**
+
+A theme pack `.json` defines a `name`, `version`, and a `colors` object mapping every colour token to a CSS colour value:
+
+```json
+{
+  "name": "Nord",
+  "version": "1.0.0",
+  "colorScheme": "dark",
+  "colors": {
+    "surface": "#2e3440",
+    "surface-alt": "#3b4252",
+    "surface-dim": "#272c36",
+    "surface-raised": "#434c5e",
+    "content": "#eceff4",
+    "content-secondary": "#d8dee9",
+    "content-muted": "#7b88a1",
+    "content-inverse": "#2e3440",
+    "edge": "#4c566a",
+    "edge-subtle": "#3b4252",
+    "edge-strong": "#d8dee9",
+    "accent": "#88c0d0",
+    "accent-hover": "#81a1c1",
+    "accent-alt": "#5e81ac",
+    "success": "#a3be8c",
+    "warning": "#ebcb8b",
+    "danger": "#bf616a",
+    "pending": "#b48ead",
+    "key-bg": "#3b4252",
+    "key-bg-hover": "#434c5e",
+    "key-bg-active": "#4c566a",
+    "key-border": "#4c566a",
+    "key-shadow": "rgba(0,0,0,0.3)",
+    "key-label": "#eceff4",
+    "key-sublabel": "#d8dee9",
+    "key-label-remap": "#88c0d0",
+    "key-bg-multi-selected": "#434c5e",
+    "tab-bg-active": "#3b4252",
+    "tab-text": "#7b88a1",
+    "tab-text-active": "#eceff4",
+    "picker-bg": "#2e3440",
+    "picker-item-bg": "#3b4252",
+    "picker-item-hover": "#434c5e",
+    "picker-item-text": "#eceff4",
+    "picker-item-border": "#4c566a"
+  }
+}
+```
+
+| Field | Required | Purpose |
+|------|:--:|---------|
+| `name` | Yes | Display name and uniqueness key for overwrite-on-import |
+| `version` | Yes | Semver string (e.g. `1.0.0`) |
+| `colorScheme` | Yes | `"light"` or `"dark"` — declares the intended brightness of the pack |
+| `colors` | Yes | Object mapping all 35 colour tokens to CSS colour values (`#hex`, `rgb()`, or `hsl()`) |
+
+All 35 colour tokens are required. Export any installed pack (row → `.json`) to get a complete template. Ready-to-use example theme packs (Kanagawa Wave / Dragon / Lotus and Solarized Light / Dark) are also available in the [`sample-packs/themes/`](../sample-packs/themes/) directory in the repository.
+
+### 6.5 Zoom (UI Scale)
+
+The Tools tab shows a **Zoom** row below Theme Packs. This setting scales the entire application UI (50–200%).
+
+![Zoom Setting](screenshots/settings-zoom.png)
+
+- Enter a percentage value in the input field (50–200) and press **Enter** or click away to apply
+- The zoom level takes effect immediately across all windows
+- This is a machine-local setting — it is not synced to other devices via Cloud Sync
+
+> **Note**: This is separate from the per-keyboard zoom in the toolbar (§4.1), which only scales the keymap editor display, and from the **Key Editor Zoom** in the Keycodes Overlay Panel (§3.14), which overrides the window zoom level while in key editor mode. The UI zoom here is the baseline applied on all other screens.
+
+> **Warning**: Changing the zoom level may cause layout issues at extreme values. Use at your own risk.
 
 ---
 
@@ -1587,7 +1700,7 @@ See the [Data Guide](Data.md) for details on how Hub authentication works.
 
 ## 8. Modal Interactions
 
-Pipette applies a uniform set of keyboard and dismissal rules to every top-level modal (Settings, Data, Macro, QMK Settings, Tap Dance, Combo, Key Override, Alt Repeat Key, Notification, Language Packs, Language Selector, Layout Store, Editor Settings, Favorite Store, and the History Toggle dialog).
+Pipette applies a uniform set of keyboard and dismissal rules to every top-level modal (Settings, Data, Macro, QMK Settings, Tap Dance, Combo, Key Override, Alt Repeat Key, Notification, Language Packs, Theme Packs, Language Selector, Layout Store, Editor Settings, Favorite Store, and the History Toggle dialog).
 
 ### Escape to Close
 
@@ -1615,13 +1728,27 @@ The status bar at the bottom of the screen shows connection information and acti
 
 ![Status Bar](screenshots/status-bar.png)
 
+**Status indicators** (left side)
+
 - **Device name**: Shows the name of the connected keyboard
 - **Loaded label**: The label of the loaded snapshot (shown only when a snapshot is loaded)
 - **Auto Advance**: Status of automatic key advancement after assigning a keycode (shown only when enabled)
-- **Key Tester**: Toggle button for Matrix Tester mode (requires matrix tester support; hidden when Typing Test is active)
-- **Typing View**: Toggle button to enter view-only mode — a compact window showing only the keyboard layout (see §4.3). Requires matrix tester support; hidden when Typing Test is active
-- **Typing Test**: Toggle button for Typing Test mode (requires matrix tester support)
 - **Locked / Unlocked**: Keyboard lock status (prevents accidental changes to dangerous keycodes)
 - **Sync status**: Cloud sync status (shown only when sync is configured)
 - **Hub connection**: Pipette Hub connection status (shown only when Hub is configured)
+
+**Quick Settings** (right side, shown when a keyboard is connected)
+
+Inline selectors for common per-session preferences. A `|` separator divides them from the mode buttons.
+
+- **Language**: Switch the UI language. Opens a dropdown of built-in languages and installed language packs (see §6.3)
+- **Theme**: Switch the color theme. Options include System, Light, Dark, and any installed theme packs (see §6.4)
+- **Key Labels**: Switch the key label set for the current keyboard. Options reflect the installed Key Labels store in drag order (see §6.2)
+- **Edit / Done**: Toggle edit mode. Replaces the selectors with **Language Packs**, **Theme Packs**, and **Key Labels** management modal buttons for installing, syncing, or reordering entries
+
+**Action buttons** (right side)
+
+- **Key Tester**: Toggle button for Matrix Tester mode (requires matrix tester support; hidden when Typing Test is active)
+- **Typing View**: Toggle button to enter view-only mode — a compact window showing only the keyboard layout (see §4.3). Requires matrix tester support; hidden when Typing Test is active
+- **Typing Test**: Toggle button for Typing Test mode (requires matrix tester support)
 - **Disconnect button**: Disconnects from the keyboard and returns to the device selection screen (hidden while Typing Test is active)

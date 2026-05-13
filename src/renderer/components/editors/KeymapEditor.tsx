@@ -49,6 +49,8 @@ interface PopoverForStateProps {
   encoderLayout: Map<string, number>
   currentLayer: number
   layers: number
+  onLayerChange?: (layer: number) => void
+  layerNames?: string[]
   onKeycodeSelect: (kc: Keycode) => void
   onRawKeycodeSelect: (code: number) => void
   onModMaskChange?: (newMask: number) => void
@@ -62,6 +64,7 @@ interface PopoverForStateProps {
 
 function PopoverForState({
   popoverState, keymap, encoderLayout, currentLayer, layers,
+  onLayerChange, layerNames,
   onKeycodeSelect, onRawKeycodeSelect, onModMaskChange, onClose,
   quickSelect, previousKeycode, onUndo, nextKeycode, onRedo,
 }: PopoverForStateProps) {
@@ -72,6 +75,7 @@ function PopoverForState({
   return (
     <KeyPopover
       anchorRect={popoverState.anchorRect} currentKeycode={currentKeycode} maskOnly={maskOnly} layers={layers}
+      currentLayer={currentLayer} onLayerChange={onLayerChange} layerNames={layerNames}
       onKeycodeSelect={onKeycodeSelect} onRawKeycodeSelect={onRawKeycodeSelect} onModMaskChange={onModMaskChange}
       onClose={onClose} quickSelect={quickSelect} previousKeycode={previousKeycode} onUndo={onUndo}
       nextKeycode={nextKeycode} onRedo={onRedo}
@@ -93,6 +97,8 @@ export const KeymapEditor = forwardRef<import('./keymap-editor-types').KeymapEdi
   basicViewType, onBasicViewTypeChange, splitKeyMode, onSplitKeyModeChange,
   quickSelect, onQuickSelectChange, keyboardLayout = 'qwerty', onKeyboardLayoutChange,
   onLock, onMatrixModeChange, onOpenLighting, onOpenRGBIndicator,
+  quickSelect, onQuickSelectChange, keyboardLayout: _keyboardLayout = 'qwerty', onKeyboardLayoutChange: _onKeyboardLayoutChange,
+  onLock, onMatrixModeChange, onOpenLighting,
   comboEntries, onOpenCombo, onSetComboEntry,
   keyOverrideEntries, onOpenKeyOverride, onSetKeyOverrideEntry,
   altRepeatKeyEntries, onOpenAltRepeatKey, onSetAltRepeatKeyEntry,
@@ -100,6 +106,7 @@ export const KeymapEditor = forwardRef<import('./keymap-editor-types').KeymapEdi
   layerNames, onSetLayerName,
   layerPanelOpen: layerPanelOpenProp, onLayerPanelOpenChange,
   scale: scaleProp = 1, onScaleChange,
+  keyEditorZoom, onKeyEditorZoomChange,
   typingTestMode, onTypingTestModeChange, onSaveTypingTestResult, typingTestHistory,
   typingTestConfig: savedTypingTestConfig, typingTestLanguage: savedTypingTestLanguage,
   onTypingTestConfigChange, onTypingTestLanguageChange,
@@ -114,7 +121,6 @@ export const KeymapEditor = forwardRef<import('./keymap-editor-types').KeymapEdi
   onViewAnalytics,
   tappingTermMs,
   deviceName, isDummy, onExportLayoutPdfAll, onExportLayoutPdfCurrent,
-  hubDisplayName, hubCanWrite,
   favHubOrigin, favHubNeedsDisplayName, favHubUploading, favHubUploadResult,
   onFavUploadToHub, onFavUpdateOnHub, onFavRemoveFromHub, onFavRenameOnHub,
   devices, connectedDevice, onDeviceListActiveChange,
@@ -978,6 +984,7 @@ export const KeymapEditor = forwardRef<import('./keymap-editor-types').KeymapEdi
         <PopoverForState
           popoverState={popoverState} keymap={keymap} encoderLayout={encoderLayout}
           currentLayer={currentLayer} layers={layers}
+          onLayerChange={onLayerChange} layerNames={layerNames}
           onKeycodeSelect={handlePopoverKeycodeSelect} onRawKeycodeSelect={handlePopoverRawKeycodeSelect}
           onModMaskChange={handlePopoverModMaskChange}
           onClose={() => setPopoverState(null)} quickSelect={quickSelect}
@@ -1001,7 +1008,7 @@ export const KeymapEditor = forwardRef<import('./keymap-editor-types').KeymapEdi
             onTabChange={() => { multiSelect.clearPickerSelection() }}
             highlightedKeycodes={configuredKeycodes} maskOnly={isMaskKey} lmMode={isLMMask} showHint={!isMaskKey}
             tabFooterContent={tabFooterContent} tabContentOverride={tabContentOverride}
-            basicViewType={basicViewType} splitKeyMode={splitKeyMode} remapLabel={remapLabel}
+            basicViewType={basicViewType} onBasicViewTypeChange={onBasicViewTypeChange} splitKeyMode={splitKeyMode} remapLabel={remapLabel}
             tabBarRight={
               <Tooltip content={t('editorSettings.title')}>
                 <button ref={layoutButtonRef} type="button" aria-label={t('editorSettings.title')}
@@ -1020,16 +1027,14 @@ export const KeymapEditor = forwardRef<import('./keymap-editor-types').KeymapEdi
               >
                 <KeycodesOverlayPanel
                   hasLayoutOptions={hasLayoutOptions} layoutOptions={parsedOptions} layoutValues={layoutValues}
-                  onLayoutOptionChange={handleLayoutOptionChange} keyboardLayout={keyboardLayout}
-                  onKeyboardLayoutChange={onKeyboardLayoutChange} autoAdvance={autoAdvance} onAutoAdvanceChange={onAutoAdvanceChange}
-                  basicViewType={basicViewType} onBasicViewTypeChange={onBasicViewTypeChange}
+                  onLayoutOptionChange={handleLayoutOptionChange} autoAdvance={autoAdvance} onAutoAdvanceChange={onAutoAdvanceChange}
                   splitKeyMode={splitKeyMode} onSplitKeyModeChange={onSplitKeyModeChange}
                   quickSelect={quickSelect} onQuickSelectChange={onQuickSelectChange}
                   matrixMode={matrixMode} hasMatrixTester={hasMatrixTester} onToggleMatrix={handleMatrixToggle}
                   unlocked={unlocked ?? false} onLock={onLock} isDummy={isDummy}
                   toolsExtra={toolsExtra} dataPanel={dataPanel}
+                  keyEditorZoom={keyEditorZoom} onKeyEditorZoomChange={onKeyEditorZoomChange}
                   onExportLayoutPdfAll={onExportLayoutPdfAll} onExportLayoutPdfCurrent={onExportLayoutPdfCurrent}
-                  hubDisplayName={hubDisplayName} hubCanWrite={hubCanWrite}
                 />
               </div>
             }

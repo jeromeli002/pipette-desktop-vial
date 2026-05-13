@@ -1,5 +1,5 @@
 {
-  "version": "0.1.2",
+  "version": "0.1.4",
   "name": "English",
   "common": {
     "save": "Save",
@@ -31,6 +31,8 @@
     "noLabel": "(No label)",
     "synced": "Synced",
     "installed": "Installed",
+    "edit": "Edit",
+    "done": "Done",
     "findOnHub": "Find on Hub",
     "searchPlaceholder": "Search Pipette Hub (type 2 or more characters)...",
     "findOnHubHint": "Browse uploaded files on <hub>Pipette Hub</hub>."
@@ -629,6 +631,16 @@
     "dark": "Dark",
     "system": "System"
   },
+  "themePacks": {
+    "manageRow": "Theme Packs Manage",
+    "title": "Theme Packs",
+    "import": "Import Theme Pack",
+    "parseError": "Failed to parse file",
+    "selectTheme": "Select {{name}}",
+    "hubEmpty": "No matching theme packs on the Hub",
+    "preview": "Preview",
+    "previewing": "Previewing"
+  },
   "layout": {
     "keyboardLayout": "Key Labels",
     "exportAllPdf": "All",
@@ -751,7 +763,9 @@
       "version": "Version {{version}}",
       "license": "License: {{license}}",
       "licenseValue": "GPL-3.0-or-later"
-    }
+    },
+    "zoomLevel": "Zoom",
+    "zoomLevelWarning": "Changing this may cause layout issues. Use at your own risk."
   },
   "analyze": {
     "noKeyboards": "No typing data yet.",
@@ -1454,7 +1468,8 @@
     "tabLayout": "Layout",
     "basicViewType": "Basic Tab View",
     "splitKeyMode": "Separate Shift in Key Picker",
-    "quickSelect": "Instant Key Selection"
+    "quickSelect": "Instant Key Selection",
+    "keyEditorZoom": "Key Editor Zoom"
   },
   "hub": {
     "uploadToHub": "Upload",
@@ -1623,8 +1638,8 @@
     "missingClose": "Close"
   },
   "i18n": {
-    "modalTitle": "Language",
-    "manageRow": "Language Manage",
+    "modalTitle": "Language Packs",
+    "manageRow": "Language Packs Manage",
     "edit": "Edit",
     "hubEmpty": "No matching language packs on the Hub",
     "search": "Search",
