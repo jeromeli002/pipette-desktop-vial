@@ -145,7 +145,7 @@ export function SettingsToolsTab({
                 data-testid="settings-language-active-name"
               >
                 {(() => {
-                  const activeId = appConfig.config.language ?? 'builtin:en'
+                  const activeId = appConfig.config.language ?? 'builtin:zh'
                   return languageOptions.find((l) => l.id === activeId)?.name ?? activeId
                 })()}
               </span>

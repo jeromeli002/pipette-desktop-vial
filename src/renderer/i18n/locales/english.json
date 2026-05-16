@@ -38,7 +38,7 @@
     "findOnHubHint": "Browse uploaded files on <hub>Pipette Hub</hub>."
   },
   "app": {
-    "title": "Pipette",
+    "title": "Pipette-JL",
     "deviceNotConnected": "No keyboard connected",
     "connecting": "Connecting{{dots}}",
     "selectDevices": "Select Device",

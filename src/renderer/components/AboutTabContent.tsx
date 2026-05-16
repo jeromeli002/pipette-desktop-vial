@@ -12,7 +12,7 @@ export function AboutTabContent() {
       <div className="flex flex-col items-center gap-3">
         <img
           src={appIcon}
-          alt="Pipette"
+          alt={t('app.title')}
           width={64}
           height={64}
           data-testid="about-app-icon"
@@ -21,7 +21,7 @@ export function AboutTabContent() {
           className="text-lg font-bold text-content"
           data-testid="about-app-name"
         >
-          Pipette
+          {t('app.title')}
         </h3>
         <span
           className="text-sm text-content-muted"
