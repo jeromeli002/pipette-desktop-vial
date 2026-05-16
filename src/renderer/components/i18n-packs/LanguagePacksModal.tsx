@@ -136,7 +136,7 @@ export function LanguagePacksModal({
     return () => { cancelled = true }
   }, [open, store.metas.length])
 
-  const activeLanguageId = appConfig.config.language ?? 'builtin:zh'
+  const activeLanguageId = appConfig.config.language ?? 'builtin:en'
 
   const installedRows: InstalledRow[] = useMemo(() => {
     const rows: InstalledRow[] = [{

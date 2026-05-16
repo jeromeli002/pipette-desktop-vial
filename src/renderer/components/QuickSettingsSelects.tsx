@@ -75,7 +75,7 @@ export function QuickSettingsSelects({
 
   const closeModal = useCallback(() => setActiveModal(null), [])
 
-  const currentLanguage = appConfig.config.language ?? 'builtin:zh'
+  const currentLanguage = appConfig.config.language ?? 'builtin:en'
   const currentTheme = appConfig.config.theme ?? 'system'
 
   return (

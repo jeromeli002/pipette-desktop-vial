@@ -105,7 +105,7 @@ export const DEFAULT_APP_CONFIG: AppConfig = {
   defaultAutoAdvance: true,
   defaultLayerPanelOpen: true,
   autoLockTime: 10,
-  language: 'builtin:zh',
+  language: 'builtin:en',
   hubEnabled: false,
   defaultBasicViewType: 'ansi',
   defaultSplitKeyMode: 'split',

@@ -38,7 +38,7 @@
     "searchPlaceholder": "Pipette Hub を検索 (2 文字以上で入力)…"
   },
   "app": {
-    "title": "Pipette-JL",
+    "title": "Pipette",
     "deviceNotConnected": "キーボードが接続されていません",
     "connecting": "接続中{{dots}}",
     "selectDevices": "デバイスを選択",
