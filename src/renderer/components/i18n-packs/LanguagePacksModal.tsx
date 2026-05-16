@@ -13,6 +13,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { Circle, CheckCircle2 } from 'lucide-react'
+import { BTN_PRIMARY, ICON_XL } from '../../constants/ui-tokens'
 import { ModalCloseButton } from '../editors/ModalCloseButton'
 import { useAppConfig } from '../../hooks/useAppConfig'
 import { useInlineRename } from '../../hooks/useInlineRename'
@@ -135,7 +136,7 @@ export function LanguagePacksModal({
     return () => { cancelled = true }
   }, [open, store.metas.length])
 
-  const activeLanguageId = appConfig.config.language ?? 'builtin:en'
+  const activeLanguageId = appConfig.config.language ?? 'builtin:zh'
 
   const installedRows: InstalledRow[] = useMemo(() => {
     const rows: InstalledRow[] = [{
@@ -594,7 +595,7 @@ export function LanguagePacksModal({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-2xl h-[80vh] flex flex-col rounded-lg bg-surface shadow-xl"
+        className="w-modal-lg max-w-modal-vw h-modal-80vh flex flex-col rounded-lg bg-surface shadow-xl"
         onClick={(e) => e.stopPropagation()}
         data-testid="language-packs-modal"
       >
@@ -623,7 +624,7 @@ export function LanguagePacksModal({
               type="button"
               disabled={hubSearching || search.trim().length < 2}
               onClick={() => void runSearch(search.trim())}
-              className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+              className={BTN_PRIMARY}
               data-testid="language-packs-search-button"
             >
               {hubSearching ? t('keyLabels.searching') : t('i18n.search')}
@@ -804,7 +805,7 @@ function InstalledRowView({
           onBlur={() => void onRenameCommit(row.packId as string)}
           onKeyDown={(e) => onRenameKey(e, row.packId as string)}
           maxLength={64}
-          className="w-full border-b border-edge bg-transparent px-1 text-sm text-content outline-none focus:border-accent"
+          className="w-full border-b border-edge bg-transparent px-1 text-sm text-content focus:outline-none focus:border-accent"
           data-testid={`language-packs-rename-input-${row.reactKey}`}
         />
       )
@@ -847,9 +848,9 @@ function InstalledRowView({
           data-testid={`language-packs-select-${row.reactKey}`}
         >
           {row.active ? (
-            <CheckCircle2 size={18} className="text-accent" aria-hidden="true" />
+            <CheckCircle2 size={ICON_XL} className="text-accent" aria-hidden="true" />
           ) : (
-            <Circle size={18} aria-hidden="true" />
+            <Circle size={ICON_XL} aria-hidden="true" />
           )}
         </button>
         <div className="flex-1 min-w-0 text-sm font-medium">{renderName()}</div>
@@ -959,7 +960,7 @@ function InstalledRowView({
         <span className="flex-1 min-w-0">
           {lastResult && (lastResult.id === row.packId || lastResult.id === row.hubPostId) && (
             <span
-              className={`text-[11px] font-medium ${lastResult.kind === 'success' ? 'text-accent' : 'text-rose-600'}`}
+              className={`text-xs font-medium ${lastResult.kind === 'success' ? 'text-accent' : 'text-rose-600'}`}
               data-testid={`language-packs-result-${row.reactKey}`}
             >
               {lastResult.message}
@@ -999,7 +1000,7 @@ function InstalledRowView({
             {hasUpdateAvailable && (
               <span
                 aria-hidden="true"
-                className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"
+                className="h-1.5 w-1.5 rounded-full bg-success animate-pulse"
                 data-testid={`language-packs-update-available-${row.reactKey}`}
               />
             )}

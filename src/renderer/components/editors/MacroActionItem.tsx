@@ -2,7 +2,9 @@
 
 import { useTranslation } from 'react-i18next'
 import { GripVertical, X } from 'lucide-react'
+import { ICON_SM, ICON_LG } from '../../constants/ui-tokens'
 import { isValidMacroText, type MacroAction } from '../../../preload/macro'
+import { INPUT_BASE } from './store-modal-shared'
 import { KeycodeField, KEYCODE_FIELD_SIZE } from './KeycodeField'
 import { Tooltip } from '../ui/Tooltip'
 
@@ -90,7 +92,7 @@ export function MacroActionItem({
               onChange={(e) => onChange(index, { type: 'text', text: e.target.value })}
               placeholder={t('editor.macro.text')}
               disabled={disabled}
-              className={`w-full rounded border px-2 py-1 text-sm disabled:opacity-50 ${valid ? 'border-edge' : 'border-danger'}`}
+              className={`w-full rounded border px-2 py-1 text-sm focus:border-accent focus:outline-none disabled:opacity-50 ${valid ? 'border-edge' : 'border-danger'}`}
             />
             {!valid && (
               <p className="mt-0.5 text-xs text-danger">{t('editor.macro.asciiOnly')}</p>
@@ -119,7 +121,7 @@ export function MacroActionItem({
                   type="button"
                   data-testid="macro-edit-action"
                   style={{ width: KEYCODE_FIELD_SIZE, height: KEYCODE_FIELD_SIZE }}
-                  className="flex shrink-0 rounded-sm outline outline-1 outline-dashed outline-edge hover:outline-accent disabled:opacity-50"
+                  className="flex shrink-0 rounded outline outline-1 outline-dashed outline-edge hover:outline-accent disabled:opacity-50"
                   onClick={() => onEditClick(action.keycodes.length)}
                   disabled={disabled}
                   aria-label={t('editor.macro.addKeycode')}
@@ -143,7 +145,7 @@ export function MacroActionItem({
                 })
               }
               disabled={disabled}
-              className="w-24 rounded border border-edge px-2 py-1 text-sm disabled:opacity-50"
+              className={`w-24 ${INPUT_BASE}`}
             />
             <span className="text-sm text-content-secondary">ms</span>
           </div>
@@ -156,7 +158,7 @@ export function MacroActionItem({
   if (focusMode && isKeycodeType) {
     return (
       <div className="flex items-center gap-3">
-        <label className="min-w-[60px] text-sm text-content">{typeLabels[action.type]}</label>
+        <label className="min-w-keycode text-sm text-content">{typeLabels[action.type]}</label>
         <div className="flex flex-wrap items-center gap-1 flex-1">
           {action.keycodes.map((kc, ki) => {
             const isSelected = selectedKeycodeIndex === ki
@@ -179,7 +181,7 @@ export function MacroActionItem({
               type="button"
               data-testid="macro-add-keycode"
               style={{ width: KEYCODE_FIELD_SIZE, height: KEYCODE_FIELD_SIZE }}
-              className={`flex shrink-0 rounded-sm outline outline-1 outline-dashed disabled:opacity-50 ${
+              className={`flex shrink-0 rounded outline outline-1 outline-dashed disabled:opacity-50 ${
                 selectedKeycodeIndex === action.keycodes.length
                   ? 'outline-accent'
                   : 'outline-edge hover:outline-accent'
@@ -200,7 +202,7 @@ export function MacroActionItem({
             disabled={disabled}
             aria-label={t('common.close')}
           >
-            <X size={20} aria-hidden="true" />
+            <X size={ICON_LG} aria-hidden="true" />
           </button>
         )}
       </div>
@@ -220,8 +222,8 @@ export function MacroActionItem({
         onDragEnd={disabled ? undefined : onDragEnd}
         className={`flex items-center gap-1.5 border-r border-edge py-1 pl-1 pr-3 ${disabled ? '' : 'cursor-grab active:cursor-grabbing'}`}
       >
-        <GripVertical className="shrink-0 text-content-muted" size={14} />
-        <span className="min-w-[36px] text-center text-sm text-content-secondary">
+        <GripVertical className="shrink-0 text-content-muted" size={ICON_SM} />
+        <span className="min-w-9 text-center text-sm text-content-secondary">
           {typeLabels[action.type]}
         </span>
       </div>
@@ -236,7 +238,7 @@ export function MacroActionItem({
           className="rounded p-1 text-content-muted hover:text-danger disabled:opacity-50"
           aria-label={t('common.delete')}
         >
-          <X size={20} aria-hidden="true" />
+          <X size={ICON_LG} aria-hidden="true" />
         </button>
       </Tooltip>
     </div>

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useInlineRename } from '../../hooks/useInlineRename'
 import { ACTION_BTN, CONFIRM_DELETE_BTN, DELETE_BTN, SectionHeader, formatDate } from './store-modal-shared'
+import { BTN_PRIMARY } from '../../constants/ui-tokens'
 import { FavoriteHubActions } from './FavoriteHubActions'
 import type { FavHubEntryResult } from './FavoriteHubActions'
 import type { FavoriteType, SavedFavoriteMeta } from '../../../shared/types/favorite-store'
@@ -162,13 +163,13 @@ export function FavoriteStoreContent({
               onChange={(e) => setSaveLabel(e.target.value)}
               placeholder={t('common.labelPlaceholder')}
               maxLength={200}
-              className="flex-1 rounded-lg border border-edge bg-surface px-3.5 py-2 text-[13px] text-content placeholder:text-content-muted focus:border-accent focus:outline-none"
+              className="flex-1 rounded-lg border border-edge bg-surface px-3.5 py-2 text-sm text-content placeholder:text-content-muted focus:border-accent focus:outline-none"
               data-testid="favorite-store-save-input"
             />
             <button
               type="submit"
               disabled={!canSubmitSave}
-              className="shrink-0 rounded bg-accent px-4 py-2 text-sm text-content-inverse hover:bg-accent-hover disabled:opacity-50"
+              className={`shrink-0 ${BTN_PRIMARY}`}
               data-testid="favorite-store-save-submit"
             >
               {t('common.save')}
@@ -177,12 +178,12 @@ export function FavoriteStoreContent({
           {(onExportCurrent || onImportCurrent || showExported || showImported) && (
             <div className="flex items-center gap-1 mt-2">
               {showImported && (
-                <span className="text-[11px] font-medium text-emerald-500" data-testid="favorite-store-imported">
+                <span className="text-xs font-medium text-success" data-testid="favorite-store-imported">
                   {t('common.imported')}
                 </span>
               )}
               {showExported && (
-                <span className="text-[11px] font-medium text-emerald-500" data-testid="favorite-store-exported">
+                <span className="text-xs font-medium text-success" data-testid="favorite-store-exported">
                   {t('common.exported')}
                 </span>
               )}
@@ -211,11 +212,11 @@ export function FavoriteStoreContent({
       {/* Scrollable Synced Data list */}
       <div className="flex-1 min-h-0 overflow-y-auto border-l border-edge px-5 pb-5">
         {loading && (
-          <div className="py-4 text-center text-[13px] text-content-muted">{t('common.loading')}</div>
+          <div className="py-4 text-center text-sm text-content-muted">{t('common.loading')}</div>
         )}
 
         {!loading && entries.length === 0 && (
-          <div className="py-4 text-center text-[13px] text-content-muted" data-testid="favorite-store-empty">
+          <div className="py-4 text-center text-sm text-content-muted" data-testid="favorite-store-empty">
             {t('favoriteStore.noSaved')}
           </div>
         )}
@@ -238,7 +239,7 @@ export function FavoriteStoreContent({
                         onBlur={() => void commitRename(entry.id)}
                         onKeyDown={(e) => handleRenameKeyDown(e, entry.id)}
                         maxLength={200}
-                        className="w-full border-b border-edge bg-transparent px-1 text-sm font-semibold text-content outline-none focus:border-accent"
+                        className="w-full border-b border-edge bg-transparent px-1 text-sm font-semibold text-content focus:outline-none focus:border-accent"
                         data-testid="favorite-store-rename-input"
                         autoFocus
                       />
@@ -297,7 +298,7 @@ export function FavoriteStoreContent({
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-content-muted font-mono">
+                  <span className="text-xs text-content-muted font-mono">
                     {formatDate(entry.savedAt)}
                   </span>
                   <button

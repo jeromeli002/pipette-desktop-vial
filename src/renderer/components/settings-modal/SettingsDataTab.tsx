@@ -82,7 +82,7 @@ export function SettingsDataTab({
     <div className="pt-4">
       {/* Google Account */}
       <section className="mb-4">
-        <h3 className="mb-3 text-[15px] font-bold text-content">
+        <h3 className="mb-3 text-heading-md font-bold text-content">
           {t('sync.googleAccount')}
         </h3>
         {sync.authStatus.authenticated ? (
@@ -108,7 +108,7 @@ export function SettingsDataTab({
           <div className="space-y-2">
             <button
               type="button"
-              className="w-full rounded bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 disabled:opacity-50"
+              className={`w-full ${BTN_PRIMARY}`}
               onClick={handleSignIn}
               disabled={authenticating}
               data-testid="sync-sign-in"
@@ -127,7 +127,7 @@ export function SettingsDataTab({
       <hr className="my-4 border-edge" />
 
       {/* Data Sync */}
-      <h3 className="mb-3 text-[15px] font-bold text-content" data-testid="data-sync-title">
+      <h3 className="mb-3 text-heading-md font-bold text-content" data-testid="data-sync-title">
         {t('settings.dataSync')}
       </h3>
 
@@ -169,7 +169,7 @@ export function SettingsDataTab({
       {/* Sync Controls */}
       <div className="mb-2 grid grid-cols-2 gap-3">
         <div className={ROW_CLASS} data-testid="sync-auto-row">
-          <span className="text-[13px] font-medium text-content">
+          <span className="text-sm font-medium text-content">
             {t('sync.autoSync')}
           </span>
           <button
@@ -184,7 +184,7 @@ export function SettingsDataTab({
         </div>
 
         <div className={ROW_CLASS} data-testid="sync-manual-row">
-          <span className="text-[13px] font-medium text-content">
+          <span className="text-sm font-medium text-content">
             {t('sync.manualSync')}
           </span>
           <button
@@ -210,7 +210,7 @@ export function SettingsDataTab({
       <hr className="my-4 border-edge" />
 
       {/* Pipette Hub */}
-      <h3 className="mb-3 text-[15px] font-bold text-content" data-testid="pipette-hub-title">
+      <h3 className="mb-3 text-heading-md font-bold text-content" data-testid="pipette-hub-title">
         {t('hub.pipetteHub')}
       </h3>
 
@@ -243,7 +243,7 @@ export function SettingsDataTab({
           <div data-testid="hub-enable-row">
             <button
               type="button"
-              className="w-full rounded bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 disabled:opacity-50"
+              className={`w-full ${BTN_PRIMARY}`}
               onClick={() => onHubEnabledChange(true)}
               disabled={!hubAuthenticated}
               data-testid="hub-enable-toggle"

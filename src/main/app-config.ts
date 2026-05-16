@@ -32,12 +32,13 @@ export function getAppConfigStore(): Store<AppConfig> {
  * canonical id and an optional `oneShotNotice` flag the UI surfaces
  * once before persisting `null` back. */
 function migrateLanguage(raw: unknown): { id: string; oneShotNotice?: 'ja-removed' } {
-  if (typeof raw !== 'string') return { id: 'builtin:en' }
-  if (raw === 'en') return { id: 'builtin:en' }
-  if (raw === 'ja') return { id: 'builtin:en', oneShotNotice: 'ja-removed' }
-  if (raw === 'builtin:en') return { id: raw }
+  if (typeof raw !== 'string') return { id: 'builtin:zh' }
+  if (raw === 'en') return { id: 'builtin:zh' }
+  if (raw === 'ja') return { id: 'builtin:zh', oneShotNotice: 'ja-removed' }
+  if (raw === 'builtin:en') return { id: 'builtin:zh' }
+  if (raw === 'builtin:zh') return { id: raw }
   if (raw.startsWith('pack:')) return { id: raw }
-  return { id: 'builtin:en' }
+  return { id: 'builtin:zh' }
 }
 
 let migrationApplied = false

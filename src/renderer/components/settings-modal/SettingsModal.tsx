@@ -7,7 +7,7 @@ import type { SettingsModalProps } from './settings-modal-shared'
 import { useSettingsSync } from './useSettingsSync'
 import { SettingsToolsTab } from './SettingsToolsTab'
 import { SettingsDataTab } from './SettingsDataTab'
-import { SettingsGuideTab } from './SettingsGuideTab'
+import { SettingsNotificationTab } from './SettingsNotificationTab'
 import { ModalCloseButton } from '../editors/ModalCloseButton'
 import { useEscapeClose } from '../../hooks/useEscapeClose'
 import { ModalTabBar, ModalTabPanel } from '../editors/modal-tabs'
@@ -70,7 +70,7 @@ export function SettingsModal({
         aria-modal="true"
         aria-busy={syncState.busy}
         aria-labelledby="settings-title"
-        className="w-[760px] max-w-[90vw] h-[min(840px,85vh)] flex flex-col rounded-2xl bg-surface-alt border border-edge shadow-xl overflow-hidden"
+        className="w-modal-lg max-w-modal-vw h-modal-settings flex flex-col rounded-2xl bg-surface-alt border border-edge shadow-xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
         data-testid="settings-modal"
       >
@@ -148,8 +148,11 @@ export function SettingsModal({
               handleAutoSyncToggle={syncState.handleAutoSyncToggle}
             />
           )}
-          {activeTab === 'guide' && (
-            <SettingsGuideTab />
+          {activeTab === 'notification' && (
+            <SettingsNotificationTab
+              recentNotifications={syncState.recentNotifications}
+              notificationLoading={syncState.notificationLoading}
+            />
           )}
           {activeTab === 'about' && <AboutTabContent />}
         </ModalTabPanel>

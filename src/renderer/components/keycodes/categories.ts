@@ -54,9 +54,6 @@ import {
   KEYCODES_USER,
   KEYCODES_MACRO,
   KEYCODES_MACRO_BASE,
-  KEYCODES_JLKB,
-  KEYCODES_JLKB_DIAL,
-  KEYCODES_JLKB_NEWKEYS,
   KEYCODES_MIDI,
   KEYCODES_MIDI_BASIC,
   KEYCODES_MIDI_OCTAVE,
@@ -284,15 +281,6 @@ export const KEYCODE_CATEGORIES: KeycodeCategory[] = [
     getKeycodes: () => KEYCODES_MACRO,
     getGroups: () => [
       { labelKey: 'keycodes.group.macroDM', keycodes: KEYCODES_MACRO_BASE },
-    ],
-  },
-  {
-    id: 'jlkb',
-    labelKey: 'keycodes.jlkb',
-    getKeycodes: () => KEYCODES_JLKB,
-     getGroups: () => [
-      { labelKey: 'keycodes.group.dial', keycodes: KEYCODES_JLKB_DIAL },
-      { labelKey: 'keycodes.group.newKeys', keycodes: KEYCODES_JLKB_NEWKEYS },
     ],
   },
   {

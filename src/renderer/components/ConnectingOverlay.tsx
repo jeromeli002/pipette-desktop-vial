@@ -48,7 +48,7 @@ export function ConnectingOverlay({
           </svg>
         </div>
 
-        <div className="flex min-h-[7rem] max-w-xs flex-col items-center justify-center gap-2">
+        <div className="flex min-h-28 max-w-xs flex-col items-center justify-center gap-2">
           <p className="text-sm text-content-secondary">
             {syncOnly
               ? t('sync.syncing')
@@ -68,7 +68,7 @@ export function ConnectingOverlay({
             </p>
           )}
           {deviceId && (
-            <p className="font-mono text-[11px] tracking-wide text-content-muted">
+            <p className="font-mono text-xs tracking-wide text-content-muted">
               {deviceId}
             </p>
           )}

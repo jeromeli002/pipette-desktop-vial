@@ -20,7 +20,7 @@ export function AppConfigProvider({ children }: { children: ReactNode }): ReactN
   useEffect(() => {
     window.vialAPI.appConfigGetAll().then((loaded) => {
       setConfig(loaded)
-      void i18n.changeLanguage(loaded.language ?? 'zhCN')
+      void i18n.changeLanguage(loaded.language ?? 'builtin:zh')
       setLoading(false)
     }).catch(() => {
       setLoading(false)

@@ -177,8 +177,11 @@ function clampNormalized(value: number, origin: number, size: number): number {
   return clamp((value - origin) / size, 0, 1)
 }
 
+// Exception: uses rounded-md (not rounded) to match the picker panel's
+// larger radius tier, and hover:text-content instead of hover:bg-surface-dim.
+// Cannot use BTN_TOGGLE_ACTIVE/INACTIVE from ui-tokens (those use rounded + px-2 py-1).
 function toggleButtonClass(active: boolean): string {
-  const base = 'rounded-md border px-3 py-1.5 text-[13px] transition-colors'
+  const base = 'rounded-md border px-3 py-1.5 text-sm transition-colors'
   if (active) return `${base} border-accent bg-accent/10 text-accent`
   return `${base} border-edge text-content-secondary hover:text-content`
 }
@@ -260,7 +263,7 @@ export function HSVColorPicker({
   }
 
   return (
-    <div className="flex w-[15rem] flex-col gap-3">
+    <div className="flex w-color-picker flex-col gap-3">
       {/* Mode toggle */}
       <div className="flex gap-1.5">
         <button
@@ -284,7 +287,7 @@ export function HSVColorPicker({
           {/* 10x10 Palette grid */}
           <div
             data-testid="palette-grid"
-            className="grid grid-cols-[repeat(10,1.5rem)] gap-0"
+            className="grid grid-cols-swatches gap-0"
           >
             {PALETTE.map((entry, i) => {
               const selected = i === nearestIdx
@@ -297,7 +300,7 @@ export function HSVColorPicker({
                   data-selected={selected || undefined}
                   className={
                     selected
-                      ? 'relative z-10 h-6 w-6 rounded-none border-0 p-0 ring-2 ring-white shadow-[0_0_0_1px_rgba(0,0,0,0.3)]'
+                      ? 'relative z-10 h-6 w-6 rounded-none border-0 p-0 ring-2 ring-content-inverse shadow-color-swatch'
                       : 'h-6 w-6 rounded-none border-0 p-0'
                   }
                   style={{ backgroundColor: entry.hex }}
@@ -317,10 +320,13 @@ export function HSVColorPicker({
       ) : (
         <>
           {/* Saturation-Value picker area */}
+          {/* Exception: HSV gradient requires absolute #000/#fff as algorithm-level
+              canvas colors for the saturation/value axes; these are not theme
+              colors and must not be replaced with CSS variables. */}
           <div
             ref={svRef}
             data-testid="sv-picker"
-            className="relative h-[180px] cursor-crosshair rounded-lg"
+            className="relative h-color-picker-sv cursor-crosshair rounded-lg"
             style={{
               background:
                 'linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, transparent)',
@@ -329,6 +335,9 @@ export function HSVColorPicker({
             }}
             {...svHandlers}
           >
+            {/* Exception: border-white keeps the cursor thumb visible across the
+                full gradient (dark→light); border-content-inverse flips to near-black
+                in dark mode, making it invisible against dark gradient areas. */}
             <div
               className="pointer-events-none absolute h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow"
               style={{
@@ -346,6 +355,8 @@ export function HSVColorPicker({
             style={{ background: HUE_GRADIENT, touchAction: 'none' }}
             {...hueHandlers}
           >
+            {/* Exception: border-white keeps the hue thumb visible across all
+                hue colors; same rationale as the SV picker cursor above. */}
             <div
               className="pointer-events-none absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow"
               style={{

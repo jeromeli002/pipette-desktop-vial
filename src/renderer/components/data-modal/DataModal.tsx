@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { useTroubleshooting } from '../../hooks/useTroubleshooting'
 import { useEscapeClose } from '../../hooks/useEscapeClose'
 import { ModalCloseButton } from '../editors/ModalCloseButton'
-import { BTN_SECONDARY as SETTINGS_BTN_SECONDARY } from '../settings-modal/settings-modal-shared'
+import { BTN_SECONDARY, BTN_DANGER_OUTLINE } from '../../constants/ui-tokens'
 import { HubPostRow, DEFAULT_PER_PAGE } from '../hub-post-shared'
 import { DataNavTree } from './DataNavTree'
 import { DataNavBreadcrumb } from './DataNavBreadcrumb'
@@ -203,7 +203,7 @@ export function DataModal({
 
     if (path.page === 'sync-favorite') {
       return (
-        <div className="py-4 text-center text-[13px] text-content-muted">
+        <div className="py-4 text-center text-sm text-content-muted">
           {t(`editor.${path.favoriteType}.title`)}
         </div>
       )
@@ -271,7 +271,7 @@ export function DataModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="data-modal-title"
-        className="w-[860px] max-w-[95vw] h-[min(720px,80vh)] flex flex-col rounded-2xl bg-surface-alt border border-edge shadow-xl overflow-hidden"
+        className="w-modal-data max-w-modal-xl-vw h-modal-data flex flex-col rounded-2xl bg-surface-alt border border-edge shadow-xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
         data-testid="data-modal"
       >
@@ -284,7 +284,7 @@ export function DataModal({
         {/* Body: sidebar + content */}
         <div className="flex flex-1 min-h-0">
           {/* Sidebar */}
-          <div className="w-[220px] shrink-0 border-r border-edge overflow-y-auto">
+          <div className="w-data-sidebar shrink-0 border-r border-edge overflow-y-auto">
             <DataNavTree
               storedKeyboards={nav.storedKeyboards}
               typingKeyboards={nav.typingKeyboards}
@@ -348,7 +348,7 @@ function LocalApplicationContent({
           <div className="flex items-center gap-2">
             <button
               type="button"
-              className={SETTINGS_BTN_SECONDARY}
+              className={BTN_SECONDARY}
               onClick={troubleshoot.handleImport}
               disabled={troubleshoot.busy}
               data-testid="local-data-import"
@@ -357,7 +357,7 @@ function LocalApplicationContent({
             </button>
             <button
               type="button"
-              className={SETTINGS_BTN_SECONDARY}
+              className={BTN_SECONDARY}
               onClick={troubleshoot.handleExport}
               disabled={troubleshoot.busy}
               data-testid="local-data-export"
@@ -371,8 +371,6 @@ function LocalApplicationContent({
     </div>
   )
 }
-
-const BTN_DANGER_OUTLINE = 'rounded border border-danger px-3 py-1 text-sm text-danger hover:bg-danger/10 disabled:opacity-50'
 
 /** Simple application settings reset with confirm */
 function AppSettingsReset({
@@ -397,7 +395,7 @@ function AppSettingsReset({
           <button type="button" className={BTN_DANGER_OUTLINE} onClick={() => void handleReset()} disabled={troubleshoot.busy} data-testid="app-reset-confirm">
             {t('common.confirmReset')}
           </button>
-          <button type="button" className={SETTINGS_BTN_SECONDARY} onClick={() => setConfirming(false)} data-testid="app-reset-cancel">
+          <button type="button" className={BTN_SECONDARY} onClick={() => setConfirming(false)} data-testid="app-reset-cancel">
             {t('common.cancel')}
           </button>
         </div>

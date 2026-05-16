@@ -17,7 +17,7 @@ export interface Quote {
 
 export const WORD_COUNT_OPTIONS = [15, 30, 60, 120] as const
 export const TIME_DURATION_OPTIONS = [15, 30, 60, 120] as const
-export const DEFAULT_LANGUAGE = 'english'
+export const DEFAULT_LANGUAGE = 'chinese'
 export const DEFAULT_CONFIG: TypingTestConfig = {
   mode: 'words',
   wordCount: 30,

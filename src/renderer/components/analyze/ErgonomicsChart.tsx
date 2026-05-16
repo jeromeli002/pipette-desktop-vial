@@ -33,6 +33,7 @@ import { aggregateErgonomics, ROW_ORDER } from './analyze-ergonomics'
 import { fetchMatrixHeatmapAllLayers } from './analyze-fetch'
 import { KeystrokeCountTooltip, Stat, TooltipShell } from './analyze-tooltip'
 import { ErgonomicsLearningCurveChart } from './ErgonomicsLearningCurveChart'
+import { CHART_TICK_FONT_SIZE } from '../../utils/chart-palette'
 
 interface Props {
   uid: string
@@ -65,8 +66,8 @@ type BarDatum = { label: string; value: number }
 type FingerKind = 'thumb' | 'index' | 'middle' | 'ring' | 'pinky'
 const FINGER_KINDS: readonly FingerKind[] = ['thumb', 'index', 'middle', 'ring', 'pinky']
 
-const PYRAMID_LEFT_COLOR = '#3b82f6'
-const PYRAMID_RIGHT_COLOR = '#ef4444'
+const PYRAMID_LEFT_COLOR = 'var(--color-accent-hover)'
+const PYRAMID_RIGHT_COLOR = 'var(--color-danger)'
 
 interface PyramidDatum {
   /** Localised category label (drives YAxis ticks). */
@@ -95,7 +96,7 @@ const Section = memo(function Section({
 }: SectionProps) {
   return (
     <div data-testid={testId}>
-      <h4 className="mb-1 text-[13px] font-semibold text-content-secondary">
+      <h4 className="mb-1 text-sm font-semibold text-content-secondary">
         {title}
       </h4>
       <div style={{ height }}>
@@ -111,13 +112,13 @@ const Section = memo(function Section({
                 <XAxis
                   type="number"
                   stroke="var(--color-content-muted)"
-                  fontSize={11}
+                  fontSize={CHART_TICK_FONT_SIZE}
                 />
                 <YAxis
                   type="category"
                   dataKey="label"
                   stroke="var(--color-content-muted)"
-                  fontSize={11}
+                  fontSize={CHART_TICK_FONT_SIZE}
                   width={80}
                 />
               </>
@@ -127,9 +128,9 @@ const Section = memo(function Section({
                   type="category"
                   dataKey="label"
                   stroke="var(--color-content-muted)"
-                  fontSize={11}
+                  fontSize={CHART_TICK_FONT_SIZE}
                 />
-                <YAxis type="number" stroke="var(--color-content-muted)" fontSize={11} />
+                <YAxis type="number" stroke="var(--color-content-muted)" fontSize={CHART_TICK_FONT_SIZE} />
               </>
             )}
             <Tooltip
@@ -177,7 +178,7 @@ const HandPyramidChart = memo(function HandPyramidChart({
   return (
     <div data-testid={testId}>
       <div className="mb-1 flex items-center justify-between gap-2">
-        <h4 className="text-[13px] font-semibold text-content-secondary">{title}</h4>
+        <h4 className="text-sm font-semibold text-content-secondary">{title}</h4>
         {titleAction}
       </div>
       <div style={{ height }}>
@@ -194,13 +195,13 @@ const HandPyramidChart = memo(function HandPyramidChart({
               domain={[-maxAbs, maxAbs]}
               tickFormatter={(v) => Math.abs(Number(v)).toLocaleString()}
               stroke="var(--color-content-muted)"
-              fontSize={11}
+              fontSize={CHART_TICK_FONT_SIZE}
             />
             <YAxis
               type="category"
               dataKey="category"
               stroke="var(--color-content-muted)"
-              fontSize={11}
+              fontSize={CHART_TICK_FONT_SIZE}
               width={yAxisWidth}
             />
             <Tooltip
@@ -389,21 +390,21 @@ function ErgonomicsSnapshotView({
 
   if (loading) {
     return (
-      <div className="py-4 text-center text-[13px] text-content-muted" data-testid="analyze-ergonomics-loading">
+      <div className="py-4 text-center text-sm text-content-muted" data-testid="analyze-ergonomics-loading">
         {t('common.loading')}
       </div>
     )
   }
   if (!layout || keys.length === 0) {
     return (
-      <div className="py-4 text-center text-[13px] text-content-muted" data-testid="analyze-ergonomics-no-layout">
+      <div className="py-4 text-center text-sm text-content-muted" data-testid="analyze-ergonomics-no-layout">
         {t('analyze.ergonomics.noLayout')}
       </div>
     )
   }
   if (aggregation.total === 0) {
     return (
-      <div className="py-4 text-center text-[13px] text-content-muted" data-testid="analyze-ergonomics-empty">
+      <div className="py-4 text-center text-sm text-content-muted" data-testid="analyze-ergonomics-empty">
         {t('analyze.ergonomics.noData')}
       </div>
     )
@@ -417,7 +418,7 @@ function ErgonomicsSnapshotView({
         * needs the wider column to keep the diverging axis legible.
         * `min-w-0` keeps recharts measurement from forcing either child
         * past its grid track. */}
-      <div className="grid grid-cols-[1fr_3fr] gap-4">
+      <div className="grid grid-cols-1-3 gap-4">
         <div className="min-w-0">
           <Section
             title={t('analyze.ergonomics.handBalance')}
@@ -438,7 +439,7 @@ function ErgonomicsSnapshotView({
               onOpenFingerAssignment ? (
                 <button
                   type="button"
-                  className="rounded-md border border-edge bg-surface px-3 py-1 text-[12px] text-content-secondary transition-colors hover:border-accent hover:text-content"
+                  className="rounded-md border border-edge bg-surface px-3 py-1 text-xs text-content-secondary transition-colors hover:border-accent hover:text-content"
                   onClick={onOpenFingerAssignment}
                   data-testid="analyze-finger-assignment-open"
                 >
@@ -452,7 +453,7 @@ function ErgonomicsSnapshotView({
       {/* Row 2: Row balance (sum across hands) sits next to its
         * left/right pyramid so the totals and the per-hand split
         * read together. */}
-      <div className="grid grid-cols-[1fr_3fr] gap-4">
+      <div className="grid grid-cols-1-3 gap-4">
         <div className="min-w-0">
           <Section
             title={t('analyze.ergonomics.rowUsage')}

@@ -39,7 +39,6 @@ import { AnalyzePage } from './components/analyze/AnalyzePage'
 import { buildKeymapSnapshot } from './components/analyze/keymap-snapshot-builder'
 import { LayoutStoreContent } from './components/editors/LayoutStoreModal'
 import { ROW_CLASS } from './components/editors/modal-controls'
-import { RGBIndicatorConfigurator } from './components/editors/RGBIndicatorConfigurator'
 import { ModalCloseButton } from './components/editors/ModalCloseButton'
 import { decodeLayoutOptions } from '../shared/kle/layout-options'
 import { ZOOM_FACTOR_DEFAULT } from '../shared/types/app-config'
@@ -68,13 +67,6 @@ export function App() {
   const keyboard = useKeyboard()
   const sync = useSync()
   const startupNotification = useStartupNotification()
-
-  // Set window title using internationalized app name
-  useEffect(() => {
-    if (window.vialAPI && window.vialAPI.setWindowTitle) {
-      window.vialAPI.setWindowTitle(t('app.name'))
-    }
-  }, [t])
 
   const effectiveIsDummy = device.isDummy && !device.isPipetteFile
 
@@ -586,7 +578,7 @@ export function App() {
     <>
       {(fileHandlers.handleImportVil || (!device.isDummy && sideload.sideloadJson)) && (
         <div className={ROW_CLASS} data-testid="overlay-import-row">
-          <span className="text-[13px] font-medium text-content">{t('layoutStore.import')}</span>
+          <span className="text-sm font-medium text-content">{t('layoutStore.import')}</span>
           <div className="flex gap-2">
             <button
               type="button"
@@ -783,7 +775,6 @@ export function App() {
             onLock={lifecycle.handleLock}
             onMatrixModeChange={editorUI.handleMatrixModeChange}
             onOpenLighting={editorUI.lightingSupported ? () => editorUI.setShowLightingModal(true) : undefined}
-            onOpenRGBIndicator={() => editorUI.setShowRGBIndicatorModal(true)}
             comboEntries={editorUI.comboSupported ? keyboard.comboEntries : undefined}
             onOpenCombo={editorUI.comboSupported ? (index: number) => editorUI.setComboInitialIndex(index) : undefined}
             onSetComboEntry={editorUI.comboSupported ? keyboard.setComboEntry : undefined}
@@ -935,12 +926,6 @@ export function App() {
             editorUI.setUnlockMacroWarning(false)
             keyboard.rejectPendingUnlock()
           }}
-          onCancel={() => {
-            device.setPollSuspended(false)
-            editorUI.setShowUnlockDialog(false)
-            editorUI.setUnlockMacroWarning(false)
-            keyboard.rejectPendingUnlock()
-          }}
           macroWarning={editorUI.unlockMacroWarning}
         />
       )}
@@ -952,7 +937,7 @@ export function App() {
           onClick={() => editorUI.setShowLightingModal(false)}
         >
           <div
-            className="w-[500px] max-w-[90vw] max-h-[80vh] overflow-y-auto rounded-lg bg-surface-alt p-6 shadow-xl"
+            className="w-modal-app max-w-modal-vw max-h-modal-80vh overflow-y-auto rounded-lg bg-surface-alt p-6 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">
@@ -989,25 +974,6 @@ export function App() {
               onSetVialRGBHSV={keyboard.setVialRGBHSV}
               onSave={api.saveLighting}
             />
-          </div>
-        </div>
-      )}
-
-      {editorUI.showRGBIndicatorModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-          data-testid="rgb-indicator-modal-backdrop"
-          onClick={() => editorUI.setShowRGBIndicatorModal(false)}
-        >
-          <div
-            className="w-[600px] max-w-[90vw] max-h-[80vh] overflow-y-auto rounded-lg bg-surface-alt p-6 shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold">{t('editor.rgbIndicator.title')}</h3>
-              <ModalCloseButton testid="rgb-indicator-modal-close" onClick={() => editorUI.setShowRGBIndicatorModal(false)} />
-            </div>
-            <RGBIndicatorConfigurator layerCount={keyboard.layers} />
           </div>
         </div>
       )}

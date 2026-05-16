@@ -147,7 +147,7 @@ export function LayoutStoreEntry({
               onBlur={() => onCommitRename?.(entry.id)}
               onKeyDown={(e) => onHandleRenameKeyDown?.(e, entry.id)}
               maxLength={200}
-              className="w-full border-b border-edge bg-transparent px-1 text-sm font-semibold text-content outline-none focus:border-accent"
+              className="w-full border-b border-edge bg-transparent px-1 text-sm font-semibold text-content focus:outline-none focus:border-accent"
               data-testid="layout-store-rename-input"
               autoFocus
             />
@@ -209,7 +209,7 @@ export function LayoutStoreEntry({
 
       {/* Row 2: date + format tags */}
       <div className="flex items-center justify-between">
-        <span className="text-[11px] text-content-muted font-mono">
+        <span className="text-xs text-content-muted font-mono">
           {entry.vilVersion != null && t('layoutStore.versionPrefix', { version: entry.vilVersion })}{formatDate(entry.savedAt)}
         </span>
         {hasEntryExport && (

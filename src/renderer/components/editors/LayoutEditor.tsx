@@ -59,7 +59,7 @@ export function LayoutEditor({
       <div className="space-y-3">
         {options.map((opt) => (
           <div key={opt.index} className="flex items-center gap-3">
-            <span className="min-w-[120px] text-sm text-content">
+            <span className="min-w-layout-label text-sm text-content">
               {opt.labels[0]}
             </span>
             {opt.labels.length <= 2 ? (
@@ -77,7 +77,7 @@ export function LayoutEditor({
                 onChange={(e) =>
                   handleChange(opt.index, Number(e.target.value))
                 }
-                className="rounded border border-edge bg-surface px-2 py-1 text-sm"
+                className="rounded border border-edge bg-surface px-2 py-1 text-sm focus:border-accent focus:outline-none"
               >
                 {opt.labels.slice(1).map((label, i) => (
                   <option key={i} value={i}>

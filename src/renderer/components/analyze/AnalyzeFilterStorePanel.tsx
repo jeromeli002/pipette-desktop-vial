@@ -18,6 +18,7 @@ import {
   formatDate,
 } from '../editors/store-modal-shared'
 import { FORMAT_BTN } from '../editors/layout-store-types'
+import { BTN_PRIMARY_XS, BTN_DANGER_XS } from '../../constants/ui-tokens'
 import type { HubEntryResult } from '../editors/layout-store-types'
 import type { AnalyzeFilterSnapshotMeta } from '../../../shared/types/analyze-filter-store'
 import { AnalyzeFilterStoreHubRow } from './AnalyzeFilterStoreHubRow'
@@ -25,7 +26,7 @@ import { AnalyzeFilterStoreHubRow } from './AnalyzeFilterStoreHubRow'
 // Only one tab today — kept as a single-element tab bar for visual
 // parity with the keymap editor's overlay and so the structure is
 // ready when a Settings tab gets a real surface to render.
-const TAB_BASE = 'flex-1 py-1.5 text-[11px] font-medium transition-colors border-b-2 border-b-accent text-content'
+const TAB_BASE = 'flex-1 py-1.5 text-xs font-medium transition-colors border-b-2 border-b-accent text-content'
 
 interface Props {
   /** Render the save body only when the user has picked a keyboard.
@@ -194,7 +195,7 @@ export function AnalyzeFilterStorePanel({
                     <button
                       type="submit"
                       disabled={saving}
-                      className="shrink-0 rounded-lg bg-danger px-3 py-1.5 text-xs font-semibold text-white hover:bg-danger/90 disabled:opacity-50"
+                      className={`shrink-0 ${BTN_DANGER_XS}`}
                       data-testid="analyze-filter-store-overwrite-confirm"
                     >
                       {t('analyzeFilterStore.confirmOverwrite')}
@@ -212,7 +213,7 @@ export function AnalyzeFilterStorePanel({
                   <button
                     type="submit"
                     disabled={saving || !saveLabel.trim()}
-                    className="shrink-0 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent/90 disabled:opacity-50"
+                    className={`shrink-0 ${BTN_PRIMARY_XS}`}
                     data-testid="analyze-filter-store-save-submit"
                   >
                     {t('common.save')}
@@ -221,7 +222,7 @@ export function AnalyzeFilterStorePanel({
               </form>
               <div className="mt-2 flex items-center gap-1">
                 {showSaved && (
-                  <span className="text-[11px] font-medium text-emerald-500" data-testid="analyze-filter-store-saved-flash">
+                  <span className="text-xs font-medium text-success" data-testid="analyze-filter-store-saved-flash">
                     {t('common.saved')}
                   </span>
                 )}
@@ -268,7 +269,7 @@ export function AnalyzeFilterStorePanel({
                                 onKeyDown={(e) => { void handleRenameKeyDown(e, entry.id) }}
                                 onBlur={() => { void commitRename(entry.id) }}
                                 maxLength={200}
-                                className="w-full border-b border-edge bg-transparent px-1 text-sm font-semibold text-content outline-none focus:border-accent"
+                                className="w-full border-b border-edge bg-transparent px-1 text-sm font-semibold text-content focus:outline-none focus:border-accent"
                                 data-testid={`analyze-filter-store-rename-input-${entry.id}`}
                               />
                             ) : (
@@ -332,7 +333,7 @@ export function AnalyzeFilterStorePanel({
 
                         {entry.summary && (
                           <div
-                            className="mb-1 truncate text-[11px] text-content-muted"
+                            className="mb-1 truncate text-xs text-content-muted"
                             title={entry.summary}
                             data-testid={`analyze-filter-store-entry-summary-${entry.id}`}
                           >
@@ -342,7 +343,7 @@ export function AnalyzeFilterStorePanel({
 
                         {/* Row 2: date + .csv export */}
                         <div className="flex items-center justify-between">
-                          <span className="font-mono text-[11px] text-content-muted">
+                          <span className="font-mono text-xs text-content-muted">
                             {formatDate(entry.savedAt)}
                           </span>
                           {onExportEntryCsv && (

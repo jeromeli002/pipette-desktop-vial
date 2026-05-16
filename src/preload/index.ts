@@ -190,21 +190,6 @@ const vialAPI = {
   // --- Matrix Tester ---
   getMatrixState: (): Promise<number[]> => protocol.getMatrixState(),
 
-  // --- RGB Indicator ---
-  setRgbIndicatorCaps: (config: unknown): Promise<void> =>
-    protocol.setRgbIndicatorCaps(config as Parameters<typeof protocol.setRgbIndicatorCaps>[0]),
-  setRgbIndicatorNum: (config: unknown): Promise<void> =>
-    protocol.setRgbIndicatorNum(config as Parameters<typeof protocol.setRgbIndicatorNum>[0]),
-  setRgbIndicatorScrl: (config: unknown): Promise<void> =>
-    protocol.setRgbIndicatorScrl(config as Parameters<typeof protocol.setRgbIndicatorScrl>[0]),
-  setRgbIndicatorLayer: (layerIndex: number, config: unknown): Promise<void> =>
-    protocol.setRgbIndicatorLayer(layerIndex, config as Parameters<typeof protocol.setRgbIndicatorLayer>[1]),
-  setRgbIndicatorSleepTime: (seconds: number): Promise<void> =>
-    protocol.setRgbIndicatorSleepTime(seconds),
-  saveRgbIndicatorConfig: (): Promise<void> => protocol.saveRgbIndicatorConfig(),
-  testRgbIndicatorAll: (): Promise<void> => protocol.testRgbIndicatorAll(),
-  testRgbIndicatorOff: (): Promise<void> => protocol.testRgbIndicatorOff(),
-
   // --- File I/O (IPC to main for native file dialogs) ---
   saveLayout: (json: string, deviceName?: string): Promise<{ success: boolean; filePath?: string; error?: string }> =>
     ipcRenderer.invoke(IpcChannels.FILE_SAVE_LAYOUT, json, deviceName),
@@ -701,8 +686,6 @@ const vialAPI = {
     ipcRenderer.invoke(IpcChannels.WINDOW_SET_ALWAYS_ON_TOP, enabled),
   setWindowMinSize: (width: number, height: number): Promise<void> =>
     ipcRenderer.invoke(IpcChannels.WINDOW_SET_MIN_SIZE, width, height),
-  setWindowTitle: (title: string): Promise<void> =>
-    ipcRenderer.invoke(IpcChannels.WINDOW_SET_TITLE, title),
   isAlwaysOnTopSupported: (): Promise<boolean> =>
     ipcRenderer.invoke(IpcChannels.WINDOW_IS_ALWAYS_ON_TOP_SUPPORTED),
   setWindowZoom: (zoom: number): Promise<void> =>

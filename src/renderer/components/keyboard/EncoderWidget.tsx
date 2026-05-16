@@ -145,7 +145,6 @@ function EncoderWidgetInner({
       {/* Outer circle */}
       <circle cx={cx} cy={cy} r={r} fill={fillColor}
         stroke={outerBorderActive ? KEY_SELECTED_COLOR : KEY_BORDER_COLOR} strokeWidth={outerBorderActive ? 2 : 1} />
-      {renderDirectionIndicator()}
       {/* Inner rect clipped to circle — same style as KeyWidget (stroke-only selection) */}
       <rect x={innerRectX} y={innerRectY} width={innerRectW} height={innerRectH}
         rx={innerCorner} ry={innerCorner}

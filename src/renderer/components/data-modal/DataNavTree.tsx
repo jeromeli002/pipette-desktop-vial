@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 import { Fragment } from 'react'
+import type { CSSProperties } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { DataNavPath } from './data-modal-types'
 import type { StoredKeyboardInfo, SyncDataScanResult } from '../../../shared/types/sync'
@@ -25,6 +26,8 @@ interface Props {
   remoteTypingHashes: Record<string, string[]>
   ensureRemoteTypingHashes: (uid: string) => void
 }
+
+const treeIndentStyle = (depth: number): CSSProperties => ({ paddingLeft: `${depth * 14 + 8}px` })
 
 function deviceLabelFromHash(hash: string): string {
   return `Device ${hash.slice(0, 8)}`
@@ -53,16 +56,16 @@ function isActivePath(a: DataNavPath | null, b: DataNavPath): boolean {
   return true
 }
 
-const LEAF_BASE = 'w-full text-left text-[13px] py-1 rounded cursor-pointer truncate'
+const LEAF_BASE = 'w-full text-left text-sm py-1 rounded cursor-pointer truncate'
 const LEAF_ACTIVE = `${LEAF_BASE} bg-surface-dim text-content font-medium`
 const LEAF_IDLE = `${LEAF_BASE} text-content-secondary hover:text-content hover:bg-surface-dim/50`
 
-const BRANCH_BASE = 'w-full text-left text-[13px] py-1 flex items-center gap-1 cursor-pointer truncate'
+const BRANCH_BASE = 'w-full text-left text-sm py-1 flex items-center gap-1 cursor-pointer truncate'
 
 function Chevron({ open }: { open: boolean }) {
   return (
     <span
-      className={`inline-block text-[9px] text-content-muted transition-transform ${open ? 'rotate-90' : ''}`}
+      className={`inline-block text-3xs text-content-muted transition-transform ${open ? 'rotate-90' : ''}`}
       aria-hidden="true"
     >
       &#9654;
@@ -80,10 +83,12 @@ interface LeafProps {
 
 function Leaf({ label, depth, active, onClick, testId }: LeafProps) {
   return (
+    // Exception: paddingLeft is runtime-computed from `depth` using a 14px-per-level
+    // step (not on the 4px grid); Tailwind cannot express a prop-driven indentation.
     <button
       type="button"
       className={active ? LEAF_ACTIVE : LEAF_IDLE}
-      style={{ paddingLeft: `${depth * 14 + 8}px` }}
+      style={treeIndentStyle(depth)}
       onClick={onClick}
       data-testid={testId}
     >
@@ -104,10 +109,11 @@ interface BranchProps {
 function Branch({ label, depth, open, onToggle, testId, children }: BranchProps) {
   return (
     <>
+      {/* Exception: same as Leaf — runtime depth-based indentation, off-grid 14px step */}
       <button
         type="button"
         className={`${BRANCH_BASE} text-content-secondary hover:text-content`}
-        style={{ paddingLeft: `${depth * 14 + 8}px` }}
+        style={treeIndentStyle(depth)}
         onClick={onToggle}
         data-testid={testId}
         aria-expanded={open}
@@ -151,8 +157,8 @@ export function DataNavTree({ storedKeyboards, typingKeyboards, hasRemoteTyping,
         >
           {storedKeyboards.length === 0 ? (
             <div
-              className="text-[11px] text-content-muted py-1"
-              style={{ paddingLeft: '50px' }}
+              className="text-xs text-content-muted py-1"
+              style={treeIndentStyle(3)}
               data-testid="nav-no-keyboards"
             >
               {t('dataModal.noKeyboards')}
@@ -201,8 +207,8 @@ export function DataNavTree({ storedKeyboards, typingKeyboards, hasRemoteTyping,
         >
           {typingKeyboards.length === 0 ? (
             <div
-              className="text-[11px] text-content-muted py-1"
-              style={{ paddingLeft: '50px' }}
+              className="text-xs text-content-muted py-1"
+              style={treeIndentStyle(3)}
               data-testid="nav-no-typing"
             >
               {t('dataModal.typing.noKeyboards')}
@@ -240,19 +246,19 @@ export function DataNavTree({ storedKeyboards, typingKeyboards, hasRemoteTyping,
         testId="nav-sync"
       >
         {syncScanning ? (
-          <div className="text-[11px] text-content-muted py-1" style={{ paddingLeft: '36px' }}>
+          <div className="text-xs text-content-muted py-1" style={treeIndentStyle(2)}>
             {t('sync.scanning')}
           </div>
         ) : (
           <>
             {!syncScanResult ? (
-              <div className="text-[11px] text-content-muted py-1" style={{ paddingLeft: '36px' }}>
+              <div className="text-xs text-content-muted py-1" style={treeIndentStyle(2)}>
                 {t('sync.noRemoteData')}
               </div>
             ) : syncScanResult.keyboards.length === 0 ? (
               <div
-                className="text-[11px] text-content-muted py-1"
-                style={{ paddingLeft: '36px' }}
+                className="text-xs text-content-muted py-1"
+                style={treeIndentStyle(2)}
                 data-testid="nav-sync-empty"
               >
                 {t('dataModal.syncNoOrphans')}
@@ -281,8 +287,8 @@ export function DataNavTree({ storedKeyboards, typingKeyboards, hasRemoteTyping,
                       />
                       {error && (
                         <div
-                          className="text-[11px] text-danger py-1"
-                          style={{ paddingLeft: `${2 * 14 + 8}px` }}
+                          className="text-xs text-danger py-1"
+                          style={treeIndentStyle(2)}
                           data-testid={`nav-sync-kb-${uid}-error`}
                         >
                           {error}
@@ -307,8 +313,8 @@ export function DataNavTree({ storedKeyboards, typingKeyboards, hasRemoteTyping,
             >
               {typingKeyboards.length === 0 ? (
                 <div
-                  className="text-[11px] text-content-muted py-1"
-                  style={{ paddingLeft: '50px' }}
+                  className="text-xs text-content-muted py-1"
+                  style={treeIndentStyle(3)}
                   data-testid="nav-sync-typing-empty"
                 >
                   {t('dataModal.typing.noKeyboards')}
@@ -332,8 +338,8 @@ export function DataNavTree({ storedKeyboards, typingKeyboards, hasRemoteTyping,
                     >
                       {hashes.length === 0 ? (
                         <div
-                          className="text-[11px] text-content-muted py-1"
-                          style={{ paddingLeft: '64px' }}
+                          className="text-xs text-content-muted py-1"
+                          style={treeIndentStyle(4)}
                           data-testid={`nav-sync-typing-${kb.uid}-empty`}
                         >
                           {t('dataModal.typing.noRemoteDevices')}
@@ -387,7 +393,7 @@ export function DataNavTree({ storedKeyboards, typingKeyboards, hasRemoteTyping,
           testId="nav-cloud-hub"
         >
           {hubKeyboardNames.length === 0 ? (
-            <div className="text-[11px] text-content-muted py-1" style={{ paddingLeft: '36px' }} data-testid="nav-hub-empty">
+            <div className="text-xs text-content-muted py-1" style={treeIndentStyle(2)} data-testid="nav-hub-empty">
               {t('hub.noPosts')}
             </div>
           ) : (

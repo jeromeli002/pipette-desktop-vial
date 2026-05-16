@@ -3,6 +3,7 @@
 import type { WordResult } from './useTypingTest'
 
 const COMPOSITION_CHAR_CLASS = 'text-accent/60 underline decoration-accent/30'
+const ERROR_CHAR_CLASS = 'text-danger underline decoration-danger/50 decoration-2 underline-offset-2'
 
 interface WordDisplayProps {
   word: string
@@ -110,7 +111,7 @@ export function WordDisplay({ word, wordIndex, currentWordIndex, currentInput, w
             .slice(word.length)
             .split('')
             .map((char, i) => (
-              <span key={`extra-${i}`} className="text-danger underline decoration-danger/50 decoration-2 underline-offset-[3px]">
+              <span key={`extra-${i}`} className={ERROR_CHAR_CLASS}>
                 {char}
               </span>
             ))}
@@ -135,7 +136,7 @@ export function WordDisplay({ word, wordIndex, currentWordIndex, currentInput, w
 function charClassName(expected: string, index: number, input: string): string {
   if (index >= input.length) return 'text-content-muted'
   if (input[index] === expected) return 'text-success'
-  return 'text-danger underline decoration-danger/50 decoration-2 underline-offset-[3px]'
+  return ERROR_CHAR_CLASS
 }
 
 function displayChar(expected: string, index: number, input: string): string {
@@ -146,7 +147,7 @@ function displayChar(expected: string, index: number, input: string): string {
 function Cursor({ blink }: { blink: boolean }) {
   return (
     <span
-      className={`absolute left-0 bottom-[0.12em] h-[1.1em] w-0.5 rounded-full bg-accent${blink ? ' animate-blink' : ''}`}
+      className={`absolute left-0 bottom-cursor h-cursor w-0.5 rounded-full bg-accent${blink ? ' animate-blink' : ''}`}
       aria-hidden="true"
     />
   )

@@ -49,6 +49,7 @@ import type {
 } from './analyze-types'
 import type { SyncProgress } from '../../../shared/types/sync'
 import { SlidersHorizontal } from 'lucide-react'
+import { ICON_MD } from '../../constants/ui-tokens'
 import { useAnalyzeFilters } from '../../hooks/useAnalyzeFilters'
 import { useAnalyzeFilterStore, type AnalyzeFilterSnapshotPayload } from '../../hooks/useAnalyzeFilterStore'
 import { useEscapeClose } from '../../hooks/useEscapeClose'
@@ -115,9 +116,9 @@ function resolveLayoutComparisonInputs(
 }
 
 const TAB_BTN_BASE =
-  'rounded-md px-3 py-1.5 text-[13px] font-medium transition-colors'
+  'rounded-md px-3 py-1.5 text-sm font-medium transition-colors'
 const TAB_BTN_IDLE = 'text-content-muted hover:text-content-secondary'
-const TAB_BTN_ACTIVE = 'bg-surface text-content shadow-sm'
+const TAB_BTN_ACTIVE = 'bg-surface text-content'
 
 // Grouped left → right: 全体像 (summary) / パフォーマンス (wpm,
 // interval) / 行動分析 (activity, byApp) / 負荷分析 (keyHeatmap,
@@ -1066,11 +1067,11 @@ export function AnalyzePane({
               aria-label={t('analyzeFilterStore.title')}
               aria-expanded={storePanelOpen}
               aria-controls={tid("analyze-filter-store-panel-overlay")}
-              className={`rounded p-1.5 transition-colors ${storePanelOpen ? 'bg-surface text-accent shadow-sm' : 'text-content-muted hover:bg-surface hover:text-content'}`}
+              className={`rounded p-1.5 transition-colors ${storePanelOpen ? 'bg-surface text-accent' : 'text-content-muted hover:bg-surface hover:text-content'}`}
               onClick={handleToggleStorePanel}
               data-testid={tid("analyze-filter-store-toggle")}
             >
-              <SlidersHorizontal size={16} aria-hidden="true" />
+              <SlidersHorizontal size={ICON_MD} aria-hidden="true" />
             </button>
           </div>
         )}
@@ -1405,7 +1406,7 @@ export function AnalyzePane({
                     onHeatmapChange={setHeatmap}
                   />
                 ) : (
-                  <div className="py-4 text-center text-[13px] text-content-muted" data-testid={tid("analyze-keyheatmap-empty")}>
+                  <div className="py-4 text-center text-sm text-content-muted" data-testid={tid("analyze-keyheatmap-empty")}>
                     {t('analyze.keyHeatmap.noSnapshot')}
                   </div>
                 )
@@ -1424,7 +1425,7 @@ export function AnalyzePane({
                     onOpenFingerAssignment={() => setFingerModalOpen(true)}
                   />
                 ) : (
-                  <div className="py-4 text-center text-[13px] text-content-muted" data-testid={tid("analyze-ergonomics-no-snapshot")}>
+                  <div className="py-4 text-center text-sm text-content-muted" data-testid={tid("analyze-ergonomics-no-snapshot")}>
                     {t('analyze.ergonomics.noSnapshot')}
                   </div>
                 )
@@ -1522,7 +1523,7 @@ export function AnalyzePane({
             // the panel is open. `shadow-lg` only when open — when
             // translated off-screen the shadow's left bleed lands inside
             // the visible area and reads as a stray gradient.
-            className={`absolute inset-y-0 right-0 z-10 w-fit min-w-[320px] rounded-l-lg border-l border-edge-subtle bg-surface-alt transition-transform duration-200 ease-out ${storePanelOpen ? 'translate-x-0 shadow-lg' : 'translate-x-full'}`}
+            className={`absolute inset-y-0 right-0 z-10 w-fit min-w-80 rounded-l-lg border-l border-edge-subtle bg-surface-alt transition-transform duration-200 ease-out ${storePanelOpen ? 'translate-x-0 shadow-lg' : 'translate-x-full'}`}
             inert={!storePanelOpen || undefined}
             data-testid={tid("analyze-filter-store-panel-container")}
           >

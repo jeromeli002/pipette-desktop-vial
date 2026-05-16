@@ -78,7 +78,7 @@ export function FavoriteTabContent({
     <div className="flex flex-col h-full">
       <div className="flex-1 min-h-0 overflow-y-auto">
         {manage.entries.length === 0 ? (
-          <div className="py-4 text-center text-[13px] text-content-muted" data-testid="data-modal-fav-empty">
+          <div className="py-4 text-center text-sm text-content-muted" data-testid="data-modal-fav-empty">
             {t('favoriteStore.noSaved')}
           </div>
         ) : (
@@ -99,7 +99,7 @@ export function FavoriteTabContent({
                         onBlur={() => void commitRename(entry.id)}
                         onKeyDown={(e) => handleRenameKeyDown(e, entry.id)}
                         maxLength={200}
-                        className="flex-1 w-full border-b border-edge bg-transparent px-1 text-sm font-semibold text-content outline-none focus:border-accent"
+                        className="flex-1 w-full border-b border-edge bg-transparent px-1 text-sm font-semibold text-content focus:outline-none focus:border-accent"
                         data-testid="data-modal-fav-rename-input"
                         autoFocus
                       />
@@ -146,7 +146,7 @@ export function FavoriteTabContent({
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-content-muted font-mono">
+                  <span className="text-xs text-content-muted font-mono">
                     {formatDate(entry.savedAt)}
                   </span>
                   <button

@@ -23,6 +23,7 @@ import { FINGER_LIST } from '../../../shared/kle/kle-ergonomics'
 import type { LayoutComparisonTargetResult } from '../../../shared/types/typing-analytics'
 import { formatSignedPercent } from './analyze-format'
 import { Stat, TooltipShell } from './analyze-tooltip'
+import { CHART_TICK_FONT_SIZE } from '../../utils/chart-palette'
 
 interface Props {
   current: LayoutComparisonTargetResult
@@ -80,7 +81,7 @@ export function LayoutComparisonFingerDiff({ current, target, targetLabel }: Pro
 
   return (
     <div className="flex h-full w-full min-h-0 min-w-0 flex-col gap-1" data-testid="analyze-layout-comparison-finger-diff">
-      <h4 className="text-[13px] font-semibold text-content-secondary">
+      <h4 className="text-sm font-semibold text-content-secondary">
         {t('analyze.layoutComparison.fingerDiffTitle', { target: targetLabel })}
       </h4>
       {/* flex-1 + min-h-0 lets the chart absorb whatever vertical
@@ -98,12 +99,12 @@ export function LayoutComparisonFingerDiff({ current, target, targetLabel }: Pro
               type="category"
               dataKey="label"
               stroke="var(--color-content-muted)"
-              fontSize={11}
+              fontSize={CHART_TICK_FONT_SIZE}
             />
             <YAxis
               type="number"
               stroke="var(--color-content-muted)"
-              fontSize={11}
+              fontSize={CHART_TICK_FONT_SIZE}
               tickFormatter={(value: number) => `${value >= 0 ? '+' : ''}${(value * 100).toFixed(0)}%`}
             />
             <ReferenceLine y={0} stroke="var(--color-content-muted)" />

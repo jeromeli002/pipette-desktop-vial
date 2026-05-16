@@ -130,7 +130,7 @@ export function TypingAnalyticsView({ initialUid, onBack }: TypingAnalyticsViewP
 
   return (
     <div
-      className="flex h-full min-h-[70vh] flex-col"
+      className="flex h-full min-h-modal-70vh flex-col"
       data-testid="analyze-view"
     >
       <div className="flex flex-1 min-h-0 min-w-0 gap-4">
@@ -157,7 +157,7 @@ export function TypingAnalyticsView({ initialUid, onBack }: TypingAnalyticsViewP
       </div>
       <footer className="flex shrink-0 items-center justify-between gap-2 border-t border-edge pt-2">
         <div
-          className="min-w-0 flex-1 truncate text-left text-[12px] text-content-muted"
+          className="min-w-0 flex-1 truncate text-left text-xs text-content-muted"
           data-testid="analyze-skip-warning"
         >
           {skipWarningMessage}
@@ -181,7 +181,7 @@ export function TypingAnalyticsView({ initialUid, onBack }: TypingAnalyticsViewP
         {onBack && (
           <button
             type="button"
-            className={`${FOOTER_BUTTON_BASE} border-edge text-red-500 hover:text-red-600`}
+            className={`${FOOTER_BUTTON_BASE} border-edge text-danger hover:text-danger/80`}
             onClick={onBack}
             data-testid="analyze-back"
           >

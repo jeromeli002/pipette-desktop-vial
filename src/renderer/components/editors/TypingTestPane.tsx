@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Globe } from 'lucide-react'
+import { ICON_SM } from '../../constants/ui-tokens'
 import { TypingTestView } from '../../typing-test/TypingTestView'
 import { LanguageSelectorModal } from '../../typing-test/LanguageSelectorModal'
 import { TypingRecordingConsentModal } from '../../typing-test/TypingRecordingConsentModal'
@@ -16,6 +17,7 @@ import type { KleKey } from '../../../shared/kle/types'
 import type { TypingTestResult, TypingViewMenuTab } from '../../../shared/types/pipette-settings'
 import type { TypingTestConfig } from '../../typing-test/types'
 import type { useTypingTest } from '../../typing-test/useTypingTest'
+import { BTN_TOGGLE_ACTIVE, BTN_TOGGLE_INACTIVE } from '../../constants/ui-tokens'
 
 export interface TypingTestPaneProps {
   typingTest: ReturnType<typeof useTypingTest>
@@ -351,10 +353,6 @@ export function TypingTestPane({
       <div
         className={viewOnly ? 'flex min-h-0 w-full flex-1 cursor-pointer items-center justify-center overflow-hidden' : 'flex items-start justify-center overflow-auto'}
         onClick={viewOnly ? () => setViewOnlyControlsOpen((v) => !v) : undefined}
-        onContextMenu={viewOnly ? (e) => {
-          e.preventDefault()
-          setViewOnlyControlsOpen(true)
-        } : undefined}
       >
         <div className="relative" style={viewOnly && paneNaturalSizeRef.current.w > 0 ? { width: paneNaturalSizeRef.current.w * cssScale, height: paneNaturalSizeRef.current.h * cssScale, overflow: 'hidden' } : undefined}>
           {viewOnly && <div className="absolute inset-0 z-10" />}
@@ -373,7 +371,7 @@ export function TypingTestPane({
                       aria-label={t('editor.typingTest.baseLayer')}
                       value={typingTest.baseLayer}
                       onChange={(e) => typingTest.setBaseLayer(Number(e.target.value))}
-                      className="rounded-md border border-edge bg-surface-alt px-2 py-1 text-sm text-content-secondary"
+                      className="rounded-md border border-edge bg-surface-alt px-2 py-1 text-sm text-content-secondary focus:border-accent focus:outline-none"
                     >
                       {Array.from({ length: layers }, (_, i) => (
                         <option key={i} value={i}>{layerNames?.[i] || i}</option>
@@ -393,7 +391,7 @@ export function TypingTestPane({
                       <span>{t('editor.typingTest.language.loadingLanguage')}</span>
                     ) : (
                       <>
-                        <Globe size={14} aria-hidden="true" />
+                        <Globe size={ICON_SM} aria-hidden="true" />
                         <span>{typingTest.language.replace(/_/g, ' ')}</span>
                       </>
                     )}
@@ -440,7 +438,7 @@ export function TypingTestPane({
           {heatmapActive && (
             <p
               data-testid="typing-test-heatmap-legend"
-              className="mt-1 text-center text-[11px] text-content-muted"
+              className="mt-1 text-center text-xs text-content-muted"
             >
               {t('editor.typingTest.heatmap.legend')}
             </p>
@@ -453,7 +451,7 @@ export function TypingTestPane({
         <div
           className={`pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center py-1 transition-opacity duration-200 ${viewOnlyControlsOpen || (!mouseOver && !recordEnabled) ? 'opacity-0' : 'opacity-100'}`}
         >
-          <span className={`text-[10px] ${!mouseOver && recordEnabled ? 'text-accent' : 'text-content-muted'}`}>
+          <span className={`text-2xs ${!mouseOver && recordEnabled ? 'text-accent' : 'text-content-muted'}`}>
             {mouseOver
               ? t('editor.typingTest.closeHint')
               : t('editor.typingTest.recordingIndicator')}
@@ -477,7 +475,7 @@ export function TypingTestPane({
                 role="tab"
                 aria-selected={menuTab === 'window'}
                 data-testid="menu-tab-window"
-                className={`flex-1 whitespace-nowrap rounded border px-2 py-1 transition-colors ${menuTab === 'window' ? 'border-accent bg-accent/10 text-accent' : 'border-edge text-content-secondary hover:text-content'}`}
+                className={`flex-1 whitespace-nowrap ${menuTab === 'window' ? BTN_TOGGLE_ACTIVE : BTN_TOGGLE_INACTIVE}`}
                 onClick={() => onMenuTabChange?.('window')}
               >
                 {t('editor.typingTest.tab.window')}
@@ -487,7 +485,7 @@ export function TypingTestPane({
                 role="tab"
                 aria-selected={menuTab === 'rec'}
                 data-testid="menu-tab-rec"
-                className={`flex-1 whitespace-nowrap rounded border px-2 py-1 transition-colors ${menuTab === 'rec' ? 'border-accent bg-accent/10 text-accent' : 'border-edge text-content-secondary hover:text-content'}`}
+                className={`flex-1 whitespace-nowrap ${menuTab === 'rec' ? BTN_TOGGLE_ACTIVE : BTN_TOGGLE_INACTIVE}`}
                 onClick={() => onMenuTabChange?.('rec')}
               >
                 {t('editor.typingTest.tab.rec')}
@@ -500,12 +498,12 @@ export function TypingTestPane({
                 other tabs match its natural height. Keep this in sync
                 if any tab grows/shrinks meaningfully. */}
             {menuTab === 'window' && (
-              <div className="flex min-h-[100px] flex-col gap-1.5">
+              <div className="flex min-h-word-list flex-col gap-1.5">
                 <button
                   type="button"
                   role="menuitem"
                   data-testid="reset-window-size"
-                  className="whitespace-nowrap rounded border border-edge px-2 py-1 text-content-secondary transition-colors hover:text-content"
+                  className={`whitespace-nowrap ${BTN_TOGGLE_INACTIVE}`}
                   onClick={() => {
                     const size = getDefaultCompactSize()
                     window.vialAPI.setWindowCompactMode(true, size).catch(() => {})
@@ -519,7 +517,7 @@ export function TypingTestPane({
                   type="button"
                   role="menuitem"
                   data-testid="fit-window-size"
-                  className="whitespace-nowrap rounded border border-edge px-2 py-1 text-content-secondary transition-colors hover:text-content"
+                  className={`whitespace-nowrap ${BTN_TOGGLE_INACTIVE}`}
                   onClick={() => {
                     const defaultSize = getDefaultCompactSize()
                     const ratio = defaultSize.height / defaultSize.width
@@ -538,7 +536,7 @@ export function TypingTestPane({
                     type="button"
                     role="menuitem"
                     data-testid="always-on-top-toggle"
-                    className={`whitespace-nowrap rounded border px-2 py-1 transition-colors ${viewOnlyAlwaysOnTop ? 'border-accent bg-accent/10 text-accent' : 'border-edge text-content-secondary hover:text-content'}`}
+                    className={`whitespace-nowrap ${viewOnlyAlwaysOnTop ? BTN_TOGGLE_ACTIVE : BTN_TOGGLE_INACTIVE}`}
                     onClick={() => onViewOnlyAlwaysOnTopChange(!viewOnlyAlwaysOnTop)}
                   >
                     {t('editor.typingTest.alwaysOnTop')}
@@ -548,14 +546,14 @@ export function TypingTestPane({
             )}
 
             {menuTab === 'rec' && (
-              <div className="flex min-h-[100px] flex-col gap-1.5">
+              <div className="flex min-h-word-list flex-col gap-1.5">
                 {onRecordEnabledChange && (
                   <button
                     type="button"
                     role="menuitemcheckbox"
                     aria-checked={recordEnabled ?? false}
                     data-testid="typing-record-toggle"
-                    className={`whitespace-nowrap rounded border px-2 py-1 transition-colors ${recordEnabled ? 'border-accent bg-accent/10 text-accent' : 'border-edge text-content-secondary hover:text-content'}`}
+                    className={`whitespace-nowrap ${recordEnabled ? BTN_TOGGLE_ACTIVE : BTN_TOGGLE_INACTIVE}`}
                     onClick={handleRecordToggle}
                   >
                     {recordEnabled ? t('editor.typingTest.recordStop') : t('editor.typingTest.recordStart')}
@@ -577,7 +575,7 @@ export function TypingTestPane({
                     className={
                       !recordEnabled
                         ? 'whitespace-nowrap rounded border border-edge px-2 py-1 text-content-muted opacity-60 cursor-not-allowed'
-                        : `whitespace-nowrap rounded border px-2 py-1 transition-colors ${monitorAppEnabled ? 'border-accent bg-accent/10 text-accent' : 'border-edge text-content-secondary hover:text-content'}`
+                        : `whitespace-nowrap ${monitorAppEnabled ? BTN_TOGGLE_ACTIVE : BTN_TOGGLE_INACTIVE}`
                     }
                     onClick={() => {
                       if (!recordEnabled) return
@@ -592,7 +590,7 @@ export function TypingTestPane({
                     type="button"
                     role="menuitem"
                     data-testid="view-analytics"
-                    className="whitespace-nowrap rounded border border-edge px-2 py-1 text-content-secondary transition-colors hover:text-content"
+                    className={`whitespace-nowrap ${BTN_TOGGLE_INACTIVE}`}
                     onClick={() => {
                       setViewOnlyControlsOpen(false)
                       onViewAnalytics()
@@ -609,7 +607,7 @@ export function TypingTestPane({
                       aria-label={t('editor.typingTest.heatmapWindow')}
                       value={heatmapWindowMin ?? 5}
                       onChange={(e) => onHeatmapWindowMinChange(Number(e.target.value))}
-                      className="rounded border border-edge bg-surface-alt px-1.5 py-0.5 text-xs text-content-secondary"
+                      className="rounded border border-edge bg-surface-alt px-1.5 py-0.5 text-xs text-content-secondary focus:border-accent focus:outline-none"
                     >
                       {TYPING_HEATMAP_WINDOW_OPTIONS.map((m) => (
                         <option key={m} value={m}>{t('editor.typingTest.heatmapWindowOption', { minutes: m })}</option>
@@ -631,7 +629,7 @@ export function TypingTestPane({
                   aria-label={t('editor.typingTest.baseLayer')}
                   value={typingTest.baseLayer}
                   onChange={(e) => typingTest.setBaseLayer(Number(e.target.value))}
-                  className="rounded border border-edge bg-surface-alt px-1.5 py-0.5 text-xs text-content-secondary"
+                  className="rounded border border-edge bg-surface-alt px-1.5 py-0.5 text-xs text-content-secondary focus:border-accent focus:outline-none"
                 >
                   {Array.from({ length: layers }, (_, i) => (
                     <option key={i} value={i}>{layerNames?.[i] || i}</option>
@@ -649,7 +647,7 @@ export function TypingTestPane({
                 // a default-edge border so "exit" reads as the
                 // destructive / out-of-mode action rather than the
                 // accent-coloured primary path.
-                className="whitespace-nowrap rounded border border-edge px-2 py-1 text-red-500 transition-colors hover:text-red-600"
+                className="whitespace-nowrap rounded border border-edge px-2 py-1 text-danger transition-colors hover:text-danger/80"
                 onClick={handleViewOnlyToggle}
               >
                 {t('editor.typingTest.exitViewOnly')}

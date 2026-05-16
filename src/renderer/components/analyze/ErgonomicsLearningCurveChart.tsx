@@ -38,6 +38,7 @@ import {
   type LearningCurveBucket,
   DEFAULT_LEARNING_MIN_SAMPLE,
 } from './analyze-ergonomics-curve'
+import { CHART_TICK_FONT_SIZE } from '../../utils/chart-palette'
 
 const pct = (v: number): string => `${Math.round(v * 100)}%`
 const signedPct = (v: number): string => `${v >= 0 ? '+' : ''}${pct(v)}`
@@ -59,9 +60,9 @@ interface Props {
 type ChartDatum = LearningCurveBucket
 
 const LINE_OVERALL = 'var(--color-accent)'
-const LINE_FINGER = '#3b82f6'
-const LINE_HAND = '#10b981'
-const LINE_HOME = '#f59e0b'
+const LINE_FINGER = 'var(--color-accent-hover)'
+const LINE_HAND = 'var(--color-success)'
+const LINE_HOME = 'var(--color-warning)'
 
 function formatDateAxis(ms: number, period: ErgonomicsLearningPeriod): string {
   const d = new Date(ms)
@@ -114,9 +115,9 @@ const TrendCard = memo(function TrendCard({
   delta?: string
 }) {
   return (
-    <div className="flex flex-col rounded border border-edge bg-surface px-3 py-2 text-[12px]">
+    <div className="flex flex-col rounded border border-edge bg-surface px-3 py-2 text-xs">
       <span className="text-content-muted">{label}</span>
-      <span className="text-[16px] font-semibold text-content">{value}</span>
+      <span className="text-base font-semibold text-content">{value}</span>
       {delta !== undefined && (
         <span className="text-content-secondary">{delta}</span>
       )}
@@ -188,21 +189,21 @@ export function ErgonomicsLearningCurveChart({
 
   if (loading) {
     return (
-      <div className="py-4 text-center text-[13px] text-content-muted" data-testid="analyze-ergonomics-learning-loading">
+      <div className="py-4 text-center text-sm text-content-muted" data-testid="analyze-ergonomics-learning-loading">
         {t('common.loading')}
       </div>
     )
   }
   if (!layout || !layoutKeys || layoutKeys.length === 0) {
     return (
-      <div className="py-4 text-center text-[13px] text-content-muted" data-testid="analyze-ergonomics-learning-no-layout">
+      <div className="py-4 text-center text-sm text-content-muted" data-testid="analyze-ergonomics-learning-no-layout">
         {t('analyze.ergonomics.noLayout')}
       </div>
     )
   }
   if (data.length === 0) {
     return (
-      <div className="py-4 text-center text-[13px] text-content-muted" data-testid="analyze-ergonomics-learning-empty">
+      <div className="py-4 text-center text-sm text-content-muted" data-testid="analyze-ergonomics-learning-empty">
         {t('analyze.ergonomics.learning.noData')}
       </div>
     )
@@ -230,14 +231,14 @@ export function ErgonomicsLearningCurveChart({
               domain={['dataMin', 'dataMax']}
               tickFormatter={(v) => formatDateAxis(Number(v), period)}
               stroke="var(--color-content-muted)"
-              fontSize={11}
+              fontSize={CHART_TICK_FONT_SIZE}
             />
             <YAxis
               type="number"
               domain={[0, 1]}
               tickFormatter={(v) => pct(Number(v))}
               stroke="var(--color-content-muted)"
-              fontSize={11}
+              fontSize={CHART_TICK_FONT_SIZE}
               width={48}
             />
             <Tooltip content={(props) => <LearningCurveTooltip {...props} />} />
@@ -308,7 +309,7 @@ export function ErgonomicsLearningCurveChart({
           value={String(qualifiedCount)}
         />
       </div>
-      <p className="text-[11px] text-content-muted">
+      <p className="text-xs text-content-muted">
         {t('analyze.ergonomics.learning.relativeTrendNote')}
       </p>
     </div>

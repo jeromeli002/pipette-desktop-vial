@@ -1,0 +1,1452 @@
+{
+  "version": "0.1.4",
+  "name": "简体中文",
+  "common": {
+    "save": "保存",
+    "saved": "已保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "confirmDelete": "确认删除？",
+    "close": "关闭",
+    "reset": "重置",
+    "confirmReset": "确认重置？",
+    "revert": "还原",
+    "confirmRevert": "确认还原？",
+    "clear": "清空",
+    "confirmClear": "确认清空？",
+    "refresh": "刷新",
+    "refreshing": "正在刷新...",
+    "disconnect": "断开连接",
+    "loading": "加载中...",
+    "apply": "应用",
+    "notConfigured": "未配置",
+    "settingsLabel": "设置：",
+    "configuration": "配置",
+    "saving": "正在保存...",
+    "back": "返回",
+    "exported": "已导出",
+    "imported": "已导入",
+    "load": "加载",
+    "labelPlaceholder": "标签",
+    "noLabel": "(无标签)",
+    "synced": "已同步",
+    "installed": "已安装",
+    "edit": "编辑",
+    "done": "完成",
+    "findOnHub": "在社区中心查找",
+    "searchPlaceholder": "搜索 Pipette 社区中心 (输入 2 个或更多字符)...",
+    "findOnHubHint": "在 <hub>Pipette 社区中心</hub> 浏览上传的文件。"
+  },
+  "app": {
+    "title": "Pipette-JL",
+    "deviceNotConnected": "未连接键盘",
+    "connecting": "正在连接{{dots}}",
+    "selectDevices": "选择设备",
+    "connectedTo": "已连接到 {{name}}",
+    "udevHelp": "如果在 Linux 上找不到设备，请确保已安装 udev 规则。详情请参阅 Vial 用户手册。",
+    "loadDummy": "从 JSON 文件加载...",
+    "keyboardTab": "设备",
+    "fileTab": "文件",
+    "analyzeTab": "分析",
+    "loadPipetteFile": "加载 .pipette 文件...",
+    "loadPipetteFileDescription": "打开 .pipette 文件进行离线编辑。除灯光和矩阵测试外，其余功能均可用。",
+    "noSavedFiles": "无保存的文件",
+    "selectKeyboard": "选择本地保存的文件",
+    "fileCount": "{{count}} 个备份"
+  },
+  "loading": {
+    "protocol": "正在读取设备信息",
+    "definition": "正在加载键盘定义",
+    "keymap": "正在加载键位图",
+    "macros": "正在加载宏",
+    "dynamicEntries": "正在加载功能特性",
+    "settings": "正在加载设置",
+    "migrating": "正在迁移快照",
+    "migratingEntry": "正在迁移快照 ({{current}}/{{total}})"
+  },
+  "editor": {
+    "autoAdvance": "自动移动",
+    "keymap": {
+      "title": "键位图",
+      "layer": "图层 {{number}}",
+      "layerLabel": "图层",
+      "collapseLayers": "折叠图层",
+      "expandLayers": "展开图层",
+      "selectKey": "点击按键进行编辑",
+      "tapHoldSettings": "点按/长按设置 (Tap-Hold)",
+      "tapHoldLabel": "点按/长按",
+      "mouseKeysSettings": "鼠标键设置",
+      "mouseKeysLabel": "鼠标键",
+      "magicSettings": "魔术键设置 (Magic)",
+      "magicLabel": "魔术键",
+      "graveEscapeSettings": "波浪/退出键设置 (Grave Escape)",
+      "graveEscapeLabel": "波浪/退出键",
+      "autoShiftSettings": "自动上档设置 (Auto Shift)",
+      "autoShiftLabel": "自动上档",
+      "oneShotKeysSettings": "单发键设置 (One Shot)",
+      "oneShotKeysLabel": "单发键",
+      "comboSettings": "组合键",
+      "comboLabel": "组合键",
+      "previousLayers": "上一层",
+      "nextLayers": "下一层",
+      "layerN": "图层 {{n}}",
+      "undo": "撤销",
+      "redo": "重做",
+      "zoomIn": "放大",
+      "zoomOut": "缩小",
+      "copySelected": "粘贴所选 ({{count}})",
+      "clickToPaste": "点击按键进行粘贴",
+      "pickerHint": "Ctrl+点击：多选 / Shift+点击：范围选择 → 点击按键进行粘贴",
+      "pickerDoubleClickHint": "再次双击同一按键或按 Enter 键关闭",
+      "keyboardTab": "键盘",
+      "pickerSourceCurrent": "当前",
+      "pickerSourceFile": "文件",
+      "pickerLoadFile": "从 .pipette 加载...",
+      "pickerNoSavedFiles": "无已保存的键盘",
+      "pickerNoEntries": "无已保存的键位图",
+      "pickerBackToFiles": "← 文件",
+      "pickerSourceDevice": "设备",
+      "pickerNoDevices": "未连接其他键盘",
+      "pickerProbing": "正在读取键盘...",
+      "pickerProbeError": "读取键盘失败",
+      "pickerBackToDevices": "← 设备",
+      "pickerCurrentState": "当前状态",
+      "pickerSavedFiles": "本地保存的文件",
+      "keyPopover": {
+        "keyTab": "按键",
+        "codeTab": "键码",
+        "searchPlaceholder": "搜索键码...",
+        "noResults": "未找到相关键码",
+        "hexLabel": "十六进制代码",
+        "hexManual": "手动分配十六进制键码",
+        "qmkLabel": "键码: {{value}}",
+        "modMask": "修饰键掩码",
+        "modTap": "修饰键点按",
+        "lt": "LT (层点按)",
+        "shT": "SH_T",
+        "lm": "LM (层修饰)",
+        "layerLabel": "图层",
+        "keySelected": "已选: {{key}}",
+        "clickToClose": "点击应用并关闭，或按 Enter 键",
+        "undo": "撤销",
+        "redo": "重做"
+      }
+    },
+    "layout": {
+      "title": "布局",
+      "options": "布局选项",
+      "preview": "预览"
+    },
+    "macro": {
+      "title": "宏",
+      "memoryUsage": "内存: {{used}} / {{total}} 字节",
+      "addAction": "添加动作",
+      "text": "文本",
+      "tap": "点按",
+      "down": "按下",
+      "up": "弹起",
+      "delay": "延迟",
+      "record": "录制",
+      "stopRecording": "停止",
+      "editTitle": "M{{index}}",
+      "textEditor": "文本编辑器",
+      "textEditorTitle": "编辑宏 (文本)",
+      "invalidJson": "无效的 JSON 格式",
+      "addKeycode": "添加键码",
+      "deleteKeycode": "删除键码",
+      "editAction": "编辑动作",
+      "asciiOnly": "仅支持 ASCII 字符 (A-Z, 0-9, 标点符号)",
+      "unlockClickAgain": "解锁后，再次点击该宏按键即可打开编辑器。",
+      "unlockWarning": "请勿在宏中存储密码或敏感信息，因为它们可能会被重放或共享。",
+      "invalidMacroEntry": "索引 {{index}} 处的宏无效"
+    },
+    "lighting": {
+      "title": "灯光",
+      "backlight": "背光",
+      "rgblight": "RGB 灯效",
+      "brightness": "亮度",
+      "effect": "特效",
+      "speed": "速度",
+      "breathing": "呼吸",
+      "hue": "色调",
+      "saturation": "饱和度",
+      "value": "明度",
+      "hex": "HEX",
+      "noLighting": "该键盘不支持灯光控制。",
+      "colorPicker": {
+        "label": "调色盘",
+        "palette": "调色板",
+        "hsv": "HSV"
+      }
+    },
+    "tapDance": {
+      "title": "连击键 (Tap Dance)",
+      "onTap": "单击",
+      "onHold": "长按",
+      "onDoubleTap": "双击",
+      "onTapHold": "单击并长按",
+      "tappingTerm": "连击判定时间 (毫秒)",
+      "hint": "在键位图中使用 TD({{index}}) 来配置此动作",
+      "editTitle": "TD({{index}})",
+      "editJson": "编辑 JSON",
+      "jsonEditorTitle": "编辑 JSON",
+      "invalidJson": "无效的 JSON 格式",
+      "unknownKeycode": "未知键码: {{keycode}}",
+      "invalidTappingTerm": "连击判定时间必须是 0 到 10000 之间的数字",
+      "applyFailed": "应用更改失败"
+    },
+    "combo": {
+      "title": "同时按键 (Combo)",
+      "key": "按键 {{number}}",
+      "output": "输出",
+      "editTitle": "同时按键 - {{index}}",
+      "timeout": "超时时间 (毫秒)",
+      "selectEntry": "选择一个条目进行编辑",
+      "settings": "同时按键设置",
+      "invalidJson": "无效的 JSON 格式",
+      "unknownKeycode": "未知键码: {{keycode}}",
+      "invalidEntry": "索引 {{index}} 处的条目无效"
+    },
+    "keyOverride": {
+      "title": "按键覆盖 (Key Override)",
+      "triggerKey": "触发按键",
+      "replacementKey": "替换按键",
+      "layers": "图层",
+      "triggerMods": "触发修饰键",
+      "negativeMods": "排他修饰键",
+      "suppressedMods": "抑制修饰键",
+      "options": "选项",
+      "enabled": "已启用",
+      "enableAll": "全部启用",
+      "disableAll": "全部禁用",
+      "editTitle": "按键覆盖 - {{index}}",
+      "modsOnly": "修饰键",
+      "settings": "按键覆盖设置",
+      "selectEntry": "选择一个条目进行编辑",
+      "invalidJson": "无效的 JSON 格式",
+      "unknownKeycode": "未知键码: {{keycode}}",
+      "invalidEntry": "索引 {{index}} 处的条目无效"
+    },
+    "altRepeatKey": {
+      "title": "交替重复键 (Alt Repeat)",
+      "lastKey": "上一按键",
+      "altKey": "交替按键",
+      "allowedMods": "允许的修饰键",
+      "options": "选项",
+      "enabled": "已启用",
+      "editTitle": "交替重复键 - {{index}}",
+      "settings": "交替重复键设置",
+      "selectEntry": "选择一个条目进行编辑",
+      "invalidJson": "无效的 JSON 格式",
+      "unknownKeycode": "未知键码: {{keycode}}",
+      "invalidEntry": "索引 {{index}} 处的条目无效"
+    },
+    "keyTester": {
+      "title": "按键测试器"
+    },
+    "typingTest": {
+      "title": "打字测试",
+      "switchToTypingMode": "打字测试",
+      "exitTypingMode": "退出打字测试",
+      "restart": "重新开始",
+      "wpm": "WPM",
+      "accuracy": "准确率",
+      "time": "时间",
+      "words": "单词",
+      "correct": "正确",
+      "incorrect": "错误",
+      "finished": "完成",
+      "loading": "加载中...",
+      "wordCount": "{{current}} / {{total}}",
+      "mode": {
+        "words": "单词",
+        "time": "时间",
+        "quote": "文段"
+      },
+      "punctuation": "标点符号",
+      "numbers": "数字",
+      "quoteLength": {
+        "short": "短",
+        "medium": "中",
+        "long": "长",
+        "all": "全部"
+      },
+      "quoteSource": "-- {{source}}",
+      "viewOnly": "打字面板",
+      "exitViewOnly": "退出打字面板",
+      "alwaysOnTop": "置顶",
+      "recordStart": "开始",
+      "recordStop": "停止",
+      "viewAnalytics": "查看分析图表",
+      "tab": {
+        "window": "窗口",
+        "rec": "录制"
+      },
+      "monitorApp": {
+        "label": "监听应用"
+      },
+      "heatmap": {
+        "legend": "热力图: 过去 1 小时"
+      },
+      "closeHint": "点击打开菜单",
+      "recordingIndicator": "正在录制",
+      "resetSize": "默认大小",
+      "fitSize": "适应大小",
+      "baseLayer": "基础图层",
+      "baseLayerShort": "基础",
+      "heatmapWindow": "热力图统计窗口 (分钟)",
+      "heatmapWindowShort": "热力图",
+      "heatmapWindowOption": "{{minutes}} 分钟",
+      "consent": {
+        "title": "是否启用打字数据分析录制？",
+        "collectedHeading": "我们收集的数据",
+        "collectedItems": [
+          "每分钟的字符输入频率",
+          "每个按键的按压次数 (行/列/图层/键码，以及点按 vs 长按)",
+          "打字速度分布 (时间间隔百分位数)",
+          "当前活动的应用名称 (仅在开启“监听应用”时；若一分钟内切换了多个应用，则记录为未知)"
+        ],
+        "notCollectedHeading": "我们绝不收集的数据",
+        "notCollectedItems": [
+          "单个按键的具体敲击时间点",
+          "具体文本内容 / 密码 / 特定的单词",
+          "窗口标题 / URL 网址 / 文件路径"
+        ],
+        "accept": "启用"
+      },
+      "paused": "窗口失去焦点",
+      "layerNote": "仅追踪 MO / LT / LM 图层切换键。其他图层键和高级功能可能无法正确体现。",
+      "language": {
+        "title": "语言",
+        "searchPlaceholder": "搜索语言...",
+        "downloaded": "已下载",
+        "available": "可用",
+        "noResults": "无匹配的语言",
+        "words": "{{count}} 个单词",
+        "loadingLanguage": "正在加载语言...",
+        "downloadFailed": "下载失败"
+      },
+      "history": {
+        "title": "历史记录",
+        "bestWpm": "最高 WPM",
+        "avgWpm": "平均 WPM",
+        "last10Avg": "近 10 次平均",
+        "totalTests": "测试次数",
+        "avgAccuracy": "平均准确率",
+        "date": "日期",
+        "mode": "模式",
+        "noResults": "暂无记录",
+        "pb": "个人最佳",
+        "allModes": "全部",
+        "exportCsv": "导出 CSV"
+      }
+    }
+  },
+  "error": {
+    "loadFailed": "加载布局文件失败",
+    "saveFailed": "保存布局文件失败",
+    "exampleUid": "请配置一个唯一的 UID。",
+    "dummyMode": "虚拟模式",
+    "pipetteFileMode": "文件模式",
+    "unsavedChanges": "未保存的更改",
+    "vilV1NotSupported": "旧版数据格式。请连接键盘并打开键位图以进行迁移。",
+    "protocolVersion": "该键盘的 VIA 协议版本不受支持。请更新固件。",
+    "exportKeymapCFailed": "导出 keymap.c 文件失败",
+    "exportPdfFailed": "导出键位图 PDF 失败",
+    "sideloadFailed": "加载 JSON 定义文件失败",
+    "sideloadInvalidDefinition": "无效的键盘定义：缺少必要字段 (matrix, layouts)",
+    "notVialCompatible": "此设备可能不是兼容 Vial 的键盘。"
+  },
+  "warning": {
+    "echoDetected": "检测到通信错误。请检查 USB 数据线并重新连接设备。"
+  },
+  "keycodes": {
+    "basic": "基础按键",
+    "iso": "ISO 键位",
+    "jis": "JIS 键位",
+    "international": "国际键位",
+    "language": "语言切换",
+    "layers": "图层相关",
+    "behavior": "按键行为",
+    "modifiers": "修饰键",
+    "lighting": "灯光控制",
+    "system": "系统控制",
+    "tapDance": "点按-长按 / 连击键",
+    "macro": "宏按键",
+    "combo": "同时按键",
+    "keyOverride": "按键覆盖",
+    "altRepeatKey": "交替重复键",
+    "settingsNote": "这些功能应用于整个键盘，无法分配给单个按键。",
+    "macroMoreActions": "+还有 {{count}} 个动作",
+    "user": "用户自定义",
+    "midi": "MIDI 控制",
+    "group": {
+      "characters": "字符键",
+      "editing": "文本编辑",
+      "modifiers": "修饰键",
+      "navigation": "光标导航",
+      "function": "功能键 (F1-F24)",
+      "lock": "锁定键",
+      "numpad": "数字小键盘",
+      "system": "系统命令",
+      "shifted": "上档符号",
+      "internal": "内部触发",
+      "magic": "魔术命令",
+      "audio": "音频 & 音乐",
+      "haptic": "触觉震动",
+      "mode": "模式切换",
+      "autoShift": "自动上档",
+      "comboKeys": "组合键",
+      "keyOverrideKeys": "覆盖键",
+      "altRepeatKeyKeys": "重复键",
+      "capsWord": "大写单词锁定",
+      "boot": "Bootloader 刷机模式",
+      "osm": "单发修饰键 (One-Shot)",
+      "modMask": "修饰键掩码",
+      "modTap": "修饰键点按 (Mod-Tap)",
+      "modSpecial": "特殊修饰键",
+      "backlight": "核心背光",
+      "rgbLighting": "底灯 RGB",
+      "rgbMatrix": "轴灯矩阵 RGB",
+      "systemControl": "系统电源",
+      "appBrowser": "应用 & 浏览器",
+      "mediaPlayback": "多媒体控制",
+      "mouse": "鼠标模拟",
+      "lockingKeys": "硬件锁定键",
+      "layerSpecial": "特殊层控制",
+      "layerMO": "MO – 瞬时开启层",
+      "layerDF": "DF – 切换默认层",
+      "layerPDF": "PDF – 永久默认层",
+      "layerTG": "TG – 开关触发层",
+      "layerTT": "TT – 连击触发层",
+      "layerOSL": "OSL – 单发触发层",
+      "layerTO": "TO – 仅开启指定层",
+      "layerLT": "LT – 瞬时层/点按键",
+      "layerLM": "LM – 瞬时层加修饰键",
+      "macroDM": "动态宏",
+      "midiNotes": "音符",
+      "midiOctave": "八度音阶",
+      "midiTranspose": "变调",
+      "midiVelocity": "力度",
+      "midiChannel": "通道",
+      "midiControl": "控制器",
+      "swapHands": "镜像手切换",
+      "sequencer": "音序器",
+      "joystick": "摇杆",
+      "ledMatrix": "LED 矩阵"
+    }
+  },
+  "unlock": {
+    "title": "解锁键盘",
+    "instructions": "长按高亮的按键来解锁键盘。",
+    "hint": "如需取消，请拔下并重新插入键盘线。",
+    "progress": "进度: {{current}} / {{total}}",
+    "cancel": "取消"
+  },
+  "fileIO": {
+    "loadLayout": "加载布局 (.vil)",
+    "sideloadJson": "旁加载 JSON 定义",
+    "importing": "正在导入...",
+    "exporting": "正在导出...",
+    "importSuccess": "导入完成",
+    "uidMismatchConfirm": "该布局文件是为其他键盘创建的。仍要加载吗？"
+  },
+  "statusBar": {
+    "autoAdvance": "自动移动",
+    "locked": "已锁定",
+    "unlocked": "已解锁",
+    "keyTester": "按键测试",
+    "sync": {
+      "pending": "等待中",
+      "syncing": "正在同步...",
+      "synced": "已同步",
+      "error": "同步错误",
+      "partial": "部分同步"
+    }
+  },
+  "security": {
+    "lock": "锁定"
+  },
+  "theme": {
+    "label": "主题",
+    "light": "浅色",
+    "dark": "深色",
+    "system": "跟随系统"
+  },
+  "themePacks": {
+    "manageRow": "主题包管理",
+    "title": "主题包",
+    "import": "导入主题包",
+    "parseError": "解析文件失败",
+    "selectTheme": "选择 {{name}}",
+    "hubEmpty": "社区中心没有匹配的主题包",
+    "preview": "预览",
+    "previewing": "正在预览"
+  },
+  "layout": {
+    "keyboardLayout": "按键标签",
+    "exportAllPdf": "全部图层",
+    "exportCurrentPdf": "当前图层",
+    "pdfFooterLabel": ".pdf"
+  },
+  "layoutStore": {
+    "title": "数据",
+    "noSavedLayouts": "无保存的布局",
+    "saveFailed": "保存布局失败",
+    "maxEntriesReached": "保存的布局已达上限 (30个)。请删除已有条目以便保存新布局。",
+    "loadFailed": "加载布局失败",
+    "delete": "删除",
+    "import": "导入",
+    "export": "导出",
+    "confirmOverwrite": "确认覆盖？",
+    "exportVil": "导出 .vil 文件",
+    "exportKeymapC": "导出 .c 文件",
+    "exportPdf": "导出 .pdf 文件",
+    "versionPrefix": "版本 v{{version}} - "
+  },
+  "analyzeFilterStore": {
+    "title": "保存的搜索条件",
+    "tabSave": "保存条件",
+    "selectKeyboard": "选择键盘以管理保存的搜索条件。",
+    "saveFailed": "保存搜索条件失败",
+    "loadFailed": "加载搜索条件失败",
+    "unsupportedVersion": "该搜索条件是由较新版本的 Pipette 编写的，无法加载。",
+    "maxEntriesReached": "保存的搜索条件已达上限 ({{max}}个)。请删除已有条目以便保存新条件。",
+    "csv": ".csv",
+    "empty": "暂无保存的搜索条件。",
+    "confirmOverwrite": "确认覆盖？"
+  },
+  "sync": {
+    "googleAccount": "Google 账号",
+    "connected": "已连接",
+    "signOut": "断开连接",
+    "confirmDisconnect": "确认断开连接？",
+    "disconnectHubWarning": "Pipette 社区中心的连接也将一并断开。",
+    "signIn": "连接账号",
+    "authenticating": "正在等待身份验证...",
+    "authFailed": "身份验证失败，请重试。",
+    "encryptionPassword": "同步加密密码",
+    "passwordSet": "密码已设置",
+    "passwordPlaceholder": "输入加密密码",
+    "setPassword": "设置密码",
+    "passwordTooWeak": "密码强度太弱",
+    "passwordSetFailed": "设置密码失败",
+    "changePassword": "修改密码",
+    "changePasswordInfo": "所有同步的数据都将使用新密码重新加密。",
+    "changingPassword": "正在修改密码...",
+    "settingPassword": "正在设置密码...",
+    "samePassword": "新密码必须与当前密码不同。",
+    "changePasswordUndecryptable": "部分文件无法解密。请先扫描并删除无法解密的文件。",
+    "autoSync": "自动同步",
+    "enable": "启用",
+    "disable": "禁用",
+    "manualSync": "手动同步",
+    "sync": "立即同步",
+    "resetTarget": {
+      "keyboardData": "键盘数据",
+      "favorites": "收藏夹",
+      "appSettings": "应用设置",
+      "i18nPacks": "语言包"
+    },
+    "deleteSelected": "删除所选数据",
+    "resetTargetsConfirm": "所选的数据将被永久删除。此操作无法撤销。",
+    "resetLocalTargetsConfirm": "所选的本地数据将被永久删除。此操作无法撤销。",
+    "resettingData": "正在删除数据...",
+    "syncing": "正在同步...",
+    "continueOffline": "继续离线使用",
+    "noSyncYet": "尚未同步",
+    "changePasswordError": {
+      "unauthenticated": "请在修改密码前登录 Google 账号。"
+    },
+    "changePasswordInProgress": "同步进行中，无法修改密码。",
+    "import": "导入",
+    "export": "导出",
+    "importComplete": "导入完成",
+    "importFailed": "导入失败",
+    "passwordMismatch": "同步密码不匹配。请检查您的加密密码。",
+    "scanRemote": "扫描云端",
+    "scanning": "正在扫描...",
+    "downloading": "正在下载...",
+    "noRemoteData": "未发现云端数据",
+    "undecryptableCount": "{{count}} 个无法解密的文件",
+    "selectAll": "全选",
+    "deselectAll": "取消全选",
+    "checkingRemotePassword": "正在检查同步状态...",
+    "existingPasswordHint": "云端已存在同步密码。请务必输入在其他设备上使用的相同密码。",
+    "unavailable": "无法连接到同步服务器。同步功能当前已被禁用。",
+    "retry": "重试"
+  },
+  "settings": {
+    "title": "设置",
+    "tabData": "连接",
+    "tabTools": "工具",
+    "dataSync": "数据同步",
+    "defaults": "新键盘默认值",
+    "defaultLayout": "默认按键标签",
+    "defaultAutoAdvance": "默认自动移动",
+    "defaultLayerPanelOpen": "默认展开图层列表",
+    "defaultBasicViewType": "默认基础视图样式",
+    "defaultSplitKeyMode": "选键器中分离 Shift 键",
+    "defaultQuickSelect": "即时按键选择",
+    "basicViewTypeList": "列表 (LIST)",
+    "basicViewTypeAnsi": "ANSI 布局",
+    "basicViewTypeIso": "ISO 布局",
+    "basicViewTypeJis": "JIS 布局",
+    "security": "安全",
+    "autoLockTime": "自动锁定时间",
+    "autoLockDescription": "无操作一段时间后自动锁定。",
+    "autoLockMinutes": "{{minutes}} 分钟",
+    "maxKeymapHistory": "历史最大键位图留存数",
+    "tabNotification": "通知",
+    "tabAbout": "关于",
+    "about": {
+      "version": "版本 {{version}}",
+      "license": "开源协议: {{license}}",
+      "licenseValue": "GPL-3.0-or-later"
+    },
+    "zoomLevel": "界面缩放",
+    "zoomLevelWarning": "修改此项可能会导致布局错乱，请自行承担风险。"
+  },
+  "analyze": {
+    "noKeyboards": "暂无打字数据。",
+    "noData": "所选时间段内没有数据。",
+    "selectKeyboard": "请从列表中选择一把键盘。",
+    "appUsage": {
+      "title": "应用使用时长分布",
+      "loading": "正在加载应用数据...",
+      "empty": "暂无应用数据 — 请开启“监听应用”并开始“录制”来生成图表。",
+      "unknown": "未知 / 混合应用",
+      "other": "其他应用",
+      "tooltipKeystrokesLabel": "按键数",
+      "tooltipShareLabel": "占比"
+    },
+    "wpmByApp": {
+      "title": "各应用打字速度 (WPM)",
+      "loading": "正在加载各应用 WPM...",
+      "empty": "暂无应用标签数据 — 请开启“监听应用”并开始“录制”来生成图表。",
+      "tooltipWpmLabel": "WPM",
+      "tooltipKeystrokesLabel": "按键数"
+    },
+    "tablistLabel": "分析类型",
+    "splitView": {
+      "toggle": "分栏视图",
+      "narrowWindow": "窗口过窄无法开启分栏 — 请拉宽窗口以启用。"
+    },
+    "export": {
+      "categoriesLabel": "要导出的类别",
+      "confirm": "导出 .csv 文件",
+      "failed": "导出失败。",
+      "snapshotMissing": "按键热力图、人体工学和布局对比功能需要键位快照才能导出，该时间段内暂不可用。",
+      "conditionLabel": {
+        "device": "设备",
+        "app": "应用",
+        "keymap": "键位图",
+        "range": "时间段"
+      },
+      "fingerOverrides": "手指分配覆盖",
+      "fingerOverridesDefault": "默认预估",
+      "fingerOverridesCustomized": "自定义覆盖 ({{count}} 处)",
+      "category": {
+        "summary": "概要总览",
+        "wpm": "打字速度 (WPM)",
+        "interval": "击键间隔",
+        "activity": "活跃规律",
+        "byApp": "应用维度",
+        "heatmap": "按键热力",
+        "ergonomics": "人体工学",
+        "bigrams": "双字连击 (Bigrams)",
+        "layer": "图层使用",
+        "layoutComparison": "布局效能对比"
+      },
+      "appDataApps": {
+        "label": "应用独立数据",
+        "all": "所有应用",
+        "none": "无",
+        "selectAll": "全选",
+        "deselectAll": "全不选",
+        "hint": "选择将哪些应用的详细打字数据上传并展示在社区中心。"
+      }
+    },
+    "loading": {
+      "keyboards": "正在加载键盘列表...",
+      "syncing": "正在同步分析数据...",
+      "preparing": "正在生成图表..."
+    },
+    "unit": {
+      "keys": "次按键",
+      "activations": "次激活"
+    },
+    "snapshotTimeline": {
+      "title": "键位图快照历史",
+      "current": "当前键位图"
+    },
+    "wpm": {
+      "legend": "打字速度 (WPM)",
+      "description": "WPM — 每分钟单词数。\n计算方式：每分钟内活跃打字的总击键数除以 5。",
+      "timeSeries": {
+        "summary": {
+          "label": "速度数据概要",
+          "totalKeystrokes": "总击键数",
+          "activeDuration": "活跃打字时长",
+          "overallWpm": "综合速度 (WPM)",
+          "peakWpm": "峰值速度 (WPM)",
+          "lowestWpm": "最低速度 (WPM)",
+          "weightedMedianWpm": "加权中位数 WPM",
+          "totalBackspaces": "退格键 (Bksp) 总数",
+          "overallBksPercent": "综合退格键占比",
+          "overallBksPercentDesc": "退格按键次数占总击键数的百分比。"
+        }
+      },
+      "errorProxy": {
+        "legend": "退格键占比 (Bksp %)",
+        "description": "退格键占比 — 退格键占总击键数的百分比。\n数据来源于原生键盘事件流，包含日常所有的输入，而不仅仅是打字测试。"
+      },
+      "timeOfDay": {
+        "tooltipLabel": "时段",
+        "summary": {
+          "label": "每日时段速度概要",
+          "totalKeystrokes": "总击键数",
+          "activeDuration": "活跃打字时长",
+          "overallWpm": "综合速度 (WPM)",
+          "peakHour": "巅峰时段",
+          "peakHourDesc": "打字速度最快的小时。",
+          "lowestHour": "最慢时段",
+          "lowestHourDesc": "打字速度最慢的小时 (不含无活跃的时段)。",
+          "activeHours": "活跃小时数",
+          "activeHoursDesc": "一天 24 小时中，有击键记录的小时总数。"
+        }
+      }
+    },
+    "interval": {
+      "legend": {
+        "min": "最小值",
+        "p25": "25%分位数",
+        "p50": "中位数",
+        "p75": "75%分位数",
+        "max": "最大值"
+      },
+      "description": {
+        "min": "最小值 — 在任意一分钟内记录到的最短按键间隔 (极限手速瞬间)。",
+        "p25": "25%分位数 — 下四分位数。\n每分钟 p25 的日平均值；意味着 1/4 的击键间隔短于该值。",
+        "p50": "中位数 — 每分钟击键间隔中位数的日平均值。\n意味着有一半的击键间隔短于该值。",
+        "p75": "75%分位数 — 上四分位数。\n每分钟 p75 的日平均值；意味着 3/4 的击键间隔短于该值。",
+        "max": "最大值 — 任意一分钟内记录到的最长按键间隔 (最长停顿时间)。"
+      },
+      "bin": {
+        "lt50": "<50毫秒",
+        "50to100": "50-100毫秒",
+        "100to200": "100-200毫秒",
+        "200to500": "200-500毫秒",
+        "500to1000": "500毫秒-1秒",
+        "1000to2000": "1-2秒",
+        "2000to5000": "2-5秒",
+        "5000to10000": "5-10秒",
+        "gt10000": ">10秒"
+      },
+      "distribution": {
+        "tooltipLabel": "预估击键数",
+        "summary": {
+          "label": "打字节奏概要",
+          "medianP50": "击键间隔中位数",
+          "fast": "极速 (<200ms)",
+          "fastDesc": "短于 200毫秒 的击键间隔占比。",
+          "normal": "常速 (200-500ms)",
+          "normalDesc": "介于 200毫秒 到 500毫秒 之间的击键间隔占比。",
+          "slow": "慢速 (500ms-2s)",
+          "slowDesc": "介于 500毫秒 到 2秒 之间的击键间隔占比。",
+          "pause": "停顿 (>=2s)",
+          "pauseDesc": "长达 2秒 或更长时间的按键停顿占比。",
+          "longestPause": "最长单次停顿 (每分钟最高)"
+        }
+      },
+      "timeSeries": {
+        "summary": {
+          "label": "时间序列间隔概要",
+          "medianP50": "加权中位数间隔",
+          "shortest": "最短击键间隔 (每分钟最低)",
+          "longestPause": "最长击键间隔 (每分钟最高)"
+        }
+      }
+    },
+    "activity": {
+      "tableLabel": "时段 × 星期活跃度 (击键数)",
+      "tableLabelWpm": "时段 × 星期打字速度 (WPM)",
+      "hourHeader": "{{hour}}:00",
+      "cellTitle": "{{dow}} {{hour}}:00 — {{keystrokes}} $t(analyze.unit.keys)",
+      "cellTitleWithShare": "{{dow}} {{hour}}:00 — {{keystrokes}} $t(analyze.unit.keys) (占总量的 {{share}}%)",
+      "cellTitleWpm": "{{dow}} {{hour}}:00 — {{wpm}} WPM ({{keystrokes}} $t(analyze.unit.keys) / {{activeDuration}})",
+      "legendLow": "0",
+      "legendHigh": "{{count}} $t(analyze.unit.keys)",
+      "legendHighWpm": "{{wpm}} WPM",
+      "summary": {
+        "keysContext": "{{count}} $t(analyze.unit.keys) ({{share}}%)",
+        "wpmContext": "{{wpm}} WPM"
+      },
+      "keystrokes": {
+        "summary": {
+          "label": "活跃规律概要",
+          "mostFrequentDow": "最忙碌的一天",
+          "mostFrequentDowDesc": "在一周中总击键次数最多的一天。",
+          "mostFrequentHour": "最忙碌的时段",
+          "mostFrequentHourDesc": "一天中总击键次数最多的小时时段。",
+          "peakCell": "活动峰值点",
+          "peakCellDesc": "击键数最多的具体格子 (某天×某小时)。",
+          "activeCells": "活跃时段数",
+          "activeCellsDesc": "有击键记录的格子总数 (总共 168 个格子)。"
+        }
+      },
+      "wpm": {
+        "summary": {
+          "label": "活跃速度概要",
+          "overallWpm": "综合速度 (WPM)",
+          "peakCell": "手速峰值点",
+          "peakCellDesc": "打字速度 WPM 最高的具体格子 (某天×某小时)。",
+          "lowestCell": "最慢活动点",
+          "lowestCellDesc": "打字速度 WPM 最慢的具体格子 (仅统计有活动的时段)。",
+          "activeCells": "活跃时段数",
+          "activeCellsDesc": "有击键记录的格子总数 (总共 168 个格子)。"
+        }
+      },
+      "sessions": {
+        "tooltipLabel": "连续打字段落 (Sessions)",
+        "tooltipValue": "{{count}} 次连续打字 (占比 {{share}}%)",
+        "bin": {
+          "lt5Min": "<5 分钟",
+          "5to15Min": "5-15 分钟",
+          "15to30Min": "15-30 分钟",
+          "30to60Min": "30-60 分钟",
+          "1to2Hours": "1-2 小时",
+          "2to4Hours": "2-4 小时",
+          "gtFourHours": ">4 小时"
+        },
+        "summary": {
+          "label": "连续输入时长概要",
+          "sessionCount": "打字段落总数",
+          "totalDuration": "累计打字时长",
+          "meanDuration": "平均连续时长",
+          "medianDuration": "连续时长中位数",
+          "longestDuration": "最长单次连续打字",
+          "shortestDuration": "最短单次连续打字"
+        }
+      },
+      "dow": {
+        "0": "周日",
+        "1": "周一",
+        "2": "周二",
+        "3": "周三",
+        "4": "周四",
+        "5": "周五",
+        "6": "周六"
+      },
+      "calendar": {
+        "gridLabel": "年度活跃度日历",
+        "monthShortYear": "{{year}}年 {{monthShort}}",
+        "monthShort": {
+          "1": "1月",
+          "2": "2月",
+          "3": "3月",
+          "4": "4月",
+          "5": "5月",
+          "6": "6月",
+          "7": "7月",
+          "8": "8月",
+          "9": "9月",
+          "10": "10月",
+          "11": "11月",
+          "12": "12月"
+        },
+        "cellTooltipKeystrokes": "{{date}} — {{keystrokes}} $t(analyze.unit.keys) (时长: {{activeDuration}})",
+        "cellTooltipWpm": "{{date}} — {{wpm}} WPM (时长: {{activeDuration}})",
+        "cellTooltipSessions": "{{date}} — 开启了 {{count}} 次连续打字",
+        "cellTooltipEmpty": "{{date}} — 无活动",
+        "summary": {
+          "label": "日历数据概要",
+          "total": "总击键数",
+          "avgWpm": "平均打字速度 (WPM)",
+          "activeDays": "活跃天数",
+          "activeDaysValue": "{{active}} / {{total}} 天 ({{share}}%)",
+          "peak": "单日最高产量",
+          "avg": "活跃日平均击键数"
+        }
+      }
+    },
+    "analysisTab": {
+      "summary": "总览",
+      "wpm": "速度 (WPM)",
+      "interval": "间隔",
+      "activity": "规律",
+      "keyHeatmap": "热力图",
+      "ergonomics": "人体工学",
+      "bigrams": "双字组合",
+      "layoutComparison": "布局对比",
+      "layer": "图层",
+      "byApp": "应用"
+    },
+    "summary": {
+      "today": {
+        "sectionTitle": "今日情况",
+        "ariaLabel": "今日概要",
+        "keystrokesLabel": "击键次数",
+        "wpmLabel": "平均手速",
+        "activeDurationLabel": "打字时长"
+      },
+      "weeklyReport": {
+        "sectionTitle": "过去 7 天",
+        "ariaLabel": "周报概要",
+        "delta": "{{glyph}} {{sign}}{{pct}}% (对比前一个 7 天)",
+        "deltaInsufficient": "{{glyph}} — (对比前一个 7 天数据不足)",
+        "keystrokesLabel": "击键次数",
+        "wpmLabel": "打字速度 (WPM)",
+        "activeDurationLabel": "打字时长",
+        "activeDurationContext": "上周同期为 {{previous}}",
+        "activeDaysLabel": "活跃天数",
+        "activeDaysUnit": "天"
+      },
+      "profile": {
+        "sectionTitle": "输入画像 (近 {{days}} 天)",
+        "ariaLabel": "输入画像信息",
+        "insufficient": "数据量不足",
+        "speedLabel": "打字速度级别",
+        "speedDesc": "根据全局 WPM 分为慢 (<30) / 中 (30–50) / 快 (≥50)。需要连续打字数日方可稳定预估。",
+        "speedContext": "{{wpm}} WPM",
+        "speed": {
+          "slow": "较慢",
+          "medium": "中等",
+          "fast": "高效"
+        },
+        "handBalanceLabel": "左右手均衡度",
+        "handBalanceDesc": "双字组合击键中落在各只手的比例。在 50/50 的 ±5% 范围内视为理想均衡。",
+        "handBalanceContext": "左手 {{leftPct}}% / 右手 {{rightPct}}%",
+        "handBalance": {
+          "leftBias": "左手偏重",
+          "balanced": "左右均衡",
+          "rightBias": "右手偏重"
+        },
+        "sfbLabel": "同指连击率 (SFB)",
+        "sfbDesc": "使用同一根手指连续敲击不同按键的比例。越低对双手的负担越小。<4% 极佳，4–8% 中等，≥8% 偏高。",
+        "sfbContext": "{{pct}}% 同指连击",
+        "sfb": {
+          "low": "偏低 (优秀)",
+          "medium": "中等",
+          "high": "偏高"
+        },
+        "fatigueLabel": "疲劳风险估算",
+        "fatigueDesc": "统计周期内，您手速最快和最慢小时之间的 WPM 差距。差距越大代表疲劳导致的速度衰减风险越高。",
+        "fatigueContext": "最慢比最快衰减了 {{pct}}%",
+        "fatigue": {
+          "low": "低风险",
+          "medium": "中等风险",
+          "high": "高风险"
+        }
+      }
+    },
+    "bigrams": {
+      "loading": "正在加载双字连击数据...",
+      "empty": "该范围内暂无双字组合数据。请录制一些打字输入后再试。",
+      "error": "加载双字组合数据失败。请重试或检查系统日志。",
+      "quadrant": {
+        "top": "高频双字对",
+        "slow": "双字输入间隔",
+        "fingerIki": "手指物理间隔时间 (IKI)"
+      },
+      "column": {
+        "pair": "双字对",
+        "count": "频次",
+        "avgIki": "平均 IKI",
+        "p95": "95%分位数 IKI"
+      },
+      "fingerIki": {
+        "noSnapshot": "手指物理间隔分析需要对应的键位图快照。请开始一个录制会话或选择包含快照的时间段。",
+        "sortLabel": "排序方式",
+        "sort": {
+          "desc": "最慢优先",
+          "asc": "最快优先"
+        }
+      },
+      "pairIntervalThreshold": {
+        "label": "平均间隔",
+        "suffix": "毫秒或更慢",
+        "ariaLabel": "最小平均间隔 (毫秒)"
+      },
+      "cellTooltipOccurrencesLabel": "出现次数",
+      "cellTooltipAvgIkiLabel": "平均间隔"
+    },
+    "keyHeatmap": {
+      "layer": "图层",
+      "layerOption": "图层 {{i}}",
+      "layerOptionMulti": "混合图层 {{layers}}",
+      "bondToggle": "将图层 {{i}} 与另一组绑定展示",
+      "noLayout": "此快照对应的键盘布局数据不可用。",
+      "noSnapshot": "该时间范围内没有记录到键位快照。请开启数据录制以捕捉当前键位。",
+      "ranking": {
+        "frequentUsedN": "高频前 N 项",
+        "frequentUsed": "高频使用按键",
+        "colKey": "按键",
+        "colLayer": "图层",
+        "colMatrix": "矩阵位置",
+        "colCount": "次数",
+        "aggregate": "数据聚合",
+        "aggregateOption": {
+          "cell": "按物理键位",
+          "char": "按输入字符"
+        },
+        "keyGroup": "按键分组",
+        "keyGroupOption": {
+          "all": "全部",
+          "char": "字符键",
+          "modifier": "修饰键",
+          "layerOp": "图层控制键"
+        },
+        "emptyFrequentUsed": "在此时间范围内没有任何按键记录。"
+      }
+    },
+    "ergonomics": {
+      "fingerLoad": "手指负荷",
+      "handBalance": "左右手均衡",
+      "rowUsage": "行均衡度",
+      "rowLoad": "键盘行负荷",
+      "noSnapshot": "该时间范围内没有记录到键位快照。请开启数据录制以捕捉当前键位。",
+      "noLayout": "此快照对应的键盘布局数据不可用。",
+      "noData": "该时间范围内没有击键记录。",
+      "finger": {
+        "left-pinky": "左手小指",
+        "left-ring": "左手无名指",
+        "left-middle": "左手中指",
+        "left-index": "左手食指",
+        "left-thumb": "左手大拇指",
+        "right-thumb": "右手大拇指",
+        "right-index": "右手食指",
+        "right-middle": "右手中指",
+        "right-ring": "右手无名指",
+        "right-pinky": "右手小指"
+      },
+      "fingerKind": {
+        "thumb": "大拇指",
+        "index": "食指",
+        "middle": "中指",
+        "ring": "无名指",
+        "pinky": "小指"
+      },
+      "hand": {
+        "left": "左手",
+        "right": "右手"
+      },
+      "rowCategory": {
+        "function": "功能键行",
+        "number": "数字行",
+        "top": "上排键",
+        "home": "主行 (家园行)",
+        "bottom": "下排键",
+        "thumb": "拇指行"
+      },
+      "learning": {
+        "noData": "当前范围内矩阵活动数据不足。请多打字或扩大时间过滤范围。",
+        "belowMinSample": "样本量低于最低要求",
+        "totalKeystrokes": "{{count}} 次击键",
+        "relativeTrendNote": "分值代表的是相对发展趋势，而非经绝对标定的等级水平。请着重观察曲线的长期走向，而不要将百分比直接视作期末分数。",
+        "score": {
+          "overall": "综合效能得分",
+          "fingerLoad": "手指负荷优化",
+          "handBalance": "左右手平衡",
+          "homeRowStay": "主行留存率"
+        },
+        "summary": {
+          "latestOverall": "最新得分",
+          "delta_one": "对比上一周期",
+          "delta_other": "对比前 {{count}} 个周期",
+          "baselineMean": "基准平均值 {{value}}",
+          "bucketCount": "统计区间总数",
+          "qualifiedCount": "达标区间数"
+        }
+      }
+    },
+    "layoutComparison": {
+      "sourceLabel": "当前键盘布局",
+      "targetLabel": "对比候选布局",
+      "noTargetOption": "— 请选择布局 —",
+      "noTarget": "请选择一个备选布局，以评估其针对您个人真实打字数据的效能表现。",
+      "noSnapshot": "该时间范围内没有记录到键位快照。请开启数据录制以捕捉当前键位。",
+      "noData": "该时间范围内没有任何矩阵击键活动。",
+      "loading": "正在计算布局效能对比...",
+      "fetchError": "计算布局对比指标失败。",
+      "skipWarning": "有 {{percent}}% 的按键事件无法映射到候选布局中。以下指标仅供粗略参考。",
+      "fingerDiffTitle": "各手指负荷差异 (对比 {{target}})",
+      "heatmapDiffTitle": "各物理键位负荷差异 (对比 {{target}})",
+      "heatmapDiffLegend": {
+        "decrease": "备选布局负担更轻",
+        "increase": "备选布局负担更重"
+      },
+      "headers": {
+        "metric": "核心指标",
+        "current": "当前布局"
+      },
+      "metrics": {
+        "fingerLoad": "手指负荷分布",
+        "handBalance": "左右手均衡度",
+        "rowDist": "按键行分布",
+        "homeRow": "主行 (Home-row) 留存"
+      }
+    },
+    "layer": {
+      "title": "各图层击键计数",
+      "activationsTitle": "图层激活次数",
+      "layerLabel": "图层 {{layer}}",
+      "noData": "该时间范围内没有图层活动记录。",
+      "noActivations": "该时间范围内没有切层控制键的敲击记录。",
+      "requiresSnapshot": "图层激活分析需要对应的键位图快照。请在当前时间段内开启并留存至少一次录制。"
+    },
+    "finger": {
+      "short": {
+        "left-pinky": "左小",
+        "left-ring": "左无",
+        "left-middle": "左中",
+        "left-index": "左食",
+        "left-thumb": "左拇",
+        "right-thumb": "右拇",
+        "right-index": "右食",
+        "right-middle": "右中",
+        "right-ring": "右无",
+        "right-pinky": "右小"
+      }
+    },
+    "fingerAssignment": {
+      "button": "手指分工修正",
+      "title": "指定按键所属手指",
+      "subtitle": "点击下方按键可人为修正系统预估的手指分工。",
+      "save": "保存修正",
+      "reset": "恢复为系统预估",
+      "resetAll": "重置所有按键",
+      "noSnapshot": "该时间范围内无适用的键位快照。",
+      "popoverLabel": "选择指别",
+      "leftHand": "左手侧",
+      "rightHand": "右手侧"
+    },
+    "peak": {
+      "peakKeystrokesPerMin": "单分钟最高手速",
+      "peakKeystrokesPerDay": "单日最高敲击产量",
+      "longestSession": "最长连续打字时间 (分钟)",
+      "longestSessionDesc": "最长的单次高频连续打字时长。中途停顿超过 5 分钟将被切分为新段落。"
+    },
+    "streakGoal": {
+      "sectionTitle": "打字目标连续达成卡片",
+      "ariaLabel": "每日击键目标和连续天数统计概要",
+      "currentStreakLabel": "当前连续天数",
+      "currentStreakDesc": "在当前周期内已达标的连续天数。\n达到目标总天数后计数器将自动结算并复位。",
+      "currentValue": "{{current}} / {{goalDays}} 天",
+      "longestStreakLabel": "历史最长连续达标",
+      "goalLabel": "每日产量目标设置",
+      "goalDaysAria": "目标连续达标天数",
+      "goalKeystrokesAria": "每日目标击键数",
+      "changeWarning": "修改目标参数将会清空并复位当前周期的连续达标天数。",
+      "confirm": "确认应用目标",
+      "daysUnit": "天",
+      "keystrokesUnit": "次击键/天",
+      "historyButton": "成就荣誉史",
+      "historyTitle": "目标达成历史记录",
+      "historyEmpty": "暂无完整达标的复位周期",
+      "historyPeriod": "{{start}} – {{end}}",
+      "historyGoal": "目标: {{days}}天 / 每日{{keystrokes}}键",
+      "historyColumn": {
+        "period": "达成周期",
+        "goal": "设定目标",
+        "days": "实际天数",
+        "total": "总击键积累",
+        "average": "日均击键"
+      }
+    },
+    "filters": {
+      "keyboard": "选择键盘",
+      "period": "时间周期",
+      "device": "来源设备",
+      "deviceOption": {
+        "own": "当前本机设备",
+        "all": "所有历史设备"
+      },
+      "app": "关联应用",
+      "appOption": {
+        "none": "全部应用",
+        "multi": "{{first}} 及其他 +{{rest}} 个"
+      },
+      "unit": "时间单位",
+      "unitOption": {
+        "sec": "秒",
+        "ms": "毫秒"
+      },
+      "intervalViewMode": "呈现视角",
+      "intervalViewModeOption": {
+        "timeSeries": "时间趋势图",
+        "distribution": "区间分布图"
+      },
+      "wpmViewMode": "时间轴样式",
+      "wpmViewModeOption": {
+        "timeSeries": "线性时间序列",
+        "timeOfDay": "全天时段分布"
+      },
+      "wpmMinSample": "最短统计样本",
+      "wpmMinSampleOption": {
+        "sec30": "30秒",
+        "min1": "1分钟",
+        "min2": "2分钟",
+        "min5": "5分钟"
+      },
+      "ergonomicsViewMode": "展示视图",
+      "ergonomicsViewModeOption": {
+        "snapshot": "单点快照",
+        "learning": "长期演进曲线"
+      },
+      "ergonomicsPeriod": "图表步长",
+      "ergonomicsPeriodOption": {
+        "week": "按周迭代",
+        "month": "按月迭代"
+      },
+      "activityMetric": "度量核心",
+      "activityMetricOption": {
+        "keystrokes": "击键总数",
+        "wpm": "打字速度 (WPM)",
+        "sessions": "打字会话数"
+      },
+      "activityView": "时间网格样式",
+      "activityViewOption": {
+        "grid": "24小时网格",
+        "calendar": "年度日历"
+      },
+      "calendarNormalization": "数据归一化",
+      "calendarNormalizationOption": {
+        "absolute": "绝对绝对值",
+        "shareOfWeekly": "占当周比重",
+        "shareOfTotal": "占总体总比重"
+      },
+      "calendarRange": "日历跨度",
+      "calendarRangeOption": {
+        "1": "1个月",
+        "3": "3个月",
+        "6": "6个月",
+        "12": "12个月"
+      },
+      "calendarRangePrev": "往前一个月",
+      "calendarRangeNext": "往后一个月",
+      "layerBaseLayer": "参考基底层",
+      "normalization": "归一化配置",
+      "normalizationOption": {
+        "absolute": "绝对定量",
+        "perHour": "等效折算时产",
+        "shareOfTotal": "总额百分比"
+      },
+      "granularity": "时间颗粒度",
+      "granularityOption": {
+        "auto": "智能自动",
+        "min1": "1分钟",
+        "min5": "5分钟",
+        "min10": "10分钟",
+        "min15": "15分钟",
+        "min30": "30分钟",
+        "hour1": "1小时",
+        "hour3": "3小时",
+        "hour6": "6小时",
+        "hour12": "12小时",
+        "day1": "1天",
+        "day3": "3天",
+        "week1": "1周",
+        "month1": "1个月"
+      }
+    }
+  },
+  "dataModal": {
+    "title": "本地数据中心",
+    "local": "本地存储",
+    "keyboards": "已存键盘",
+    "favorites": "预设收藏",
+    "application": "应用配置",
+    "sync": "云端同步 - 暂无本地副本",
+    "hub": "社区中心 - 暂无本地副本",
+    "noKeyboards": "本地未存储任何键盘信息",
+    "noSaves": "未找到本地保存文件",
+    "importExportDesc": "备份/恢复全部本地全局数据 (含键盘配置、快照收藏及全局设置)",
+    "deleteAll": "彻底擦除所有本地数据",
+    "deleteAllConfirm": "该操作将彻底抹去所有本地及关联的云端同步存储，确定继续？",
+    "syncNoOrphans": "所有同步的数据在本地均可用",
+    "resetAppSettings": "重置应用设置",
+    "typing": {
+      "title": "打字统计数据",
+      "noKeyboards": "暂无记录的打字统计数据",
+      "noItems": "该键盘尚无存储的历史打字记录",
+      "summaryLine": "已累计记录 {{days}} 天，共计 {{keystrokes}} 次击键",
+      "colDate": "归档日期",
+      "colKeystrokes": "单日击键量",
+      "colActiveMs": "实际打字耗时",
+      "selectAll": "勾选全天历史",
+      "selectRow": "选择日期 {{date}}",
+      "deleteSelected": "彻底物理删除所选记录 ({{count}}天)",
+      "deleteAll": "抹去该键盘的所有历史天数",
+      "confirmDeleteSelected": "确定删除该设备对应的这 {{count}} 天的打字记录吗？云端备份也会同步删除，其他设备记录的相同日期不受影响。数据一旦删除将永远无法重新导入 — 如有需求，请在点击确认前先导出备份。",
+      "confirmDeleteAll": "确定将该设备在这把键盘上生成的所有历史打字记录连根抹去吗？云端备份也将同步移除。一旦清空将彻底无法恢复和重新导入 — 建议先行导出文件作备份。",
+      "exportLabel": "批量导出...",
+      "importLabel": "批量导入...",
+      "importStatus": {
+        "importing": "正在执行数据导入...",
+        "exporting": "正在执行数据打包导出...",
+        "imported": "已成功解析并导入 {{count}} 天的历史数据。",
+        "exported": "已成功打包并导出 {{count}} 天的数据文件。",
+        "reason": {
+          "invalid-filename": "文件名格式与系统导出规范模式不兼容",
+          "live-day-locked": "该日期的数据目前正在被实时打字引擎独占录制中 — 将在 {{unlock}} 自动解锁结算",
+          "duplicate-in-batch": "本次导入的批处理包中存在多个指向同一天的重叠文件",
+          "no-matching-target": "本地或云端无法找到供覆盖的存量对应占位记录",
+          "empty-or-invalid-content": "文件内容空空如也，或者内部数据行损坏无法正常解析",
+          "rows-outside-day-window": "文件内含的时间戳数据超出了文件名所声明的自然日窗口边界",
+          "read-error": "系统底层无法正常读取该实体文件"
+        }
+      },
+      "noRemoteDevices": "尚无其他协同设备在这把键盘上留下过输入足迹"
+    }
+  },
+  "editorSettings": {
+    "title": "快捷菜单",
+    "tabData": "连接管理",
+    "tabSave": "保存导出",
+    "tabTools": "进阶设置",
+    "tabLayout": "物理外观布局",
+    "basicViewType": "默认视图样式",
+    "splitKeyMode": "选键器中分离 Shift 键",
+    "quickSelect": "键盘即时点击选择按键",
+    "keyEditorZoom": "键位编辑器缩放比例"
+  },
+  "hub": {
+    "uploadToHub": "发布到中心",
+    "uploading": "正在上传云端...",
+    "uploadSuccess": "发布成功",
+    "uploadFailed": "发布失败",
+    "updateOnHub": "更新云端发布",
+    "updating": "正在向社区同步更新...",
+    "updateSuccess": "更新成功",
+    "updateFailed": "更新失败",
+    "syncSuccess": "数据拉取并同步成功",
+    "syncFailed": "同步同步失败",
+    "removeFromHub": "从社区撤回",
+    "removeSuccess": "已从社区中心成功下架",
+    "removeFailed": "撤回下架失败",
+    "confirmRemove": "确定要从公共社区中心移除该帖子吗？",
+    "pipetteHub": "社区中心 (Hub)",
+    "uploadQuestion": "确认发布到社区中心？",
+    "deleteFromHub": "下架删除",
+    "hubConnected": "社区中心已建立连接",
+    "hubDisconnected": "社区中心连接已断开",
+    "enabled": "社区服务已在线",
+    "enable": "连接社区中心",
+    "disable": "退出社区中心",
+    "confirmDisconnect": "确定断开与公共社区中心的连接吗？",
+    "noPosts": "您在社区中尚未发布任何内容",
+    "requiresAuth": "请先在“连接”选项卡中登录绑定您的 Google 账号，以解锁社区中心发布功能。",
+    "renameFailed": "重命名发布标题失败",
+    "deleteFailed": "删除帖子失败",
+    "hubSynced": "社区数据已步调一致",
+    "displayName": "社区公开昵称",
+    "displayNameDescription": "您在公共社区中心发布内容时所显示的作者别名",
+    "displayNameSaved": "昵称修改已成功保存",
+    "displayNameSaveFailed": "保存昵称设置失败",
+    "displayNameTaken": "该公开昵称非常火爆，已被他人抢先注册了",
+    "openInBrowser": "在浏览器中打开",
+    "needsDisplayName": "请先在设置中配置一个公开昵称再尝试发布内容",
+    "displayNameRequired": "必须设置昵称方可向社区分享发布数据",
+    "authDisplayNameConflict": "您的 Google 账户默认名称与社区现有用户的专属昵称存在冲突。请起一个别致的公共昵称以继续。",
+    "accountDeactivated": "您的账号目前已被系统采取停用处置。如需协助，请联系客服技术支持。",
+    "rateLimited": "您的操作太快了，请喝杯茶稍后再试。",
+    "error": {
+      "keystrokesBelow": "该统计周期内录得的有效按键次数过少 (至少需要累积 100 次击键方可分享)。",
+      "rangeExceeds": "所选的时间范围跨度超过了 30 天限制。请选择一个更精简的范围并重新保存搜索条件。",
+      "unsupportedVersion": "该导出包是由全新版本的 Pipette 客户端打包生成的，当前的公共 Hub 引擎暂时无法正确识别，请尝试升级客户端。",
+      "kindMismatch": "上传的数据核心结构载荷与分析报告帖子的范式不匹配。",
+      "invalidPayload": "社区中心网关断然拒绝了本次上传，原因为载荷数据内容无效。",
+      "malformedPayload": "社区中心认为该数据包存在格式畸变，核心图层指标缺失或维度出现异化。",
+      "entryNotFound": "原本对应的本地保存搜索条件似乎不翼而飞。请刷新管理面板后再行尝试。",
+      "malformedSavedPayload": "本地保存的条件配置文件发生损坏，无法用于解析上传。",
+      "unsupportedSavedVersion": "该条件的底层范式由更高版本的客户端写就，公共云端暂时无法提供解析支撑。",
+      "noRange": "该保存条件缺少核心的时间区间段定义 — 请先去“分析”面板中选定范围并重新保存条件。",
+      "noSnapshot": "在此选定周期内未捕获到任何硬件层面的键位图快照。请用这把键盘随意盲打几下以留下快照烙印，随后再试。",
+      "invalidId": "系统底层无法为该搜索条件匹配唯一的身份标识。请刷新重试。",
+      "titleEmpty": "发布标题不可以留空。",
+      "titleTooLong": "发布标题实在是太长了 (最高上限 200 个字符)。",
+      "authFailed": "社区公共网关鉴权认证未通过。请尝试登出账号并重新连接，随后重试。",
+      "payloadTooLarge": "由于图表数据量过于庞大，数据体积超限。请减少勾选导出的图表类别或适当缩短历史时间跨度。"
+    }
+  },
+  "notification": {
+    "title": "消息通知中心",
+    "empty": "暂无任何新通知",
+    "type": {
+      "Info": "提示",
+      "Warning": "警告",
+      "Update": "更新公告"
+    }
+  },
+  "favoriteStore": {
+    "title": "收藏夹",
+    "noSaved": "收藏夹内空空如也",
+    "saveFailed": "保存到收藏夹失败",
+    "loadFailed": "读取收藏预设失败",
+    "delete": "删除预设",
+    "saveCurrentState": "将当前状态存入收藏",
+    "export": "单项导出",
+    "exportAll": "打包导出全部",
+    "import": "导入收藏",
+    "exportFailed": "导出收藏夹预设文件失败",
+    "importFailed": "导入外部预设文件失败",
+    "importSuccess": "成功导入 {{imported}} 条预设条目",
+    "importPartial": "已成功导入 {{imported}} 条预设条目 (由于重名等原因跳过了 {{skipped}} 条)",
+    "importEmpty": "未能从文件中解析并导入任何有效条目",
+    "exportCurrent": "导出当前",
+    "importCurrent": "导入当前"
+  },
+  "keyLabels": {
+    "title": "定制按键标签",
+    "manageRow": "定制标签管理",
+    "edit": "编辑标签",
+    "hubEmpty": "社区中心没有找到匹配的定制按键标签",
+    "search": "搜索标签",
+    "searching": "正在全网搜索中...",
+    "import": "从外部导入",
+    "empty": "目前没有安装任何按键标签集。使用“搜索”功能发掘新创意，或通过“导入”添加本地 .json 文件。",
+    "actionUpload": "上传到社区",
+    "actionUpdate": "同步更新",
+    "actionSync": "云端同步",
+    "actionRemove": "解除安装",
+    "actionDownload": "下载到本地",
+    "actionDelete": "物理删除",
+    "actionExport": "导出 .json",
+    "hubRemoved": "(已从社区中心撤回)",
+    "errorDuplicate": "本地已经存在同名同姓的标签集预设",
+    "errorImportFailed": "解析并加载外部定制标签文件失败",
+    "errorInvalidName": "标签集名称包含非法字符",
+    "errorSearchFailed": "访问公共 Pipette 社区网络失败",
+    "errorGeneric": "执行相关操作失败",
+    "missingTitle": "定制标签集缺失",
+    "missingMessage": "名为 \"{{name}}\" 的专属按键标签尚未在当前机器上安装。系统将以标准的 QWERTY 键面标签为您代行展示键位布局。",
+    "missingHint": "您可以前往 {{settings}} > {{tools}} > {{keyLabels}} 从社区下载 \"{{name}}\" 标签，或者通过选键器浮窗上的“编辑”按钮快速获取。",
+    "missingClose": "知道了"
+  },
+  "i18n": {
+    "modalTitle": "系统语言包",
+    "manageRow": "外置语言包管理",
+    "edit": "翻译主视图",
+    "hubEmpty": "公共社区中心未能检索到对应的第三方语言翻译包",
+    "search": "全网搜索语言",
+    "import": "导入 .json 语言包",
+    "errorGeneric": "执行语言包动作失败",
+    "errorInvalidJson": "所选的文件未包含符合规范的 JSON 文本对象结构",
+    "notSetKeys": "缺失翻译的键值",
+    "selectLanguage": "切换语言至 {{name}}",
+    "missingKeys": {
+      "title": "未翻译的键值列表",
+      "empty": "非常完美！当前语言包已百分之百完全翻译",
+      "description": "导出一份仅包含当前版本新增/缺失翻译键值的纯净 JSON 模板。在外部完成文本翻译后重新导入即可补全。"
+    },
+    "preview": {
+      "dangerousWarning": "该语言包中埋藏了非法的系统保留敏感键值原型属性 (__proto__, constructor, prototype)，安全机制已断然拒绝导入该危险文件。"
+    },
+    "jaRemoved": {
+      "title": "日语内置包已迁移至社区 Hub",
+      "message": "为了精简客户端体积，原本内置的日语语言包现已转为线上云端分发。您可以随时去 Pipette 社区中心一键下载，或通过 设置 → 工具 → 外置语言包管理 手动导入对应的 .json 翻译文件。",
+      "dismiss": "不再提示"
+    }
+  }
+}

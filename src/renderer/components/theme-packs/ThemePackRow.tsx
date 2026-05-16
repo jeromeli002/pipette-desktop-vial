@@ -2,6 +2,7 @@
 
 import { useTranslation } from 'react-i18next'
 import { Circle, CheckCircle2 } from 'lucide-react'
+import { ICON_XL } from '../../constants/ui-tokens'
 import type { useInlineRename } from '../../hooks/useInlineRename'
 import type { ThemePackMeta } from '../../../shared/types/theme-store'
 import { formatTimestamp } from '../../utils/format-timestamp'
@@ -80,7 +81,7 @@ export function PackRow({
           onBlur={() => void onRenameCommit(meta.id)}
           onKeyDown={(e) => onRenameKey(e, meta.id)}
           maxLength={64}
-          className="w-full border-b border-edge bg-transparent px-1 text-sm text-content outline-none focus:border-accent"
+          className="w-full border-b border-edge bg-transparent px-1 text-sm text-content focus:outline-none focus:border-accent"
           data-testid={`theme-packs-rename-input-${meta.id}`}
         />
       )
@@ -110,9 +111,9 @@ export function PackRow({
           data-testid={`theme-packs-select-${meta.id}`}
         >
           {isActive ? (
-            <CheckCircle2 size={18} className="text-accent" aria-hidden="true" />
+            <CheckCircle2 size={ICON_XL} className="text-accent" aria-hidden="true" />
           ) : (
-            <Circle size={18} aria-hidden="true" />
+            <Circle size={ICON_XL} aria-hidden="true" />
           )}
         </button>
         <div className="flex-1 min-w-0 text-sm font-medium">{renderName()}</div>
@@ -174,7 +175,7 @@ export function PackRow({
         <span className="flex-1 min-w-0">
           {lastResult && lastResult.id === meta.id && (
             <span
-              className={`text-[11px] font-medium ${lastResult.kind === 'success' ? 'text-accent' : 'text-rose-600'}`}
+              className={`text-xs font-medium ${lastResult.kind === 'success' ? 'text-accent' : 'text-rose-600'}`}
               data-testid={`theme-packs-result-${meta.id}`}
             >
               {lastResult.message}
@@ -214,7 +215,7 @@ export function PackRow({
             {hasUpdateAvailable && (
               <span
                 aria-hidden="true"
-                className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"
+                className="h-1.5 w-1.5 rounded-full bg-success animate-pulse"
                 data-testid={`theme-packs-update-available-${meta.id}`}
               />
             )}
