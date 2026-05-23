@@ -112,3 +112,15 @@ export const VIAL_PROTOCOL_DYNAMIC = 4
 export const VIAL_PROTOCOL_QMK_SETTINGS = 4
 export const VIAL_PROTOCOL_EXT_MACROS = 5
 export const VIAL_PROTOCOL_KEY_OVERRIDE = 5
+
+// --- RGB Indicator Commands (0xAB prefix) ---
+export const RGB_INDICATOR_PREFIX = 0xab
+export const RGB_INDICATOR_SAVE = 0x80
+export const RGB_INDICATOR_LAYER = 0x81
+export const RGB_INDICATOR_CAPS = 0x82
+export const RGB_INDICATOR_NUM = 0x83
+export const RGB_INDICATOR_SCR = 0x84
+export const RGB_INDICATOR_SLEEP_TIME = 0x85
+export const RGB_INDICATOR_ALL = 0x90
+export const RGB_INDICATOR_OFF = 0x91
+export const RGB_INDICATOR_MAX_LEDS = 208
