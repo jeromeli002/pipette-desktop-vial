@@ -1,0 +1,1830 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+
+import { describe, it, expect, beforeEach } from 'vitest'
+import { keycodesV5 } from '../keycodes-v5'
+import { keycodesV6 } from '../keycodes-v6'
+import {
+  Keycode,
+  serialize,
+  deserialize,
+  normalize,
+  resolve,
+  isMask,
+  isBasic,
+  findKeycode,
+  findOuterKeycode,
+  findInnerKeycode,
+  findByRecorderAlias,
+  findByQmkId,
+  keycodeLabel,
+  keycodeTooltip,
+  recreateKeycodes,
+  recreateKeyboardKeycodes,
+  setProtocol,
+  getProtocol,
+  isTapDanceKeycode,
+  getTapDanceIndex,
+  isMacroKeycode,
+  getMacroIndex,
+  isResetKeycode,
+  KEYCODES,
+  KEYCODES_MAP,
+  KEYCODES_BASIC,
+  KEYCODES_SPECIAL,
+  KEYCODES_SHIFTED,
+  KEYCODES_ISO,
+  KEYCODES_JIS,
+  KEYCODES_INTERNATIONAL,
+  KEYCODES_LANGUAGE,
+  KEYCODES_BOOT,
+  KEYCODES_MODIFIERS,
+  KEYCODES_BEHAVIOR,
+  KEYCODES_LIGHTING,
+  KEYCODES_SYSTEM,
+  KEYCODES_MIDI_BASIC,
+  KEYCODES_MIDI_ADVANCED,
+  KEYCODES_MACRO_BASE,
+  KEYCODES_HIDDEN,
+  createCustomUserKeycodes,
+  isLMKeycode,
+  KEYCODES_LM_MODS,
+  getAvailableLMMods,
+  KEYCODES_BEHAVIOR_SWAP_HANDS,
+  KEYCODES_BEHAVIOR_SWAP_HANDS_TAP,
+  KEYCODES_MIDI_SEQUENCER,
+  KEYCODES_SYSTEM_JOYSTICK,
+  KEYCODES_LIGHTING_LED_MATRIX,
+  KEYCODES_MOD_MASK,
+  isModMaskKeycode,
+  isModifiableKeycode,
+  extractModMask,
+  extractBasicKey,
+  buildModMaskKeycode,
+  serializeForCExport,
+  isLTKeycode,
+  extractLTLayer,
+  buildLTKeycode,
+  isSHTKeycode,
+  buildSHTKeycode,
+  extractLMLayer,
+  extractLMMod,
+  buildLMKeycode,
+  type KeyboardKeycodeContext,
+  type CustomKeycodeDefinition,
+} from '../keycodes'
+
+// --- V5 mapping tests ---
+
+describe('keycodesV5', () => {
+  it('has correct base addresses', () => {
+    expect(keycodesV5.kc.QK_MOMENTARY).toBe(0x5100)
+    expect(keycodesV5.kc.QK_MOD_TAP).toBe(0x6000)
+    expect(keycodesV5.kc.QK_LAYER_MOD).toBe(0x5900)
+    expect(keycodesV5.kc.QK_LAYER_TAP).toBe(0x4000)
+    expect(keycodesV5.kc.QK_BOOT).toBe(0x5c00)
+  })
+
+  it('generates MO(0)-MO(31)', () => {
+    expect(keycodesV5.kc['MO(0)']).toBe(0x5100)
+    expect(keycodesV5.kc['MO(1)']).toBe(0x5101)
+    expect(keycodesV5.kc['MO(31)']).toBe(0x511f)
+  })
+
+  it('generates TD(0)-TD(255)', () => {
+    expect(keycodesV5.kc['TD(0)']).toBe(0x5700)
+    expect(keycodesV5.kc['TD(255)']).toBe(0x57ff)
+  })
+
+  it('generates M0-M255 macro keycodes', () => {
+    expect(keycodesV5.kc.M0).toBe(keycodesV5.kc.QK_MACRO)
+    expect(keycodesV5.kc.M1).toBe(keycodesV5.kc.QK_MACRO + 1)
+    expect(keycodesV5.kc.M255).toBe(keycodesV5.kc.QK_MACRO + 255)
+  })
+
+  it('generates LT0(kc)-LT15(kc) masked keycodes', () => {
+    expect(keycodesV5.kc['LT0(kc)']).toBe(0x4000)
+    expect(keycodesV5.kc['LT1(kc)']).toBe(0x4100)
+    expect(keycodesV5.kc['LT15(kc)']).toBe(0x4f00)
+  })
+
+  it('generates USER00-USER63', () => {
+    expect(keycodesV5.kc.USER00).toBe(keycodesV5.kc.QK_KB)
+    expect(keycodesV5.kc.USER63).toBe(keycodesV5.kc.QK_KB + 63)
+  })
+
+  it('populates masked set from entries ending with (kc)', () => {
+    expect(keycodesV5.masked.has(keycodesV5.kc['LSFT(kc)'])).toBe(true)
+    expect(keycodesV5.masked.has(keycodesV5.kc['LCTL(kc)'])).toBe(true)
+    expect(keycodesV5.masked.has(keycodesV5.kc['LT0(kc)'])).toBe(true)
+    expect(keycodesV5.masked.has(keycodesV5.kc.KC_A)).toBe(false)
+  })
+
+  it('has basic keycodes matching HID usage codes', () => {
+    expect(keycodesV5.kc.KC_A).toBe(0x04)
+    expect(keycodesV5.kc.KC_Z).toBe(0x1d)
+    expect(keycodesV5.kc.KC_1).toBe(0x1e)
+    expect(keycodesV5.kc.KC_0).toBe(0x27)
+    expect(keycodesV5.kc.KC_ENTER).toBe(0x28)
+    expect(keycodesV5.kc.KC_SPACE).toBe(0x2c)
+  })
+
+  it('contains TO(x) with ON_PRESS bit', () => {
+    // v5 TO uses (1 << 4) | x pattern
+    expect(keycodesV5.kc['TO(0)']).toBe(0x5000 | (1 << 4) | 0)
+    expect(keycodesV5.kc['TO(1)']).toBe(0x5000 | (1 << 4) | 1)
+  })
+
+  it('has fake keycodes for features not in v5', () => {
+    expect(keycodesV5.kc.RM_ON).toBe(0x9990)
+    expect(keycodesV5.kc.QK_REBOOT).toBe(0x999d)
+    expect(keycodesV5.kc.QK_CAPS_WORD_TOGGLE).toBe(0x999e)
+    expect(keycodesV5.kc.QK_KEY_OVERRIDE_TOGGLE).toBe(0x999c3)
+    expect(keycodesV5.kc.QK_KEY_OVERRIDE_ON).toBe(0x999c4)
+    expect(keycodesV5.kc.QK_KEY_OVERRIDE_OFF).toBe(0x999c5)
+  })
+})
+
+// --- V6 mapping tests ---
+
+describe('keycodesV6', () => {
+  it('has correct base addresses (different from v5)', () => {
+    expect(keycodesV6.kc.QK_MOMENTARY).toBe(0x5220)
+    expect(keycodesV6.kc.QK_MOD_TAP).toBe(0x2000)
+    expect(keycodesV6.kc.QK_LAYER_MOD).toBe(0x5000)
+    expect(keycodesV6.kc.QK_BOOT).toBe(0x7c00)
+    expect(keycodesV6.kc.QK_MACRO).toBe(0x7700)
+  })
+
+  it('generates MO(0)-MO(31)', () => {
+    expect(keycodesV6.kc['MO(0)']).toBe(0x5220)
+    expect(keycodesV6.kc['MO(1)']).toBe(0x5221)
+    expect(keycodesV6.kc['MO(31)']).toBe(0x523f)
+  })
+
+  it('generates TO(x) without ON_PRESS bit (different from v5)', () => {
+    // v6 TO uses simple addition
+    expect(keycodesV6.kc['TO(0)']).toBe(0x5200)
+    expect(keycodesV6.kc['TO(1)']).toBe(0x5201)
+  })
+
+  it('has QK_PERSISTENT_DEF_LAYER (v6 only real keycode)', () => {
+    expect(keycodesV6.kc.QK_PERSISTENT_DEF_LAYER).toBe(0x52e0)
+    expect(keycodesV6.kc['PDF(0)']).toBe(0x52e0)
+    expect(keycodesV6.kc['PDF(1)']).toBe(0x52e1)
+  })
+
+  it('has RM_* at proper addresses (not fake)', () => {
+    expect(keycodesV6.kc.RM_ON).toBe(0x7840)
+    expect(keycodesV6.kc.RM_TOGG).toBe(0x7842)
+  })
+
+  it('has QK_REPEAT_KEY and QK_ALT_REPEAT_KEY', () => {
+    expect(keycodesV6.kc.QK_REPEAT_KEY).toBe(0x7c79)
+    expect(keycodesV6.kc.QK_ALT_REPEAT_KEY).toBe(0x7c7a)
+  })
+
+  it('has QK_KEY_OVERRIDE_TOGGLE, ON, OFF', () => {
+    expect(keycodesV6.kc.QK_KEY_OVERRIDE_TOGGLE).toBe(0x7c5d)
+    expect(keycodesV6.kc.QK_KEY_OVERRIDE_ON).toBe(0x7c5e)
+    expect(keycodesV6.kc.QK_KEY_OVERRIDE_OFF).toBe(0x7c5f)
+  })
+
+  it('has LM0(kc)-LM15(kc) masked keycodes', () => {
+    // v6: QK_LAYER_MOD=0x5000, layer<<5, mod bits zeroed for masked base
+    expect(keycodesV6.kc['LM0(kc)']).toBe(0x5000 | (0 << 5))
+    expect(keycodesV6.kc['LM1(kc)']).toBe(0x5000 | (1 << 5))
+    expect(keycodesV6.kc['LM15(kc)']).toBe(0x5000 | (15 << 5))
+    // v5: QK_LAYER_MOD=0x5900, layer<<4
+    expect(keycodesV5.kc['LM0(kc)']).toBe(0x5900 | (0 << 4))
+    expect(keycodesV5.kc['LM1(kc)']).toBe(0x5900 | (1 << 4))
+    expect(keycodesV5.kc['LM15(kc)']).toBe(0x5900 | (15 << 4))
+  })
+
+  it('LM entries are in the masked set', () => {
+    expect(keycodesV6.masked.has(keycodesV6.kc['LM0(kc)'])).toBe(true)
+    expect(keycodesV6.masked.has(keycodesV6.kc['LM15(kc)'])).toBe(true)
+    expect(keycodesV5.masked.has(keycodesV5.kc['LM0(kc)'])).toBe(true)
+  })
+
+  it('basic keycodes are identical between v5 and v6', () => {
+    expect(keycodesV6.kc.KC_A).toBe(keycodesV5.kc.KC_A)
+    expect(keycodesV6.kc.KC_Z).toBe(keycodesV5.kc.KC_Z)
+    expect(keycodesV6.kc.KC_ENTER).toBe(keycodesV5.kc.KC_ENTER)
+    expect(keycodesV6.kc.KC_SPACE).toBe(keycodesV5.kc.KC_SPACE)
+  })
+
+  it('modifier codes are identical between v5 and v6', () => {
+    expect(keycodesV6.kc.MOD_LCTL).toBe(keycodesV5.kc.MOD_LCTL)
+    expect(keycodesV6.kc.MOD_LSFT).toBe(keycodesV5.kc.MOD_LSFT)
+    expect(keycodesV6.kc.QK_LCTL).toBe(keycodesV5.kc.QK_LCTL)
+    expect(keycodesV6.kc.QK_LSFT).toBe(keycodesV5.kc.QK_LSFT)
+  })
+})
+
+// --- Keycode class tests ---
+
+describe('Keycode class', () => {
+  it('creates instance with correct properties', () => {
+    const kc = new Keycode({
+      qmkId: 'TEST_KC',
+      label: 'Test',
+      tooltip: 'Test tooltip',
+      masked: false,
+      printable: 't',
+      recorderAlias: ['test'],
+      alias: ['TEST_ALIAS'],
+    })
+    expect(kc.qmkId).toBe('TEST_KC')
+    expect(kc.label).toBe('Test')
+    expect(kc.tooltip).toBe('Test tooltip')
+    expect(kc.masked).toBe(false)
+    expect(kc.printable).toBe('t')
+    expect(kc.alias).toEqual(['TEST_KC', 'TEST_ALIAS'])
+    expect(kc.hidden).toBe(false)
+  })
+
+  it('isSupportedBy returns true when no feature required', () => {
+    const kc = new Keycode({ qmkId: 'TEST1', label: 'T' })
+    expect(kc.isSupportedBy(new Set())).toBe(true)
+  })
+
+  it('isSupportedBy checks feature set', () => {
+    const kc = new Keycode({
+      qmkId: 'TEST2',
+      label: 'T',
+      requiresFeature: 'caps_word',
+    })
+    expect(kc.isSupportedBy(new Set())).toBe(false)
+    expect(kc.isSupportedBy(new Set(['caps_word']))).toBe(true)
+  })
+})
+
+// --- Core keycode system tests ---
+
+describe('Core keycode system', () => {
+  beforeEach(() => {
+    setProtocol(0)
+    recreateKeycodes()
+  })
+
+  it('KEYCODES array is populated', () => {
+    expect(KEYCODES.length).toBeGreaterThan(0)
+  })
+
+  it('KEYCODES_MAP maps qmk_id (without kc suffix) to keycode', () => {
+    expect(KEYCODES_MAP.get('KC_A')?.qmkId).toBe('KC_A')
+    expect(KEYCODES_MAP.get('LSFT')?.qmkId).toBe('LSFT(kc)')
+  })
+
+  it('contains all category arrays', () => {
+    expect(KEYCODES_SPECIAL.length).toBe(2)
+    expect(KEYCODES_BASIC.length).toBeGreaterThan(50)
+    expect(KEYCODES_SHIFTED.length).toBe(21)
+    expect(KEYCODES_ISO.length).toBe(2)
+    expect(KEYCODES_JIS.length).toBe(5)
+    expect(KEYCODES_INTERNATIONAL.length).toBe(5)
+    expect(KEYCODES_LANGUAGE.length).toBe(5)
+    expect(KEYCODES_BOOT.length).toBe(3)
+    expect(KEYCODES_MODIFIERS.length).toBeGreaterThan(30)
+    expect(KEYCODES_BEHAVIOR.length).toBeGreaterThan(30)
+    expect(KEYCODES_LIGHTING.length).toBeGreaterThan(20)
+    expect(KEYCODES_SYSTEM.length).toBeGreaterThan(40)
+    expect(KEYCODES_MACRO_BASE.length).toBe(5)
+    expect(KEYCODES_HIDDEN.length).toBe(256)
+    expect(KEYCODES_MIDI_BASIC.length).toBeGreaterThan(10)
+    expect(KEYCODES_MIDI_ADVANCED.length).toBeGreaterThan(10)
+  })
+})
+
+// --- resolve() tests ---
+
+describe('resolve()', () => {
+  it('resolves v5 keycodes by default', () => {
+    setProtocol(0)
+    expect(resolve('KC_A')).toBe(0x04)
+    expect(resolve('QK_MOMENTARY')).toBe(0x5100)
+    expect(resolve('QK_MOD_TAP')).toBe(0x6000)
+  })
+
+  it('resolves v6 keycodes when protocol is 6', () => {
+    setProtocol(6)
+    expect(resolve('KC_A')).toBe(0x04)
+    expect(resolve('QK_MOMENTARY')).toBe(0x5220)
+    expect(resolve('QK_MOD_TAP')).toBe(0x2000)
+  })
+
+  it('throws for unknown constants', () => {
+    expect(() => resolve('NONEXISTENT_KEY')).toThrow()
+  })
+})
+
+// --- serialize() tests ---
+
+describe('serialize()', () => {
+  beforeEach(() => {
+    setProtocol(0)
+    recreateKeycodes()
+  })
+
+  it('serializes basic keycode', () => {
+    expect(serialize(0x04)).toBe('KC_A')
+    expect(serialize(0x28)).toBe('KC_ENTER')
+  })
+
+  it('serializes KC_NO and KC_TRNS', () => {
+    expect(serialize(0x00)).toBe('KC_NO')
+    expect(serialize(0x01)).toBe('KC_TRNS')
+  })
+
+  it('serializes masked keycodes (e.g. LSFT(KC_A))', () => {
+    const lsftA = keycodesV5.kc['LSFT(kc)'] | keycodesV5.kc.KC_A
+    expect(serialize(lsftA)).toBe('LSFT(KC_A)')
+  })
+
+  it.each([
+    ['KC_TILD', 'LSFT(KC_GRAVE)'],
+    ['KC_EXLM', 'LSFT(KC_1)'],
+    ['KC_AT', 'LSFT(KC_2)'],
+    ['KC_HASH', 'LSFT(KC_3)'],
+    ['KC_DLR', 'LSFT(KC_4)'],
+    ['KC_PERC', 'LSFT(KC_5)'],
+    ['KC_CIRC', 'LSFT(KC_6)'],
+    ['KC_AMPR', 'LSFT(KC_7)'],
+    ['KC_ASTR', 'LSFT(KC_8)'],
+    ['KC_LPRN', 'LSFT(KC_9)'],
+    ['KC_RPRN', 'LSFT(KC_0)'],
+    ['KC_UNDS', 'LSFT(KC_MINUS)'],
+    ['KC_PLUS', 'LSFT(KC_EQUAL)'],
+    ['KC_LCBR', 'LSFT(KC_LBRACKET)'],
+    ['KC_RCBR', 'LSFT(KC_RBRACKET)'],
+    ['KC_LT', 'LSFT(KC_COMMA)'],
+    ['KC_GT', 'LSFT(KC_DOT)'],
+    ['KC_COLN', 'LSFT(KC_SCOLON)'],
+    ['KC_PIPE', 'LSFT(KC_BSLASH)'],
+    ['KC_QUES', 'LSFT(KC_SLASH)'],
+    ['KC_DQUO', 'LSFT(KC_QUOTE)'],
+  ])('decomposes %s to %s', (shifted, expected) => {
+    expect(serialize(keycodesV5.kc[shifted])).toBe(expected)
+  })
+
+  it('decomposes non-named LSFT combos', () => {
+    const lsftB = keycodesV5.kc['LSFT(kc)'] | keycodesV5.kc.KC_B
+    expect(serialize(lsftB)).toBe('LSFT(KC_B)')
+  })
+
+  it('decomposes shifted keycodes into mask form (v6)', () => {
+    setProtocol(6)
+    recreateKeycodes()
+    // Spot-check representative keycodes in v6 protocol
+    expect(serialize(keycodesV6.kc.KC_EXLM)).toBe('LSFT(KC_1)')
+    expect(serialize(keycodesV6.kc.KC_AT)).toBe('LSFT(KC_2)')
+    expect(serialize(keycodesV6.kc.KC_TILD)).toBe('LSFT(KC_GRAVE)')
+    expect(serialize(keycodesV6.kc.KC_PIPE)).toBe('LSFT(KC_BSLASH)')
+    expect(serialize(keycodesV6.kc.KC_QUES)).toBe('LSFT(KC_SLASH)')
+    const lsftB = keycodesV6.kc['LSFT(kc)'] | keycodesV6.kc.KC_B
+    expect(serialize(lsftB)).toBe('LSFT(KC_B)')
+  })
+
+  it('serializes International keycodes as JIS names (JIS wins in RAWCODES_MAP)', () => {
+    expect(serialize(0x87)).toBe('KC_RO')
+    expect(serialize(0x88)).toBe('KC_KANA')
+    expect(serialize(0x89)).toBe('KC_JYEN')
+    expect(serialize(0x8a)).toBe('KC_HENK')
+    expect(serialize(0x8b)).toBe('KC_MHEN')
+  })
+
+  it('serializes Language keycodes', () => {
+    expect(serialize(0x90)).toBe('KC_LANG1')
+    expect(serialize(0x91)).toBe('KC_LANG2')
+    expect(serialize(0x92)).toBe('KC_LANG3')
+    expect(serialize(0x93)).toBe('KC_LANG4')
+    expect(serialize(0x94)).toBe('KC_LANG5')
+  })
+
+  it('returns hex for unknown codes', () => {
+    expect(serialize(0xffff)).toBe('0xffff')
+  })
+
+  it('serializes LM keycodes with custom bit layout (v5)', () => {
+    // v5: LM0 + MOD_LCTL = 0x5900 | (0 << 4) | 0x01
+    expect(serialize(0x5900 | (0 << 4) | 0x01)).toBe('LM0(MOD_LCTL)')
+    // v5: LM1 + MOD_LSFT = 0x5900 | (1 << 4) | 0x02
+    expect(serialize(0x5900 | (1 << 4) | 0x02)).toBe('LM1(MOD_LSFT)')
+    // v5: LM15 + MOD_LGUI = 0x5900 | (15 << 4) | 0x08
+    expect(serialize(0x5900 | (15 << 4) | 0x08)).toBe('LM15(MOD_LGUI)')
+  })
+
+  it('serializes LM keycodes with custom bit layout (v6)', () => {
+    setProtocol(6)
+    recreateKeycodes()
+    // v6: LM0 + MOD_LCTL = 0x5000 | (0 << 5) | 0x01
+    expect(serialize(0x5000 | (0 << 5) | 0x01)).toBe('LM0(MOD_LCTL)')
+    // v6: LM3 + MOD_RALT = 0x5000 | (3 << 5) | 0x14
+    expect(serialize(0x5000 | (3 << 5) | 0x14)).toBe('LM3(MOD_RALT)')
+    // v6: LM15 + MOD_HYPR = 0x5000 | (15 << 5) | 0x0f
+    expect(serialize(0x5000 | (15 << 5) | 0x0f)).toBe('LM15(MOD_HYPR)')
+  })
+})
+
+// --- deserialize() tests ---
+
+describe('deserialize()', () => {
+  beforeEach(() => {
+    setProtocol(0)
+    recreateKeycodes()
+  })
+
+  it('deserializes integer passthrough', () => {
+    expect(deserialize(0x04)).toBe(0x04)
+  })
+
+  it('deserializes basic keycode names', () => {
+    expect(deserialize('KC_A')).toBe(keycodesV5.kc.KC_A)
+    expect(deserialize('KC_ENTER')).toBe(keycodesV5.kc.KC_ENTER)
+  })
+
+  it('deserializes expressions like LSFT(KC_A)', () => {
+    const expected = keycodesV5.kc['LSFT(kc)'] | keycodesV5.kc.KC_A
+    expect(deserialize('LSFT(KC_A)')).toBe(expected)
+  })
+
+  it('deserializes expressions like LT(0, KC_A)', () => {
+    const expected = keycodesV5.kc.QK_LAYER_TAP | (0 << 8) | keycodesV5.kc.KC_A
+    expect(deserialize('LT(0, KC_A)')).toBe(expected)
+  })
+
+  it('deserializes MO(0)', () => {
+    expect(deserialize('MO(0)')).toBe(keycodesV5.kc['MO(0)'])
+  })
+
+  it('deserializes LM 2-arg form: LM(0, MOD_LCTL)', () => {
+    const expected = keycodesV5.kc.QK_LAYER_MOD | (0 << 4) | 0x01
+    expect(deserialize('LM(0, MOD_LCTL)')).toBe(expected)
+  })
+
+  it('deserializes LM 1-arg masked form: LM0(MOD_LCTL)', () => {
+    const expected = keycodesV5.kc.QK_LAYER_MOD | (0 << 4) | 0x01
+    expect(deserialize('LM0(MOD_LCTL)')).toBe(expected)
+  })
+
+  it('deserializes LM1(MOD_LSFT)', () => {
+    const expected = keycodesV5.kc.QK_LAYER_MOD | (1 << 4) | 0x02
+    expect(deserialize('LM1(MOD_LSFT)')).toBe(expected)
+  })
+
+  it('returns 0 for invalid expressions', () => {
+    expect(deserialize('TOTALLY_INVALID_THING')).toBe(0)
+  })
+
+  it('deserializes hex strings', () => {
+    expect(deserialize('0x04')).toBe(0x04)
+  })
+})
+
+// --- normalize() tests ---
+
+describe('normalize()', () => {
+  beforeEach(() => {
+    setProtocol(0)
+    recreateKeycodes()
+  })
+
+  it('normalizes shifted keycodes to decomposed form', () => {
+    // KC_PERC (0x222) = LSFT(KC_5) — normalize returns decomposed form
+    expect(normalize('KC_PERC')).toBe('LSFT(KC_5)')
+    expect(normalize('KC_EXLM')).toBe('LSFT(KC_1)')
+    // LSFT(KC_B) has no named alias so stays decomposed
+    expect(normalize('LSFT(KC_B)')).toBe('LSFT(KC_B)')
+  })
+
+  it('preserves already-normal keycodes', () => {
+    expect(normalize('KC_A')).toBe('KC_A')
+  })
+})
+
+// --- isMask() tests ---
+
+describe('isMask()', () => {
+  it('detects masked keycodes', () => {
+    expect(isMask('LSFT(KC_A)')).toBe(true)
+    expect(isMask('LCTL(KC_B)')).toBe(true)
+  })
+
+  it('detects LT and LM masked keycodes after keyboard init', () => {
+    const keyboard: KeyboardKeycodeContext = {
+      vialProtocol: 6,
+      layers: 4,
+      macroCount: 0,
+      tapDanceCount: 0,
+      customKeycodes: null,
+      midi: '',
+      supportedFeatures: new Set(),
+    }
+    recreateKeyboardKeycodes(keyboard)
+    expect(isMask('LT0(KC_A)')).toBe(true)
+    expect(isMask('LT3(KC_A)')).toBe(true)
+    expect(isMask('LM0(MOD_LCTL)')).toBe(true)
+    expect(isMask('LM3(MOD_LSFT)')).toBe(true)
+  })
+
+  it('returns false for non-masked keycodes', () => {
+    expect(isMask('KC_A')).toBe(false)
+    expect(isMask('MO(0)')).toBe(false)
+  })
+
+  it('detects shifted keycodes as masked via serialize()', () => {
+    setProtocol(0)
+    recreateKeycodes()
+    expect(isMask(serialize(keycodesV5.kc.KC_EXLM))).toBe(true)
+    expect(isMask(serialize(keycodesV5.kc.KC_TILD))).toBe(true)
+    setProtocol(6)
+    recreateKeycodes()
+    expect(isMask(serialize(keycodesV6.kc.KC_EXLM))).toBe(true)
+    expect(isMask(serialize(keycodesV6.kc.KC_TILD))).toBe(true)
+  })
+})
+
+// --- isLMKeycode() tests ---
+
+describe('isLMKeycode()', () => {
+  it('detects LM keycodes (v5)', () => {
+    setProtocol(0)
+    recreateKeycodes()
+    expect(isLMKeycode(0x5900 | (0 << 4) | 0x01)).toBe(true) // LM0 + MOD_LCTL
+    expect(isLMKeycode(0x5900 | (15 << 4) | 0x08)).toBe(true) // LM15 + MOD_LGUI
+    expect(isLMKeycode(0x5900)).toBe(true) // LM0 with no mod
+  })
+
+  it('detects LM keycodes (v6)', () => {
+    setProtocol(6)
+    recreateKeycodes()
+    expect(isLMKeycode(0x5000 | (0 << 5) | 0x01)).toBe(true) // LM0 + MOD_LCTL
+    expect(isLMKeycode(0x5000 | (15 << 5) | 0x1f)).toBe(true) // LM15 max mod
+  })
+
+  it('returns false for non-LM keycodes', () => {
+    setProtocol(6)
+    recreateKeycodes()
+    expect(isLMKeycode(0x04)).toBe(false) // KC_A
+    expect(isLMKeycode(0x5220)).toBe(false) // MO(0)
+    expect(isLMKeycode(0x4000)).toBe(false) // LT0(kc)
+  })
+})
+
+// --- find functions ---
+
+describe('find functions', () => {
+  beforeEach(() => {
+    setProtocol(0)
+    recreateKeycodes()
+  })
+
+  it('findKeycode finds by qmk_id', () => {
+    expect(findKeycode('KC_A')?.qmkId).toBe('KC_A')
+    expect(findKeycode('NONEXISTENT')).toBeUndefined()
+  })
+
+  it('findKeycode handles "kc" -> KC_NO', () => {
+    expect(findKeycode('kc')?.qmkId).toBe('KC_NO')
+  })
+
+  it('findOuterKeycode extracts outer from masked', () => {
+    const outer = findOuterKeycode('LSFT(KC_A)')
+    expect(outer?.qmkId).toBe('LSFT(kc)')
+  })
+
+  it('findInnerKeycode extracts inner from masked', () => {
+    const inner = findInnerKeycode('LSFT(KC_A)')
+    expect(inner?.qmkId).toBe('KC_A')
+  })
+
+  it('findInnerKeycode extracts MOD_* from LM masked', () => {
+    const inner = findInnerKeycode('LM0(MOD_LCTL)')
+    expect(inner?.qmkId).toBe('MOD_LCTL')
+    expect(inner?.label).toBe('LCtl')
+  })
+
+  it('findByRecorderAlias finds keycodes by alias', () => {
+    const kc = findByRecorderAlias('a')
+    expect(kc?.qmkId).toBe('KC_A')
+  })
+
+  it('findByQmkId finds keycodes by exact qmk_id', () => {
+    const kc = findByQmkId('KC_A')
+    expect(kc?.qmkId).toBe('KC_A')
+  })
+})
+
+// --- KEYCODES_LM_MODS ---
+
+describe('KEYCODES_LM_MODS', () => {
+  it('has 10 modifier entries', () => {
+    expect(KEYCODES_LM_MODS).toHaveLength(10)
+  })
+
+  it('includes all standard modifiers', () => {
+    const ids = KEYCODES_LM_MODS.map((kc) => kc.qmkId)
+    expect(ids).toContain('MOD_LCTL')
+    expect(ids).toContain('MOD_LSFT')
+    expect(ids).toContain('MOD_LALT')
+    expect(ids).toContain('MOD_LGUI')
+    expect(ids).toContain('MOD_RCTL')
+    expect(ids).toContain('MOD_RSFT')
+    expect(ids).toContain('MOD_RALT')
+    expect(ids).toContain('MOD_RGUI')
+    expect(ids).toContain('MOD_MEH')
+    expect(ids).toContain('MOD_HYPR')
+  })
+})
+
+// --- getAvailableLMMods ---
+
+describe('getAvailableLMMods', () => {
+  it('returns all 10 mods for v6 (5-bit mask)', () => {
+    setProtocol(6)
+    recreateKeycodes()
+    const mods = getAvailableLMMods()
+    expect(mods).toHaveLength(10)
+    const ids = mods.map((kc) => kc.qmkId)
+    expect(ids).toContain('MOD_RCTL')
+    expect(ids).toContain('MOD_RGUI')
+  })
+
+  it('excludes right-side mods for v5 (4-bit mask)', () => {
+    setProtocol(5)
+    recreateKeycodes()
+    const mods = getAvailableLMMods()
+    const ids = mods.map((kc) => kc.qmkId)
+    // Left-side mods fit in 4 bits
+    expect(ids).toContain('MOD_LCTL')
+    expect(ids).toContain('MOD_LSFT')
+    expect(ids).toContain('MOD_LALT')
+    expect(ids).toContain('MOD_LGUI')
+    expect(ids).toContain('MOD_MEH')
+    expect(ids).toContain('MOD_HYPR')
+    // Right-side mods have bit 4 set (0x10), exceeding v5's 0x0f mask
+    expect(ids).not.toContain('MOD_RCTL')
+    expect(ids).not.toContain('MOD_RSFT')
+    expect(ids).not.toContain('MOD_RALT')
+    expect(ids).not.toContain('MOD_RGUI')
+  })
+})
+
+// --- keycodeLabel and keycodeTooltip ---
+
+describe('keycodeLabel / keycodeTooltip', () => {
+  beforeEach(() => {
+    setProtocol(0)
+    recreateKeycodes()
+  })
+
+  it('returns label for known keycode', () => {
+    expect(keycodeLabel('KC_A')).toBe('A')
+  })
+
+  it('returns qmk_id for unknown keycode', () => {
+    expect(keycodeLabel('UNKNOWN_KC')).toBe('UNKNOWN_KC')
+  })
+
+  it('returns tooltip with qmk_id prefix', () => {
+    const tip = keycodeTooltip('QK_BOOT')
+    expect(tip).toContain('QK_BOOT')
+    expect(tip).toContain('bootloader')
+  })
+
+  it('returns undefined tooltip for unknown keycode', () => {
+    expect(keycodeTooltip('UNKNOWN_KC')).toBeUndefined()
+  })
+})
+
+// --- isBasic() ---
+
+describe('isBasic()', () => {
+  beforeEach(() => {
+    setProtocol(0)
+    recreateKeycodes()
+  })
+
+  it('returns true for basic keycodes', () => {
+    expect(isBasic('KC_A')).toBe(true)
+    expect(isBasic('KC_SPACE')).toBe(true)
+  })
+
+  it('returns false for non-basic keycodes', () => {
+    expect(isBasic('QK_BOOT')).toBe(false)
+  })
+})
+
+// --- recreateKeyboardKeycodes ---
+
+describe('recreateKeyboardKeycodes()', () => {
+  it('generates layer keycodes based on keyboard info', () => {
+    const keyboard: KeyboardKeycodeContext = {
+      vialProtocol: 6,
+      layers: 4,
+      macroCount: 8,
+      tapDanceCount: 4,
+      customKeycodes: null,
+      midi: 'basic',
+      supportedFeatures: new Set(['caps_word']),
+    }
+    recreateKeyboardKeycodes(keyboard)
+
+    expect(getProtocol()).toBe(6)
+
+    // Should have MO(0)-MO(3), DF(0)-DF(3), etc.
+    expect(KEYCODES_MAP.has('MO(0)')).toBe(true)
+    expect(KEYCODES_MAP.has('MO(3)')).toBe(true)
+
+    // Should have macros M0-M7
+    expect(KEYCODES_MAP.has('M0')).toBe(true)
+    expect(KEYCODES_MAP.has('M7')).toBe(true)
+    expect(KEYCODES_MAP.has('M8')).toBe(false)
+
+    // Should have tap dance TD(0)-TD(3)
+    expect(KEYCODES_MAP.has('TD(0)')).toBe(true)
+    expect(KEYCODES_MAP.has('TD(3)')).toBe(true)
+
+    // FN_MO13 and FN_MO23 should be present (layers >= 4)
+    expect(KEYCODES_MAP.has('FN_MO13')).toBe(true)
+    expect(KEYCODES_MAP.has('FN_MO23')).toBe(true)
+
+    // LT keycodes: LT0-LT3
+    expect(KEYCODES_MAP.has('LT0')).toBe(true)
+    expect(KEYCODES_MAP.has('LT3')).toBe(true)
+
+    // caps_word should be visible
+    const capsWord = findByQmkId('QK_CAPS_WORD_TOGGLE')
+    expect(capsWord?.hidden).toBe(false)
+  })
+
+  it('hides unsupported features', () => {
+    const keyboard: KeyboardKeycodeContext = {
+      vialProtocol: 6,
+      layers: 2,
+      macroCount: 0,
+      tapDanceCount: 0,
+      customKeycodes: null,
+      midi: '',
+      supportedFeatures: new Set(),
+    }
+    recreateKeyboardKeycodes(keyboard)
+
+    const capsWord = findByQmkId('QK_CAPS_WORD_TOGGLE')
+    expect(capsWord?.hidden).toBe(true)
+
+    // FN_MO13/FN_MO23 should NOT be present (layers < 4)
+    expect(KEYCODES_MAP.has('FN_MO13')).toBe(false)
+  })
+
+  it('handles custom user keycodes', () => {
+    const keyboard: KeyboardKeycodeContext = {
+      vialProtocol: 6,
+      layers: 2,
+      macroCount: 0,
+      tapDanceCount: 0,
+      customKeycodes: [
+        { name: 'CUSTOM_1', title: 'Custom One', shortName: 'C1' },
+        { name: 'CUSTOM_2', title: 'Custom Two', shortName: 'C2' },
+      ],
+      midi: '',
+      supportedFeatures: new Set(),
+    }
+    recreateKeyboardKeycodes(keyboard)
+
+    const user0 = findByQmkId('USER00')
+    expect(user0?.label).toBe('C1')
+  })
+})
+
+// --- AnyKeycode expression evaluator ---
+
+describe('AnyKeycode expression evaluator', () => {
+  beforeEach(() => {
+    setProtocol(0)
+    recreateKeycodes()
+  })
+
+  it('evaluates modifier wrappers', () => {
+    const expected = keycodesV5.kc.QK_LSFT | keycodesV5.kc.KC_A
+    expect(deserialize('LSFT(KC_A)')).toBe(expected)
+  })
+
+  it('evaluates combined modifiers', () => {
+    const expected = keycodesV5.kc.QK_LCTL | keycodesV5.kc.QK_LSFT | keycodesV5.kc.KC_A
+    expect(deserialize('C_S(KC_A)')).toBe(expected)
+  })
+
+  it('evaluates LT(layer, kc)', () => {
+    const expected =
+      keycodesV5.kc.QK_LAYER_TAP | ((2 & 0x0f) << 8) | (keycodesV5.kc.KC_A & 0xff)
+    expect(deserialize('LT(2, KC_A)')).toBe(expected)
+  })
+
+  it('evaluates MO(layer)', () => {
+    const expected = keycodesV5.kc.QK_MOMENTARY | 3
+    expect(deserialize('MO(3)')).toBe(expected)
+  })
+
+  it('evaluates MT(mod, kc)', () => {
+    const expected =
+      keycodesV5.kc.QK_MOD_TAP |
+      ((keycodesV5.kc.MOD_LSFT & 0x1f) << 8) |
+      (keycodesV5.kc.KC_A & 0xff)
+    expect(deserialize('MT(MOD_LSFT, KC_A)')).toBe(expected)
+  })
+
+  it('evaluates LCTL_T(kc) mod-tap wrappers', () => {
+    const expected =
+      keycodesV5.kc.QK_MOD_TAP |
+      ((keycodesV5.kc.MOD_LCTL & 0x1f) << 8) |
+      (keycodesV5.kc.KC_A & 0xff)
+    expect(deserialize('LCTL_T(KC_A)')).toBe(expected)
+  })
+
+  it('evaluates TD(n)', () => {
+    const expected = keycodesV5.kc.QK_TAP_DANCE | 5
+    expect(deserialize('TD(5)')).toBe(expected)
+  })
+
+  it('evaluates LT0(kc) shortcut', () => {
+    const expected =
+      keycodesV5.kc.QK_LAYER_TAP | ((0 & 0x0f) << 8) | (keycodesV5.kc.KC_B & 0xff)
+    expect(deserialize('LT0(KC_B)')).toBe(expected)
+  })
+
+  it('evaluates bitwise OR expressions', () => {
+    const expected = keycodesV5.kc.MOD_LCTL | keycodesV5.kc.MOD_LSFT
+    expect(deserialize('MOD_LCTL | MOD_LSFT')).toBe(expected)
+  })
+
+  it('evaluates hex literals', () => {
+    expect(deserialize('0x04')).toBe(4)
+    expect(deserialize('0XFF')).toBe(0xff) // uppercase 0X
+  })
+
+  it('evaluates decimal literals', () => {
+    expect(deserialize('42')).toBe(42)
+  })
+
+  it('evaluates bitwise AND expressions', () => {
+    expect(deserialize('0xFF & 0x0F')).toBe(0x0f)
+  })
+
+  it('evaluates bitwise XOR expressions', () => {
+    expect(deserialize('0xFF ^ 0x0F')).toBe(0xf0)
+  })
+
+  it('evaluates mixed bitwise operators with correct precedence', () => {
+    // & binds tighter than |: 0x03 | (0xFF & 0xF0) = 0x03 | 0xF0 = 0xF3
+    expect(deserialize('0x03 | 0xFF & 0xF0')).toBe(0xf3)
+  })
+
+  it('evaluates parenthesized sub-expressions', () => {
+    // (MOD_LCTL | MOD_LSFT) is a common pattern from Python simpleeval
+    const expected = keycodesV5.kc.MOD_LCTL | keycodesV5.kc.MOD_LSFT
+    expect(deserialize('(MOD_LCTL | MOD_LSFT)')).toBe(expected)
+  })
+
+  it('evaluates addition and subtraction', () => {
+    expect(deserialize('0x100 + 1')).toBe(0x101)
+    expect(deserialize('10 - 3')).toBe(7)
+  })
+
+  it('evaluates shift operators', () => {
+    expect(deserialize('1 << 8')).toBe(256)
+    expect(deserialize('0xFF00 >> 8')).toBe(0xff)
+  })
+
+  it('evaluates unary minus', () => {
+    expect(deserialize('-1 + 2')).toBe(1)
+  })
+
+  it('rejects trailing tokens', () => {
+    // "KC_A KC_B" should fail (return 0) because KC_B is unexpected trailing
+    expect(deserialize('KC_A KC_B')).toBe(0)
+  })
+
+  it('rejects invalid characters', () => {
+    // '#' is not a valid token character
+    expect(deserialize('KC_A#')).toBe(0)
+  })
+
+  it('works with v6 protocol', () => {
+    setProtocol(6)
+    recreateKeycodes()
+    const expected = keycodesV6.kc.QK_LSFT | keycodesV6.kc.KC_A
+    expect(deserialize('LSFT(KC_A)')).toBe(expected)
+  })
+
+  it('deserializes International keycode aliases', () => {
+    expect(deserialize('KC_INT1')).toBe(0x87)
+    expect(deserialize('KC_INT2')).toBe(0x88)
+    expect(deserialize('KC_INT3')).toBe(0x89)
+    expect(deserialize('KC_INT4')).toBe(0x8a)
+    expect(deserialize('KC_INT5')).toBe(0x8b)
+  })
+
+  it('deserializes Language keycodes and aliases', () => {
+    expect(deserialize('KC_LANG1')).toBe(0x90)
+    expect(deserialize('KC_LANG2')).toBe(0x91)
+    expect(deserialize('KC_LANG3')).toBe(0x92)
+    expect(deserialize('KC_LANG4')).toBe(0x93)
+    expect(deserialize('KC_LANG5')).toBe(0x94)
+    expect(deserialize('KC_LNG1')).toBe(0x90)
+    expect(deserialize('KC_LNG2')).toBe(0x91)
+    expect(deserialize('KC_HAEN')).toBe(0x90)
+    expect(deserialize('KC_HANJ')).toBe(0x91)
+  })
+})
+
+// --- Tap Dance helpers ---
+
+describe('isTapDanceKeycode()', () => {
+  it('returns true for tap dance keycodes', () => {
+    expect(isTapDanceKeycode(0x5700)).toBe(true)
+    expect(isTapDanceKeycode(0x5703)).toBe(true)
+    expect(isTapDanceKeycode(0x57ff)).toBe(true)
+  })
+
+  it('returns false for non-tap dance keycodes', () => {
+    expect(isTapDanceKeycode(0x0004)).toBe(false) // KC_A
+    expect(isTapDanceKeycode(0x5100)).toBe(false) // MO(0) v5
+    expect(isTapDanceKeycode(0x5600)).toBe(false)
+    expect(isTapDanceKeycode(0x5800)).toBe(false)
+  })
+})
+
+describe('getTapDanceIndex()', () => {
+  it('extracts the index from a tap dance keycode', () => {
+    expect(getTapDanceIndex(0x5700)).toBe(0)
+    expect(getTapDanceIndex(0x5703)).toBe(3)
+    expect(getTapDanceIndex(0x57ff)).toBe(255)
+  })
+})
+
+// --- Macro helpers ---
+
+const macroKeyboardV6: KeyboardKeycodeContext = {
+  vialProtocol: 6,
+  layers: 4,
+  macroCount: 256,
+  tapDanceCount: 0,
+  customKeycodes: null,
+  midi: '',
+  supportedFeatures: new Set(),
+}
+
+describe('isMacroKeycode()', () => {
+  beforeEach(() => {
+    recreateKeyboardKeycodes(macroKeyboardV6)
+  })
+
+  it('returns true for macro keycodes (v6)', () => {
+    expect(isMacroKeycode(0x7700)).toBe(true)
+    expect(isMacroKeycode(0x7703)).toBe(true)
+    expect(isMacroKeycode(0x77ff)).toBe(true)
+  })
+
+  it('returns false for non-macro keycodes', () => {
+    expect(isMacroKeycode(0x0004)).toBe(false) // KC_A
+    expect(isMacroKeycode(0x5700)).toBe(false) // TD(0)
+    expect(isMacroKeycode(0x7c00)).toBe(false) // QK_BOOT
+  })
+
+  it('returns true for macro keycodes (v5)', () => {
+    recreateKeyboardKeycodes({ ...macroKeyboardV6, vialProtocol: 5 })
+    expect(isMacroKeycode(0x5f12)).toBe(true) // M0 in v5
+    expect(isMacroKeycode(0x5f13)).toBe(true) // M1 in v5
+  })
+})
+
+describe('getMacroIndex()', () => {
+  beforeEach(() => {
+    recreateKeyboardKeycodes(macroKeyboardV6)
+  })
+
+  it('extracts the index from a macro keycode', () => {
+    expect(getMacroIndex(0x7700)).toBe(0)
+    expect(getMacroIndex(0x7703)).toBe(3)
+    expect(getMacroIndex(0x77ff)).toBe(255)
+  })
+
+  it('returns -1 for non-macro keycodes', () => {
+    expect(getMacroIndex(0x0004)).toBe(-1)
+    expect(getMacroIndex(0x5700)).toBe(-1)
+  })
+})
+
+// --- isResetKeycode tests ---
+
+describe('isResetKeycode()', () => {
+  it('returns true for QK_BOOT in v6 (0x7c00)', () => {
+    setProtocol(6)
+    recreateKeycodes()
+    expect(isResetKeycode(0x7c00)).toBe(true)
+  })
+
+  it('returns true for QK_BOOT in v5 (0x5c00)', () => {
+    setProtocol(5)
+    recreateKeycodes()
+    expect(isResetKeycode(0x5c00)).toBe(true)
+  })
+
+  it('returns false for non-boot keycodes', () => {
+    setProtocol(6)
+    recreateKeycodes()
+    expect(isResetKeycode(0x0004)).toBe(false) // KC_A
+    expect(isResetKeycode(0x5700)).toBe(false) // TD(0)
+    expect(isResetKeycode(0x7700)).toBe(false) // M0
+    expect(isResetKeycode(0x0000)).toBe(false) // KC_NO
+  })
+
+  it('returns false for QK_REBOOT (not the reset keycode)', () => {
+    setProtocol(6)
+    recreateKeycodes()
+    expect(isResetKeycode(0x7c01)).toBe(false) // QK_REBOOT
+  })
+})
+
+// --- CustomKeycodeDefinition optional fields tests ---
+
+describe('createCustomUserKeycodes()', () => {
+  beforeEach(() => {
+    setProtocol(0)
+    recreateKeycodes()
+  })
+
+  it('handles fully specified custom keycodes', () => {
+    const customs: CustomKeycodeDefinition[] = [
+      { name: 'MY_KEY', title: 'My Custom Key', shortName: 'MK' },
+    ]
+    createCustomUserKeycodes(customs)
+    const kc = findByQmkId('USER00')
+    expect(kc).toBeDefined()
+    expect(kc!.label).toBe('MK')
+    expect(kc!.tooltip).toBe('My Custom Key')
+  })
+
+  it('handles custom keycodes with missing optional fields using defaults', () => {
+    const customs: CustomKeycodeDefinition[] = [
+      {}, // all fields omitted — defaults to USER00 for label, tooltip, alias
+      { name: 'ONLY_NAME' }, // only name — label/tooltip default to USER01
+    ]
+    createCustomUserKeycodes(customs)
+    const kc0 = findByQmkId('USER00')
+    expect(kc0).toBeDefined()
+    expect(kc0!.label).toBe('USER00')
+    expect(kc0!.tooltip).toBe('USER00')
+
+    const kc1 = findByQmkId('USER01')
+    expect(kc1).toBeDefined()
+    expect(kc1!.label).toBe('USER01')
+    expect(kc1!.tooltip).toBe('USER01')
+  })
+
+  it('sets cExportId to custom name for keymap.c export', () => {
+    const customs: CustomKeycodeDefinition[] = [
+      { name: 'MY_KEY', title: 'My Custom Key', shortName: 'MK' },
+      { name: 'OTHER_KEY', title: 'Other Key', shortName: 'OK' },
+    ]
+    createCustomUserKeycodes(customs)
+    const kc0 = findByQmkId('USER00')
+    expect(kc0).toBeDefined()
+    expect(kc0!.cExportId).toBe('MY_KEY')
+
+    const kc1 = findByQmkId('USER01')
+    expect(kc1).toBeDefined()
+    expect(kc1!.cExportId).toBe('OTHER_KEY')
+  })
+
+  it('falls back cExportId to USER## when name is missing', () => {
+    const customs: CustomKeycodeDefinition[] = [
+      {}, // no name
+    ]
+    createCustomUserKeycodes(customs)
+    const kc0 = findByQmkId('USER00')
+    expect(kc0).toBeDefined()
+    // When name is missing, cExportId should be undefined so it falls back to qmkId (USER00)
+    expect(kc0!.cExportId).toBeUndefined()
+  })
+})
+
+// --- New keycode categories ---
+
+describe('Swap Hands keycodes', () => {
+  it('has 7 static swap hands keycodes', () => {
+    expect(KEYCODES_BEHAVIOR_SWAP_HANDS).toHaveLength(7)
+  })
+
+  it('has 1 masked SH_T(kc) keycode', () => {
+    expect(KEYCODES_BEHAVIOR_SWAP_HANDS_TAP).toHaveLength(1)
+    expect(KEYCODES_BEHAVIOR_SWAP_HANDS_TAP[0].masked).toBe(true)
+    expect(KEYCODES_BEHAVIOR_SWAP_HANDS_TAP[0].qmkId).toBe('SH_T(kc)')
+  })
+
+  it('v6 addresses are correct', () => {
+    expect(keycodesV6.kc.SH_TOGG).toBe(0x56f0)
+    expect(keycodesV6.kc.SH_OS).toBe(0x56f6)
+    expect(keycodesV6.kc['SH_T(kc)']).toBe(0x5600)
+  })
+
+  it('v5 has fake addresses for swap hands', () => {
+    expect(keycodesV5.kc.SH_TOGG).toBe(0x999d1)
+    expect(keycodesV5.kc['SH_T(kc)']).toBe(0x999d0)
+  })
+
+  it('serializes SH_TOGG correctly in v6 (fallback for static in masked range)', () => {
+    setProtocol(6)
+    recreateKeycodes()
+    // SH_TOGG (0x56F0) is in the 0x5600 masked range, but should resolve via exact match
+    expect(serialize(0x56f0)).toBe('SH_TOGG')
+    expect(serialize(0x56f6)).toBe('SH_OS')
+  })
+
+  it('serializes SH_T(kc) masked keycode correctly in v6', () => {
+    setProtocol(6)
+    recreateKeycodes()
+    // SH_T(KC_A) = 0x5600 | 0x04
+    expect(serialize(0x5600 | 0x04)).toBe('SH_T(KC_A)')
+  })
+
+  it('deserializes SH_T(KC_A) correctly in v6', () => {
+    setProtocol(6)
+    recreateKeycodes()
+    expect(deserialize('SH_T(KC_A)')).toBe(0x5600 | 0x04)
+  })
+})
+
+describe('Sequencer keycodes', () => {
+  it('has 9 sequencer keycodes', () => {
+    expect(KEYCODES_MIDI_SEQUENCER).toHaveLength(9)
+  })
+
+  it('v6 addresses are correct', () => {
+    expect(keycodesV6.kc.SQ_ON).toBe(0x7200)
+    expect(keycodesV6.kc.SQ_SCLR).toBe(0x7208)
+  })
+
+  it('v5 has fake addresses', () => {
+    expect(keycodesV5.kc.SQ_ON).toBe(0x999e0)
+  })
+})
+
+describe('Joystick keycodes', () => {
+  it('has 32 joystick keycodes', () => {
+    expect(KEYCODES_SYSTEM_JOYSTICK).toHaveLength(32)
+  })
+
+  it('v6 addresses are correct', () => {
+    expect(keycodesV6.kc.JS_0).toBe(0x7400)
+    expect(keycodesV6.kc.JS_31).toBe(0x741f)
+  })
+
+  it('v5 has fake addresses', () => {
+    expect(keycodesV5.kc.JS_0).toBe(0x999f0)
+    expect(keycodesV5.kc.JS_31).toBe(0x99a0f)
+  })
+
+  it('serializes joystick keycodes in v6', () => {
+    setProtocol(6)
+    recreateKeycodes()
+    expect(serialize(0x7400)).toBe('JS_0')
+    expect(serialize(0x741f)).toBe('JS_31')
+  })
+})
+
+describe('LED Matrix keycodes', () => {
+  it('has 9 LED Matrix keycodes', () => {
+    expect(KEYCODES_LIGHTING_LED_MATRIX).toHaveLength(9)
+  })
+
+  it('v6 addresses are correct', () => {
+    expect(keycodesV6.kc.LM_ON).toBe(0x7810)
+    expect(keycodesV6.kc.LM_SPDD).toBe(0x7818)
+  })
+
+  it('v5 has fake addresses', () => {
+    expect(keycodesV5.kc.LM_ON).toBe(0x99a10)
+  })
+
+  it('serializes LED Matrix keycodes in v6', () => {
+    setProtocol(6)
+    recreateKeycodes()
+    expect(serialize(0x7810)).toBe('LM_ON')
+    expect(serialize(0x7818)).toBe('LM_SPDD')
+  })
+})
+
+describe('isModMaskKeycode()', () => {
+  it('returns false for basic keycodes (0x0000-0x00FF)', () => {
+    expect(isModMaskKeycode(0x0000)).toBe(false) // KC_NO
+    expect(isModMaskKeycode(0x0004)).toBe(false) // KC_A
+    expect(isModMaskKeycode(0x00ff)).toBe(false) // max basic
+  })
+
+  it('returns true for mod+basic range (0x0100-0x1FFF)', () => {
+    expect(isModMaskKeycode(0x0100)).toBe(true) // lower bound: LCTL
+    expect(isModMaskKeycode(0x0204)).toBe(true) // LSFT(KC_A)
+    expect(isModMaskKeycode(0x1fff)).toBe(true) // upper bound
+  })
+
+  it('returns false for keycodes above mod+basic range', () => {
+    expect(isModMaskKeycode(0x2000)).toBe(false)
+    expect(isModMaskKeycode(0x4000)).toBe(false) // LT range
+    expect(isModMaskKeycode(0x6000)).toBe(false) // MT range
+  })
+})
+
+describe('isModifiableKeycode()', () => {
+  it('returns true for basic keycodes', () => {
+    expect(isModifiableKeycode(0x0000)).toBe(true)
+    expect(isModifiableKeycode(0x0004)).toBe(true) // KC_A
+    expect(isModifiableKeycode(0x00ff)).toBe(true)
+  })
+
+  it('returns true for mod+basic keycodes', () => {
+    expect(isModifiableKeycode(0x0100)).toBe(true)
+    expect(isModifiableKeycode(0x0204)).toBe(true)
+    expect(isModifiableKeycode(0x1fff)).toBe(true)
+  })
+
+  it('returns false for LT, MT, and other ranges', () => {
+    expect(isModifiableKeycode(0x2000)).toBe(false)
+    expect(isModifiableKeycode(0x4000)).toBe(false) // LT
+    expect(isModifiableKeycode(0x6000)).toBe(false) // MT
+  })
+
+  it('returns false for negative values', () => {
+    expect(isModifiableKeycode(-1)).toBe(false)
+    expect(isModifiableKeycode(-100)).toBe(false)
+  })
+})
+
+describe('extractModMask()', () => {
+  it('returns 0 for basic keycodes', () => {
+    expect(extractModMask(0x0004)).toBe(0)
+    expect(extractModMask(0x0000)).toBe(0)
+  })
+
+  it('extracts left modifier bits', () => {
+    expect(extractModMask(0x0100)).toBe(0x01) // CTL
+    expect(extractModMask(0x0200)).toBe(0x02) // SFT
+    expect(extractModMask(0x0400)).toBe(0x04) // ALT
+    expect(extractModMask(0x0800)).toBe(0x08) // GUI
+  })
+
+  it('extracts right modifier flag', () => {
+    expect(extractModMask(0x1100)).toBe(0x11) // RCTL
+    expect(extractModMask(0x1200)).toBe(0x12) // RSFT
+    expect(extractModMask(0x1400)).toBe(0x14) // RALT
+    expect(extractModMask(0x1800)).toBe(0x18) // RGUI
+  })
+
+  it('extracts combined modifiers', () => {
+    expect(extractModMask(0x0300)).toBe(0x03) // CTL+SFT
+    expect(extractModMask(0x0f00)).toBe(0x0f) // all left mods
+  })
+})
+
+describe('extractBasicKey()', () => {
+  it('extracts the lower byte', () => {
+    expect(extractBasicKey(0x0004)).toBe(0x04) // KC_A
+    expect(extractBasicKey(0x0204)).toBe(0x04) // LSFT(KC_A)
+    expect(extractBasicKey(0x1204)).toBe(0x04) // RSFT(KC_A)
+    expect(extractBasicKey(0x0000)).toBe(0x00) // KC_NO
+    expect(extractBasicKey(0x00ff)).toBe(0xff)
+  })
+})
+
+describe('buildModMaskKeycode()', () => {
+  it('returns basic key when mask is 0', () => {
+    expect(buildModMaskKeycode(0, 0x04)).toBe(0x04) // KC_A
+    expect(buildModMaskKeycode(0, 0x00)).toBe(0x00)
+  })
+
+  it('combines modifier mask with basic key', () => {
+    expect(buildModMaskKeycode(0x02, 0x04)).toBe(0x0204) // LSFT(KC_A)
+    expect(buildModMaskKeycode(0x01, 0x04)).toBe(0x0104) // LCTL(KC_A)
+    expect(buildModMaskKeycode(0x12, 0x04)).toBe(0x1204) // RSFT(KC_A)
+  })
+
+  it('round-trips with extract functions', () => {
+    const testCodes = [0x0204, 0x0304, 0x0f04, 0x1204, 0x1f04]
+    for (const code of testCodes) {
+      const mask = extractModMask(code)
+      const basic = extractBasicKey(code)
+      expect(buildModMaskKeycode(mask, basic)).toBe(code)
+    }
+  })
+
+  it('masks input values to valid ranges', () => {
+    expect(buildModMaskKeycode(0xff, 0x04)).toBe(0x1f04) // mask clamped to 5 bits
+    expect(buildModMaskKeycode(0x02, 0x1ff)).toBe(0x02ff) // basic clamped to 8 bits
+  })
+})
+
+// --- KEYCODES_MOD_MASK completeness ---
+
+describe('KEYCODES_MOD_MASK', () => {
+  it('has 30 entries (all modifier combinations)', () => {
+    expect(KEYCODES_MOD_MASK).toHaveLength(30)
+  })
+
+  it.each([
+    ['LCSG(kc)', 0xb00],
+    ['LSAG(kc)', 0xe00],
+    ['RCS(kc)', 0x1300],
+    ['RCA(kc)', 0x1500],
+    ['RSA(kc)', 0x1600],
+    ['RMEH(kc)', 0x1700],
+    ['RSG(kc)', 0x1a00],
+    ['RCSG(kc)', 0x1b00],
+    ['RAG(kc)', 0x1c00],
+    ['RCAG(kc)', 0x1d00],
+    ['RSAG(kc)', 0x1e00],
+    ['RHYPR(kc)', 0x1f00],
+  ])('maps %s to 0x%s (v6)', (qmkId, expectedHex) => {
+    expect(keycodesV6.kc[qmkId]).toBe(expectedHex)
+  })
+
+  it.each([
+    ['LCSG(kc)', 0xb00],
+    ['LSAG(kc)', 0xe00],
+    ['RCS(kc)', 0x1300],
+    ['RCA(kc)', 0x1500],
+    ['RSA(kc)', 0x1600],
+    ['RMEH(kc)', 0x1700],
+    ['RSG(kc)', 0x1a00],
+    ['RCSG(kc)', 0x1b00],
+    ['RAG(kc)', 0x1c00],
+    ['RCAG(kc)', 0x1d00],
+    ['RSAG(kc)', 0x1e00],
+    ['RHYPR(kc)', 0x1f00],
+  ])('maps %s to 0x%s (v5)', (qmkId, expectedHex) => {
+    expect(keycodesV5.kc[qmkId]).toBe(expectedHex)
+  })
+
+  it('has unique qmkIds', () => {
+    const ids = KEYCODES_MOD_MASK.map((kc) => kc.qmkId)
+    expect(new Set(ids).size).toBe(ids.length)
+  })
+
+  const newEntries: [string, number][] = [
+    ['LCSG(kc)', 0xb00],
+    ['LSAG(kc)', 0xe00],
+    ['RCS(kc)', 0x1300],
+    ['RCA(kc)', 0x1500],
+    ['RSA(kc)', 0x1600],
+    ['RMEH(kc)', 0x1700],
+    ['RSG(kc)', 0x1a00],
+    ['RCSG(kc)', 0x1b00],
+    ['RAG(kc)', 0x1c00],
+    ['RCAG(kc)', 0x1d00],
+    ['RSAG(kc)', 0x1e00],
+    ['RHYPR(kc)', 0x1f00],
+  ]
+
+  it('round-trips new entries through serialize/deserialize (v6)', () => {
+    setProtocol(6)
+    recreateKeycodes()
+    for (const [qmkId, hex] of newEntries) {
+      const withA = hex | 0x04 // combine with KC_A
+      const outerName = qmkId.replace('(kc)', '')
+      expect(serialize(withA)).toBe(`${outerName}(KC_A)`)
+      expect(deserialize(`${outerName}(KC_A)`)).toBe(withA)
+    }
+  })
+
+  it('round-trips new entries through serialize/deserialize (v5)', () => {
+    setProtocol(0)
+    recreateKeycodes()
+    for (const [qmkId, hex] of newEntries) {
+      const withA = hex | 0x04 // combine with KC_A
+      const outerName = qmkId.replace('(kc)', '')
+      expect(serialize(withA)).toBe(`${outerName}(KC_A)`)
+      expect(deserialize(`${outerName}(KC_A)`)).toBe(withA)
+    }
+  })
+})
+
+// --- serializeForCExport ---
+
+describe('serializeForCExport', () => {
+  function toHex(code: number): string {
+    return '0x' + code.toString(16)
+  }
+
+  describe.each([
+    ['v6', 6],
+    ['v5', 0],
+  ] as const)('%s', (_label, proto) => {
+    let kc: Record<string, number>
+
+    beforeEach(() => {
+      setProtocol(proto)
+      recreateKeycodes()
+      kc = proto === 6 ? keycodesV6.kc : keycodesV5.kc
+    })
+
+    it('LM keycodes return hex', () => {
+      const lmCode = kc.QK_LAYER_MOD | (0 << kc.QMK_LM_SHIFT) | kc.MOD_LSFT
+      expect(serializeForCExport(lmCode)).toMatch(/^0x[0-9a-f]+$/)
+    })
+
+    it('vial-qmk undefined Modifier Mask keycodes return hex', () => {
+      const notInVialQmk: [string, number][] = [
+        ['LCSG(kc)', 0xb00],
+        ['LSAG(kc)', 0xe00],
+        ['RCA(kc)', 0x1500],
+        ['RMEH(kc)', 0x1700],
+        ['RCSG(kc)', 0x1b00],
+        ['RCAG(kc)', 0x1d00],
+        ['RSAG(kc)', 0x1e00],
+        ['RHYPR(kc)', 0x1f00],
+      ]
+      for (const [, hex] of notInVialQmk) {
+        const withA = hex | 0x04
+        expect(serializeForCExport(withA)).toBe(toHex(withA))
+      }
+    })
+
+    it('vial-qmk compilable Modifier Mask keycodes return named format', () => {
+      const inVialQmk: [string, number][] = [
+        ['RCS(kc)', 0x1300],
+        ['RSA(kc)', 0x1600],
+        ['RSG(kc)', 0x1a00],
+        ['RAG(kc)', 0x1c00],
+      ]
+      for (const [name, hex] of inVialQmk) {
+        const withA = hex | 0x04
+        const expected = name.replace('kc', 'KC_A')
+        expect(serializeForCExport(withA)).toBe(expected)
+      }
+    })
+
+    it('vial-qmk undefined Mod-Tap keycodes return hex', () => {
+      const notInVialQmk = [
+        'LCSG_T(kc)', 'LSAG_T(kc)',
+        'RCA_T(kc)', 'RCSG_T(kc)', 'RSAG_T(kc)',
+        'RMEH_T(kc)', 'RALL_T(kc)', 'RCAG_T(kc)',
+      ]
+      for (const qmkId of notInVialQmk) {
+        const outerCode = kc[qmkId]
+        if (outerCode === undefined) continue
+        const withA = outerCode | 0x04
+        expect(serializeForCExport(withA)).toBe(toHex(withA))
+      }
+    })
+
+    it('vial-qmk compilable Mod-Tap keycodes return named format', () => {
+      const inVialQmk = [
+        'RCS_T(kc)', 'RSA_T(kc)', 'RAG_T(kc)', 'RSG_T(kc)',
+      ]
+      for (const qmkId of inVialQmk) {
+        const outerCode = kc[qmkId]
+        if (outerCode === undefined) continue
+        const withA = outerCode | 0x04
+        const expected = qmkId.replace('kc', 'KC_A')
+        expect(serializeForCExport(withA)).toBe(expected)
+      }
+    })
+
+    it('Swap Hands non-masked keycodes return named format', () => {
+      for (const qmkId of ['SH_TOGG', 'SH_TT', 'SH_MON', 'SH_MOFF', 'SH_OFF', 'SH_ON', 'SH_OS']) {
+        const code = kc[qmkId]
+        if (code === undefined) continue
+        expect(serializeForCExport(code)).toBe(qmkId)
+      }
+    })
+
+    it('Swap Hands Tap masked keycode returns named format', () => {
+      const shTBase = kc['SH_T(kc)']
+      if (shTBase === undefined) return
+      const withA = shTBase | 0x04
+      // v5: SH_T(KC_A) collides with SH_MOFF (same code), serialize resolves to SH_MOFF
+      const expected = proto === 6 ? 'SH_T(KC_A)' : 'SH_MOFF'
+      expect(serializeForCExport(withA)).toBe(expected)
+    })
+
+    it('Sequencer keycodes return hex when MIDI keycodes not loaded', () => {
+      // SQ_ keycodes are in KEYCODES_MIDI which is empty until createMidiKeycodes() is called.
+      // Without MIDI loaded, SQ_ codes are not in RAWCODES_MAP so serialize falls back to hex.
+      for (const qmkId of ['SQ_ON', 'SQ_OFF', 'SQ_TOGG']) {
+        const code = kc[qmkId]
+        if (code === undefined) continue
+        expect(serializeForCExport(code)).toBe(toHex(code))
+      }
+    })
+
+    it('LED Matrix keycodes return named format', () => {
+      for (const qmkId of ['LM_ON', 'LM_OFF', 'LM_TOGG']) {
+        const code = kc[qmkId]
+        if (code === undefined) continue
+        expect(serializeForCExport(code)).toBe(qmkId)
+      }
+    })
+
+    it('Joystick keycodes return named format', () => {
+      const code = kc['JS_0']
+      if (code === undefined) return
+      expect(serializeForCExport(code)).toBe('JS_0')
+    })
+
+    it('Key Override keycodes return short alias format', () => {
+      const expected: Record<string, string> = {
+        QK_KEY_OVERRIDE_TOGGLE: 'KO_TOGG',
+        QK_KEY_OVERRIDE_ON: 'KO_ON',
+        QK_KEY_OVERRIDE_OFF: 'KO_OFF',
+      }
+      for (const [qmkId, cExport] of Object.entries(expected)) {
+        const code = kc[qmkId]
+        if (code === undefined) continue
+        expect(serializeForCExport(code)).toBe(cExport)
+      }
+    })
+
+    it('vial-gui defined masked keycodes return alias names', () => {
+      const lsftA = kc['LSFT(kc)'] | kc.KC_A
+      expect(serializeForCExport(lsftA)).toBe('LSFT(KC_A)')
+      const lctlTa = kc['LCTL_T(kc)'] | kc.KC_A
+      expect(serializeForCExport(lctlTa)).toBe('LCTL_T(KC_A)')
+    })
+
+    it('keycodes without cExportId match serialize()', () => {
+      expect(serializeForCExport(kc.KC_A)).toBe(serialize(kc.KC_A))
+      expect(serializeForCExport(kc.KC_NO)).toBe(serialize(kc.KC_NO))
+    })
+
+    it('keycodes with cExportId use short alias', () => {
+      expect(serializeForCExport(kc.KC_ENTER)).toBe('KC_ENT')
+      expect(serializeForCExport(kc.KC_SPACE)).toBe('KC_SPC')
+      expect(serializeForCExport(kc.KC_APPLICATION)).toBe('KC_APP')
+    })
+
+    it('cExportId remaps legacy names to standard QMK names', () => {
+      // Basic keys
+      expect(serializeForCExport(kc.KC_LSHIFT)).toBe('KC_LSFT')
+      expect(serializeForCExport(kc.KC_RSHIFT)).toBe('KC_RSFT')
+      expect(serializeForCExport(kc.KC_LCTRL)).toBe('KC_LCTL')
+      expect(serializeForCExport(kc.KC_RCTRL)).toBe('KC_RCTL')
+      expect(serializeForCExport(kc.KC_BSPACE)).toBe('KC_BSPC')
+      expect(serializeForCExport(kc.KC_CAPSLOCK)).toBe('KC_CAPS')
+      expect(serializeForCExport(kc.KC_NUMLOCK)).toBe('KC_NUM')
+      expect(serializeForCExport(kc.KC_SCROLLLOCK)).toBe('KC_SCRL')
+      expect(serializeForCExport(kc.KC_PSCREEN)).toBe('KC_PSCR')
+      expect(serializeForCExport(kc.KC_PGDOWN)).toBe('KC_PGDN')
+      expect(serializeForCExport(kc.KC_LBRACKET)).toBe('KC_LBRC')
+      expect(serializeForCExport(kc.KC_RBRACKET)).toBe('KC_RBRC')
+      expect(serializeForCExport(kc.KC_BSLASH)).toBe('KC_BSLS')
+      expect(serializeForCExport(kc.KC_SCOLON)).toBe('KC_SCLN')
+      expect(serializeForCExport(kc.KC_NONUS_BSLASH)).toBe('KC_NUBS')
+
+      // JIS / International
+      expect(serializeForCExport(kc.KC_RO)).toBe('KC_INT1')
+      expect(serializeForCExport(kc.KC_KANA)).toBe('KC_INT2')
+      expect(serializeForCExport(kc.KC_JYEN)).toBe('KC_INT3')
+      expect(serializeForCExport(kc.KC_HENK)).toBe('KC_INT4')
+      expect(serializeForCExport(kc.KC_MHEN)).toBe('KC_INT5')
+
+      // Language
+      expect(serializeForCExport(kc.KC_LANG1)).toBe('KC_LNG1')
+      expect(serializeForCExport(kc.KC_LANG2)).toBe('KC_LNG2')
+
+      // Space Cadet
+      expect(serializeForCExport(kc.KC_GESC)).toBe('QK_GESC')
+      expect(serializeForCExport(kc.KC_LSPO)).toBe('SC_LSPO')
+      expect(serializeForCExport(kc.KC_RSPC)).toBe('SC_RSPC')
+      expect(serializeForCExport(kc.KC_SFTENT)).toBe('SC_SENT')
+
+      // Auto Shift
+      expect(serializeForCExport(kc.KC_ASDN)).toBe('AS_DOWN')
+      expect(serializeForCExport(kc.KC_ASUP)).toBe('AS_UP')
+      expect(serializeForCExport(kc.KC_ASTG)).toBe('AS_TOGG')
+
+      // Audio
+      expect(serializeForCExport(kc.AU_TOG)).toBe('AU_TOGG')
+      expect(serializeForCExport(kc.CLICKY_TOGGLE)).toBe('CK_TOGG')
+      expect(serializeForCExport(kc.MU_MOD)).toBe('MU_NEXT')
+
+      // Haptic
+      expect(serializeForCExport(kc.HPT_ON)).toBe('HF_ON')
+      expect(serializeForCExport(kc.HPT_OFF)).toBe('HF_OFF')
+      expect(serializeForCExport(kc.HPT_FBK)).toBe('HF_FDBK')
+
+      // Combo
+      expect(serializeForCExport(kc.CMB_ON)).toBe('CM_ON')
+      expect(serializeForCExport(kc.CMB_OFF)).toBe('CM_OFF')
+      expect(serializeForCExport(kc.CMB_TOG)).toBe('CM_TOGG')
+
+      // Backlight
+      expect(serializeForCExport(kc.BL_INC)).toBe('BL_UP')
+      expect(serializeForCExport(kc.BL_DEC)).toBe('BL_DOWN')
+
+      // Volume
+      expect(serializeForCExport(kc.KC__VOLDOWN)).toBe('KC_KB_VOLUME_DOWN')
+      expect(serializeForCExport(kc.KC__VOLUP)).toBe('KC_KB_VOLUME_UP')
+
+      // Dynamic Macro
+      expect(serializeForCExport(kc.DYN_REC_START1)).toBe('DM_REC1')
+      expect(serializeForCExport(kc.DYN_REC_START2)).toBe('DM_REC2')
+      expect(serializeForCExport(kc.DYN_REC_STOP)).toBe('DM_RSTP')
+      expect(serializeForCExport(kc.DYN_MACRO_PLAY1)).toBe('DM_PLY1')
+      expect(serializeForCExport(kc.DYN_MACRO_PLAY2)).toBe('DM_PLY2')
+
+      // Magic (sample)
+      expect(serializeForCExport(kc.MAGIC_SWAP_CONTROL_CAPSLOCK)).toBe('CL_SWAP')
+      expect(serializeForCExport(kc.MAGIC_NO_GUI)).toBe('GU_OFF')
+    })
+
+    it('cExportId remaps inner keycodes in masked combinations', () => {
+      // LSFT(KC_BSPACE) should become LSFT(KC_BSPC)
+      const lsftBspace = kc['LSFT(kc)'] | kc.KC_BSPACE
+      expect(serializeForCExport(lsftBspace)).toBe('LSFT(KC_BSPC)')
+    })
+
+    it('MO/TG/LT layer keycodes match serialize()', () => {
+      expect(serializeForCExport(kc['MO(1)'])).toBe(serialize(kc['MO(1)']))
+      expect(serializeForCExport(kc['TG(2)'])).toBe(serialize(kc['TG(2)']))
+      const lt1a = kc['LT1(kc)'] | kc.KC_A
+      expect(serializeForCExport(lt1a)).toBe(serialize(lt1a))
+    })
+  })
+
+  it('Sequencer keycodes return named format when MIDI is loaded (v6)', () => {
+    setProtocol(6)
+    recreateKeyboardKeycodes({
+      vialProtocol: 6,
+      layers: 4,
+      macroCount: 0,
+      tapDanceCount: 0,
+      customKeycodes: null,
+      midi: 'advanced',
+      supportedFeatures: new Set(),
+    })
+    const kc6 = keycodesV6.kc
+    for (const qmkId of ['SQ_ON', 'SQ_OFF', 'SQ_TOGG']) {
+      const code = kc6[qmkId]
+      if (code === undefined) continue
+      expect(serializeForCExport(code)).toBe(qmkId)
+    }
+  })
+
+  it('MIDI cExportId remaps legacy names when MIDI is loaded (v6)', () => {
+    setProtocol(6)
+    recreateKeyboardKeycodes({
+      vialProtocol: 6,
+      layers: 4,
+      macroCount: 0,
+      tapDanceCount: 0,
+      customKeycodes: null,
+      midi: 'advanced',
+      supportedFeatures: new Set(),
+    })
+    const kc6 = keycodesV6.kc
+
+    // Octave notes: MI_C_1 → MI_C1
+    expect(serializeForCExport(kc6.MI_C_1)).toBe('MI_C1')
+    expect(serializeForCExport(kc6.MI_Cs_3)).toBe('MI_Cs3')
+    expect(serializeForCExport(kc6.MI_B_5)).toBe('MI_B5')
+
+    // MI_ALLOFF → MI_AOFF
+    expect(serializeForCExport(kc6.MI_ALLOFF)).toBe('MI_AOFF')
+
+    // Octave: MI_OCT_N2 → MI_OCN2, MI_OCT_0 → MI_OC0
+    expect(serializeForCExport(kc6.MI_OCT_N2)).toBe('MI_OCN2')
+    expect(serializeForCExport(kc6.MI_OCT_0)).toBe('MI_OC0')
+    expect(serializeForCExport(kc6.MI_OCT_7)).toBe('MI_OC7')
+
+    // Transpose: MI_TRNS_N6 → MI_TRN6, MI_TRNS_0 → MI_TR0
+    expect(serializeForCExport(kc6.MI_TRNS_N6)).toBe('MI_TRN6')
+    expect(serializeForCExport(kc6.MI_TRNS_0)).toBe('MI_TR0')
+    expect(serializeForCExport(kc6.MI_TRNS_6)).toBe('MI_TR6')
+    expect(serializeForCExport(kc6.MI_TRNSD)).toBe('MI_TRSD')
+    expect(serializeForCExport(kc6.MI_TRNSU)).toBe('MI_TRSU')
+
+    // Velocity: MI_VEL_1 → MI_VL1
+    expect(serializeForCExport(kc6.MI_VEL_1)).toBe('MI_VL1')
+    expect(serializeForCExport(kc6.MI_VEL_10)).toBe('MI_VL10')
+
+    // Channel: MI_CHD → MI_CHND, MI_CHU → MI_CHNU
+    expect(serializeForCExport(kc6.MI_CHD)).toBe('MI_CHND')
+    expect(serializeForCExport(kc6.MI_CHU)).toBe('MI_CHNU')
+
+    // Control: MI_SUS → MI_SUST, MI_MODSD → MI_MODD, etc.
+    expect(serializeForCExport(kc6.MI_SUS)).toBe('MI_SUST')
+    expect(serializeForCExport(kc6.MI_MODSD)).toBe('MI_MODD')
+    expect(serializeForCExport(kc6.MI_MODSU)).toBe('MI_MODU')
+    expect(serializeForCExport(kc6.MI_BENDD)).toBe('MI_BNDD')
+    expect(serializeForCExport(kc6.MI_BENDU)).toBe('MI_BNDU')
+
+    // Unchanged MIDI names stay the same
+    expect(serializeForCExport(kc6.MI_OCTD)).toBe('MI_OCTD')
+    expect(serializeForCExport(kc6.MI_PORT)).toBe('MI_PORT')
+    expect(serializeForCExport(kc6.MI_CH1)).toBe('MI_CH1')
+  })
+})
+
+// --- LT (Layer-Tap) helpers ---
+
+describe('isLTKeycode()', () => {
+  beforeEach(() => { setProtocol(5); recreateKeycodes() })
+
+  it('returns true for Layer-Tap range keycodes', () => {
+    expect(isLTKeycode(0x4000)).toBe(true) // LT0(KC_NO)
+    expect(isLTKeycode(0x4004)).toBe(true) // LT0(KC_A)
+    expect(isLTKeycode(0x4f04)).toBe(true) // LT15(KC_A)
+    expect(isLTKeycode(0x4fff)).toBe(true) // upper bound
+  })
+
+  it('returns false for non-LT keycodes', () => {
+    expect(isLTKeycode(0x0004)).toBe(false) // KC_A
+    expect(isLTKeycode(0x5000)).toBe(false) // above LT range
+    expect(isLTKeycode(0x6004)).toBe(false) // Mod-Tap range
+    expect(isLTKeycode(0x3fff)).toBe(false) // below LT range
+  })
+})
+
+describe('extractLTLayer() / buildLTKeycode()', () => {
+  beforeEach(() => { setProtocol(5); recreateKeycodes() })
+
+  it('extracts correct layer from LT keycode', () => {
+    expect(extractLTLayer(0x4004)).toBe(0) // LT0(KC_A)
+    expect(extractLTLayer(0x4104)).toBe(1) // LT1(KC_A)
+    expect(extractLTLayer(0x4f04)).toBe(15) // LT15(KC_A)
+  })
+
+  it('builds correct LT keycode from layer and basic key', () => {
+    expect(buildLTKeycode(0, 4)).toBe(0x4004) // LT0(KC_A)
+    expect(buildLTKeycode(1, 4)).toBe(0x4104) // LT1(KC_A)
+    expect(buildLTKeycode(15, 4)).toBe(0x4f04) // LT15(KC_A)
+    expect(buildLTKeycode(0, 0x2c)).toBe(0x402c) // LT0(KC_SPACE)
+  })
+
+  it('roundtrips: extractLTLayer(buildLTKeycode(l, k)) === l', () => {
+    for (let layer = 0; layer < 16; layer++) {
+      const code = buildLTKeycode(layer, 4)
+      expect(extractLTLayer(code)).toBe(layer)
+      expect(extractBasicKey(code)).toBe(4)
+    }
+  })
+})
+
+describe('isSHTKeycode()', () => {
+  beforeEach(() => { setProtocol(5); recreateKeycodes() })
+
+  it('returns true for Swap Hands Tap range keycodes', () => {
+    const base = resolve('SH_T(kc)')
+    expect(isSHTKeycode(base)).toBe(true) // SH_T(KC_NO)
+    expect(isSHTKeycode(base + 4)).toBe(true) // SH_T(KC_A)
+    expect(isSHTKeycode(base + 0xef)).toBe(true) // upper bound
+  })
+
+  it('returns false for non-SH_T keycodes', () => {
+    expect(isSHTKeycode(0x0004)).toBe(false)
+    expect(isSHTKeycode(0x4004)).toBe(false) // LT range
+    expect(isSHTKeycode(0x6004)).toBe(false) // MT range
+  })
+})
+
+describe('buildSHTKeycode()', () => {
+  beforeEach(() => { setProtocol(5); recreateKeycodes() })
+
+  it('builds correct SH_T keycode', () => {
+    const base = resolve('SH_T(kc)')
+    expect(buildSHTKeycode(4)).toBe(base + 4) // SH_T(KC_A)
+    expect(buildSHTKeycode(0x2c)).toBe(base + 0x2c) // SH_T(KC_SPACE)
+  })
+})
+
+describe('extractLMLayer() / extractLMMod() / buildLMKeycode()', () => {
+  it('works for protocol v5', () => {
+    setProtocol(5)
+    recreateKeycodes()
+    const code = buildLMKeycode(1, 0x01) // LM1(MOD_LCTL)
+    expect(extractLMLayer(code)).toBe(1)
+    expect(extractLMMod(code)).toBe(0x01)
+    expect(isLMKeycode(code)).toBe(true)
+  })
+
+  it('works for protocol v6', () => {
+    setProtocol(6)
+    recreateKeycodes()
+    const code = buildLMKeycode(2, 0x03) // LM2(MOD_LCTL | MOD_LSFT)
+    expect(extractLMLayer(code)).toBe(2)
+    expect(extractLMMod(code)).toBe(0x03)
+    expect(isLMKeycode(code)).toBe(true)
+  })
+
+  it('roundtrips for all layers', () => {
+    for (const proto of [5, 6]) {
+      setProtocol(proto)
+      recreateKeycodes()
+      for (let layer = 0; layer < 16; layer++) {
+        const code = buildLMKeycode(layer, 0x05)
+        expect(extractLMLayer(code)).toBe(layer)
+        expect(extractLMMod(code)).toBe(0x05)
+      }
+    }
+  })
+})

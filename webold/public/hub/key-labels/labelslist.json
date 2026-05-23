@@ -1,0 +1,164 @@
+{
+  "labels": [
+    {
+      "id": "brazilian",
+      "name": "Brazilian (QWERTY)",
+      "filename": "Brazilian__QWERTY.json"
+    },
+    {
+      "id": "canadian-csa",
+      "name": "Canadian CSA (QWERTY)",
+      "filename": "Canadian_CSA__QWERTY.json"
+    },
+    {
+      "id": "colemak",
+      "name": "Colemak",
+      "filename": "Colemak.json"
+    },
+    {
+      "id": "colemak-dh-ansi",
+      "name": "Colemak DH (ANSI)",
+      "filename": "Colemak_DH__ANSI.json"
+    },
+    {
+      "id": "colemak-dh-iso",
+      "name": "Colemak DH (ISO)",
+      "filename": "Colemak_DH__ISO.json"
+    },
+    {
+      "id": "colemak-dh-matrix",
+      "name": "Colemak DH (Matrix)",
+      "filename": "Colemak_DH__Matrix.json"
+    },
+    {
+      "id": "croatian",
+      "name": "Croatian (QWERTZ)",
+      "filename": "Croatian__QWERTZ.json"
+    },
+    {
+      "id": "danish",
+      "name": "Danish (QWERTY)",
+      "filename": "Danish__QWERTY.json"
+    },
+    {
+      "id": "dvorak",
+      "name": "Dvorak",
+      "filename": "Dvorak.json"
+    },
+    {
+      "id": "eurkey",
+      "name": "EurKey (QWERTY)",
+      "filename": "EurKey__QWERTY.json"
+    },
+    {
+      "id": "french",
+      "name": "French (AZERTY)",
+      "filename": "French__AZERTY.json"
+    },
+    {
+      "id": "french-mac",
+      "name": "French (MAC)",
+      "filename": "French__MAC.json"
+    },
+    {
+      "id": "french-bepo",
+      "name": "French (BÉPO)",
+      "filename": "French__B_PO.json"
+    },
+    {
+      "id": "german",
+      "name": "German (QWERTZ)",
+      "filename": "German__QWERTZ.json"
+    },
+    {
+      "id": "hebrew",
+      "name": "Hebrew (Standard)",
+      "filename": "Hebrew__Standard.json"
+    },
+    {
+      "id": "hungarian",
+      "name": "Hungarian (QWERTZ)",
+      "filename": "Hungarian__QWERTZ.json"
+    },
+    {
+      "id": "italian",
+      "name": "Italian (QWERTY)",
+      "filename": "Italian__QWERTY.json"
+    },
+    {
+      "id": "japanese",
+      "name": "Japanese (QWERTY)",
+      "filename": "Japanese__QWERTY.json"
+    },
+    {
+      "id": "japanese-ej",
+      "name": "Japanese (QWERTY - E/J)",
+      "filename": "Japanese__QWERTY_-_E_J.json"
+    },
+    {
+      "id": "latam",
+      "name": "Latin American (QWERTY)",
+      "filename": "Latin_American__QWERTY.json"
+    },
+    {
+      "id": "norwegian",
+      "name": "Norwegian (QWERTY)",
+      "filename": "Norwegian__QWERTY.json"
+    },
+    {
+      "id": "portuguese",
+      "name": "Portuguese (QWERTY)",
+      "filename": "Portuguese__QWERTY.json"
+    },
+    {
+      "id": "polish",
+      "name": "Polish (QWERTY)",
+      "filename": "Polish__QWERTY.json"
+    },
+    {
+      "id": "slovak",
+      "name": "Slovak (QWERTY)",
+      "filename": "Slovak__QWERTY.json"
+    },
+    {
+      "id": "spanish",
+      "name": "Spanish (QWERTY)",
+      "filename": "Spanish__QWERTY.json"
+    },
+    {
+      "id": "spanish-dvorak",
+      "name": "Spanish (Dvorak)",
+      "filename": "Spanish__Dvorak.json"
+    },
+    {
+      "id": "swedish",
+      "name": "Swedish (QWERTY)",
+      "filename": "Swedish__QWERTY.json"
+    },
+    {
+      "id": "swedish-swerty",
+      "name": "Swedish (SWERTY)",
+      "filename": "Swedish__SWERTY.json"
+    },
+    {
+      "id": "swiss",
+      "name": "Swiss (QWERTZ)",
+      "filename": "Swiss__QWERTZ.json"
+    },
+    {
+      "id": "turkish",
+      "name": "Turkish (QWERTY)",
+      "filename": "Turkish__QWERTY.json"
+    },
+    {
+      "id": "uk",
+      "name": "UK (QWERTY)",
+      "filename": "UK__QWERTY.json"
+    },
+    {
+      "id": "us-international",
+      "name": "US - International (QWERTY)",
+      "filename": "US_-_International__QWERTY.json"
+    }
+  ]
+}

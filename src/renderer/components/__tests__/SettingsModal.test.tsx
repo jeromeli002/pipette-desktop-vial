@@ -663,11 +663,30 @@ describe('SettingsModal', () => {
   })
 
   describe('Theme packs section (Tools tab)', () => {
-    it('renders theme packs manage row with edit button', () => {
+    it('renders theme packs manage row with selector and edit button', () => {
       renderAndSwitchToTools()
 
       expect(screen.getByTestId('settings-theme-packs-row')).toBeInTheDocument()
+      expect(screen.getByTestId('settings-theme-selector')).toBeInTheDocument()
       expect(screen.getByTestId('settings-theme-packs-button')).toBeInTheDocument()
+    })
+
+    it('calls onThemeChange when selector changes', () => {
+      const onThemeChange = vi.fn()
+      renderAndSwitchToTools({ theme: 'system', onThemeChange })
+
+      fireEvent.change(screen.getByTestId('settings-theme-selector'), { target: { value: 'dark' } })
+      expect(onThemeChange).toHaveBeenCalledWith('dark')
+    })
+
+    it('renders built-in theme options', () => {
+      renderAndSwitchToTools()
+      const selector = screen.getByTestId('settings-theme-selector')
+      const options = selector.querySelectorAll('option')
+      expect(options).toHaveLength(3)
+      expect(options[0]).toHaveTextContent('theme.light')
+      expect(options[1]).toHaveTextContent('theme.dark')
+      expect(options[2]).toHaveTextContent('theme.system')
     })
   })
 
@@ -702,10 +721,26 @@ describe('SettingsModal', () => {
   })
 
   describe('Language selector (Tools tab)', () => {
-    it('renders the language row with edit button', () => {
+    it('renders the language row with selector and edit button', () => {
       renderAndSwitchToTools()
       expect(screen.getByTestId('settings-language-row')).toBeInTheDocument()
+      expect(screen.getByTestId('settings-language-selector')).toBeInTheDocument()
       expect(screen.getByTestId('settings-language-packs-button')).toBeInTheDocument()
+    })
+
+    it('calls appConfig.set and i18n.changeLanguage when selector changes', () => {
+      renderAndSwitchToTools()
+      const selector = screen.getByTestId('settings-language-selector')
+      fireEvent.change(selector, { target: { value: 'builtin:en' } })
+      expect(mockAppConfigSet).toHaveBeenCalledWith('language', 'builtin:en')
+    })
+
+    it('renders language options from SUPPORTED_LANGUAGES', () => {
+      renderAndSwitchToTools()
+      const selector = screen.getByTestId('settings-language-selector')
+      const options = selector.querySelectorAll('option')
+      expect(options).toHaveLength(1)
+      expect(options[0]).toHaveTextContent('English')
     })
   })
 

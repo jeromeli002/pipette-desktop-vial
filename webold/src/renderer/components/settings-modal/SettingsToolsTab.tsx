@@ -1,26 +1,21 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import i18n from '../../i18n'
-import { TIME_STEPS } from './settings-modal-shared'
+import { THEME_OPTIONS, TIME_STEPS } from './settings-modal-shared'
 import { ROW_CLASS, toggleTrackClass, toggleKnobClass } from '../editors/modal-controls'
+import { KEYBOARD_LAYOUTS } from '../../data/keyboard-layouts'
 import { useAppConfig } from '../../hooks/useAppConfig'
+import i18n, { SUPPORTED_LANGUAGES } from '../../i18n'
 import { useKeyLabels } from '../../hooks/useKeyLabels'
-import { useI18nPackStore } from '../../hooks/useI18nPackStore'
-import { useThemePackStore } from '../../hooks/useThemePackStore'
-import { useLayoutOptions } from '../../hooks/useLayoutOptions'
-import { useLanguageOptions } from '../../hooks/useLanguageOptions'
 import { KeyLabelsModal } from '../key-labels/KeyLabelsModal'
-import { LanguagePacksModal } from '../i18n-packs/LanguagePacksModal'
-import { ThemePacksModal } from '../theme-packs/ThemePacksModal'
-import type { ThemeSelection } from '../../hooks/useTheme'
+import type { ThemeMode } from '../../hooks/useTheme'
 import type { KeyboardLayoutId, AutoLockMinutes } from '../../hooks/useDevicePrefs'
-import { ZOOM_FACTOR_MIN, ZOOM_FACTOR_MAX, ZOOM_FACTOR_DEFAULT, clampZoomFactor, type BasicViewType, type SplitKeyMode } from '../../../shared/types/app-config'
+import type { BasicViewType, SplitKeyMode } from '../../../shared/types/app-config'
 
 export interface SettingsToolsTabProps {
-  theme: ThemeSelection
-  onThemeChange: (mode: ThemeSelection) => void
+  theme: ThemeMode
+  onThemeChange: (mode: ThemeMode) => void
   defaultLayout: KeyboardLayoutId
   onDefaultLayoutChange: (layout: KeyboardLayoutId) => void
   defaultAutoAdvance: boolean
@@ -68,36 +63,7 @@ export function SettingsToolsTab({
   const { t } = useTranslation()
   const appConfig = useAppConfig()
   const [keyLabelsOpen, setKeyLabelsOpen] = useState(false)
-  const [languagePacksOpen, setLanguagePacksOpen] = useState(false)
-  const [themePacksOpen, setThemePacksOpen] = useState(false)
   const keyLabels = useKeyLabels()
-  const i18nPacks = useI18nPackStore()
-  const themePacks = useThemePackStore()
-
-  const [zoomInput, setZoomInput] = useState(String(appConfig.config.zoomFactor ?? ZOOM_FACTOR_DEFAULT))
-
-  useEffect(() => {
-    setZoomInput(String(appConfig.config.zoomFactor ?? ZOOM_FACTOR_DEFAULT))
-  }, [appConfig.config.zoomFactor])
-
-  const commitZoomValue = useCallback((val: string) => {
-    const raw = Number(val)
-    if (Number.isNaN(raw)) {
-      setZoomInput(String(appConfig.config.zoomFactor ?? ZOOM_FACTOR_DEFAULT))
-      return
-    }
-    const clamped = clampZoomFactor(raw)
-    setZoomInput(String(clamped))
-    if (clamped !== (appConfig.config.zoomFactor ?? ZOOM_FACTOR_DEFAULT)) {
-      appConfig.set('zoomFactor', clamped)
-    }
-  }, [appConfig])
-
-  const commitZoom = useCallback(() => {
-    commitZoomValue(zoomInput)
-  }, [zoomInput, commitZoomValue])
-
-  const languageOptions = useLanguageOptions(i18nPacks.metas)
 
   /**
    * Default-layout dropdown options. QWERTY is materialised as a Key
@@ -106,7 +72,21 @@ export function SettingsToolsTab({
    * Labels modal. `KEYBOARD_LAYOUTS` only serves as a safety net for
    * the brief window before `metas` has loaded.
    */
-  const layoutOptions = useLayoutOptions(keyLabels.metas)
+  const layoutOptions = useMemo(() => {
+    const seen = new Set<string>()
+    const out: Array<{ id: string; name: string; isKeyLabel: boolean }> = []
+    for (const meta of keyLabels.metas) {
+      if (seen.has(meta.id)) continue
+      seen.add(meta.id)
+      out.push({ id: meta.id, name: meta.name, isKeyLabel: true })
+    }
+    for (const def of KEYBOARD_LAYOUTS) {
+      if (seen.has(def.id)) continue
+      seen.add(def.id)
+      out.push({ id: def.id, name: def.name, isKeyLabel: false })
+    }
+    return out
+  }, [keyLabels.metas])
 
   // Auto-heal an orphaned saved default layout. If the entry was
   // deleted from the Key Label store (locally or via sync) the saved
@@ -126,38 +106,51 @@ export function SettingsToolsTab({
     <>
     <div className="pt-4 space-y-6">
       <section>
+        <h4 className="mb-2 text-sm font-medium text-content-secondary">
+          {t('theme.label')}
+        </h4>
+        <div className="flex rounded-lg border border-edge bg-surface p-1 gap-0.5">
+          {THEME_OPTIONS.map(({ mode, icon: Icon }) => (
+            <button
+              key={mode}
+              type="button"
+              className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                theme === mode
+                  ? 'bg-accent/15 text-accent'
+                  : 'text-content-secondary hover:text-content'
+              }`}
+              onClick={() => onThemeChange(mode)}
+              data-testid={`theme-option-${mode}`}
+            >
+              <Icon size={16} aria-hidden="true" />
+              {t(`theme.${mode}`)}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section>
         <div className="grid grid-cols-2 gap-3">
           <div className={ROW_CLASS} data-testid="settings-language-row">
             <label htmlFor="settings-language-selector" className="text-sm font-medium text-content-secondary">
-              {t('i18n.manageRow')}
+              {t('settings.language')}
             </label>
-            <div className="flex items-center gap-2">
-              <select
-                id="settings-language-selector"
-                value={appConfig.config.language ?? 'builtin:zh'}
-                onChange={(e) => {
-                  const lang = e.target.value
-                  appConfig.set('language', lang)
-                  void i18n.changeLanguage(lang)
-                }}
-                className="rounded border border-edge bg-surface px-2.5 py-1.5 text-sm text-content focus:border-accent focus:outline-none"
-                data-testid="settings-language-selector"
-              >
-                {languageOptions.map((lang) => (
-                  <option key={lang.id} value={lang.id}>
-                    {lang.name}
-                  </option>
-                ))}
-              </select>
-              <button
-                type="button"
-                onClick={() => setLanguagePacksOpen(true)}
-                className="rounded border border-edge bg-surface px-2.5 py-1.5 text-sm text-content hover:bg-surface-hover focus:border-accent focus:outline-none"
-                data-testid="settings-language-packs-button"
-              >
-                {t('i18n.edit')}
-              </button>
-            </div>
+            <select
+              id="settings-language-selector"
+              value={appConfig.config.language ?? 'en'}
+              onChange={(e) => {
+                appConfig.set('language', e.target.value)
+                void i18n.changeLanguage(e.target.value)
+              }}
+              className="rounded border border-edge bg-surface px-2.5 py-1.5 text-[13px] text-content focus:border-accent focus:outline-none"
+              data-testid="settings-language-selector"
+            >
+              {SUPPORTED_LANGUAGES.map((lang) => (
+                <option key={lang.id} value={lang.id}>
+                  {lang.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className={ROW_CLASS} data-testid="settings-key-labels-row">
@@ -167,76 +160,11 @@ export function SettingsToolsTab({
             <button
               type="button"
               onClick={() => setKeyLabelsOpen(true)}
-              className="rounded border border-edge bg-surface px-2.5 py-1.5 text-sm text-content hover:bg-surface-hover focus:border-accent focus:outline-none"
+              className="rounded border border-edge bg-surface px-2.5 py-1.5 text-[13px] text-content hover:bg-surface-hover focus:border-accent focus:outline-none"
               data-testid="settings-key-labels-button"
             >
               {t('keyLabels.edit')}
             </button>
-          </div>
-
-          <div className={ROW_CLASS} data-testid="settings-theme-packs-row">
-            <label htmlFor="settings-theme-selector" className="text-sm font-medium text-content-secondary">
-              {t('themePacks.manageRow')}
-            </label>
-            <div className="flex items-center gap-2">
-              <select
-                id="settings-theme-selector"
-                value={theme}
-                onChange={(e) => onThemeChange(e.target.value as ThemeSelection)}
-                className="rounded border border-edge bg-surface px-2.5 py-1.5 text-sm text-content focus:border-accent focus:outline-none"
-                data-testid="settings-theme-selector"
-              >
-                <option value="light">{t('theme.light')}</option>
-                <option value="dark">{t('theme.dark')}</option>
-                <option value="system">{t('theme.system')}</option>
-                {themePacks.metas
-                  .filter((m) => !m.deletedAt)
-                  .map((meta) => (
-                    <option key={meta.id} value={`pack:${meta.id}`}>
-                      {meta.name}
-                    </option>
-                  ))}
-              </select>
-              <button
-                type="button"
-                onClick={() => setThemePacksOpen(true)}
-                className="rounded border border-edge bg-surface px-2.5 py-1.5 text-sm text-content hover:bg-surface-hover focus:border-accent focus:outline-none"
-                data-testid="settings-theme-packs-button"
-              >
-                {t('i18n.edit')}
-              </button>
-            </div>
-          </div>
-
-          <div className={ROW_CLASS} data-testid="settings-zoom-factor-row">
-            <div className="flex flex-col gap-0.5">
-              <span className="text-sm font-medium text-content-secondary">
-                {t('settings.zoomLevel')}
-              </span>
-              <span className="text-xs text-content-muted">
-                {t('settings.zoomLevelWarning')}
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <input
-                id="settings-zoom-factor-input"
-                type="number"
-                min={ZOOM_FACTOR_MIN}
-                max={ZOOM_FACTOR_MAX}
-                value={zoomInput}
-                onChange={(e) => {
-                  const val = e.target.value
-                  setZoomInput(val)
-                  // Spin-button clicks have empty inputType in Chromium
-                  if (!(e.nativeEvent as InputEvent).inputType) commitZoomValue(val)
-                }}
-                onBlur={commitZoom}
-                onKeyDown={(e) => { if (e.key === 'Enter') commitZoom() }}
-                className="zoom-factor-input w-20 rounded border border-edge bg-surface px-2.5 py-1.5 text-sm text-content text-right tabular-nums hover:bg-surface-hover focus:border-accent focus:outline-none"
-                data-testid="settings-zoom-factor-input"
-              />
-              <span className="text-sm text-content-muted">%</span>
-            </div>
           </div>
         </div>
       </section>
@@ -247,14 +175,14 @@ export function SettingsToolsTab({
         </h4>
         <div className="grid grid-cols-2 gap-3">
           <div className={ROW_CLASS} data-testid="settings-default-basic-view-type-row">
-            <label htmlFor="settings-default-basic-view-type-selector" className="text-sm font-medium text-content">
+            <label htmlFor="settings-default-basic-view-type-selector" className="text-[13px] font-medium text-content">
               {t('settings.defaultBasicViewType')}
             </label>
             <select
               id="settings-default-basic-view-type-selector"
               value={defaultBasicViewType}
               onChange={(e) => onDefaultBasicViewTypeChange(e.target.value as BasicViewType)}
-              className="rounded border border-edge bg-surface px-2.5 py-1.5 text-sm text-content focus:border-accent focus:outline-none"
+              className="rounded border border-edge bg-surface px-2.5 py-1.5 text-[13px] text-content focus:border-accent focus:outline-none"
               data-testid="settings-default-basic-view-type-selector"
             >
               <option value="ansi">{t('settings.basicViewTypeAnsi')}</option>
@@ -265,26 +193,26 @@ export function SettingsToolsTab({
           </div>
 
           <div className={ROW_CLASS} data-testid="settings-default-layout-row">
-            <label htmlFor="settings-default-layout-selector" className="text-sm font-medium text-content">
+            <label htmlFor="settings-default-layout-selector" className="text-[13px] font-medium text-content">
               {t('settings.defaultLayout')}
             </label>
             <select
               id="settings-default-layout-selector"
               value={defaultLayout}
               onChange={(e) => onDefaultLayoutChange(e.target.value as KeyboardLayoutId)}
-              className="rounded border border-edge bg-surface px-2.5 py-1.5 text-sm text-content focus:border-accent focus:outline-none"
+              className="rounded border border-edge bg-surface px-2.5 py-1.5 text-[13px] text-content focus:border-accent focus:outline-none"
               data-testid="settings-default-layout-selector"
             >
               {layoutOptions.map((layoutDef) => (
                 <option key={layoutDef.id} value={layoutDef.id}>
-                  {layoutDef.name}
+                  {t(`keyboardLayouts.${layoutDef.id}`, { defaultValue: layoutDef.name })}
                 </option>
               ))}
             </select>
           </div>
 
           <div className={ROW_CLASS} data-testid="settings-default-auto-advance-row">
-            <span className="text-sm font-medium text-content">
+            <span className="text-[13px] font-medium text-content">
               {t('settings.defaultAutoAdvance')}
             </span>
             <button
@@ -301,7 +229,7 @@ export function SettingsToolsTab({
           </div>
 
           <div className={ROW_CLASS} data-testid="settings-default-split-key-mode-row">
-            <span className="text-sm font-medium text-content">
+            <span className="text-[13px] font-medium text-content">
               {t('settings.defaultSplitKeyMode')}
             </span>
             <button
@@ -318,7 +246,7 @@ export function SettingsToolsTab({
           </div>
 
           <div className={ROW_CLASS} data-testid="settings-default-quick-select-row">
-            <span className="text-sm font-medium text-content">
+            <span className="text-[13px] font-medium text-content">
               {t('settings.defaultQuickSelect')}
             </span>
             <button
@@ -335,7 +263,7 @@ export function SettingsToolsTab({
           </div>
 
           <div className={ROW_CLASS} data-testid="settings-default-layer-panel-open-row">
-            <span className="text-sm font-medium text-content">
+            <span className="text-[13px] font-medium text-content">
               {t('settings.defaultLayerPanelOpen')}
             </span>
             <button
@@ -352,14 +280,14 @@ export function SettingsToolsTab({
           </div>
 
           <div className={ROW_CLASS} data-testid="settings-max-keymap-history-row">
-            <label htmlFor="settings-max-keymap-history-selector" className="text-sm font-medium text-content">
+            <label htmlFor="settings-max-keymap-history-selector" className="text-[13px] font-medium text-content">
               {t('settings.maxKeymapHistory')}
             </label>
             <select
               id="settings-max-keymap-history-selector"
               value={maxKeymapHistory}
               onChange={(e) => onMaxKeymapHistoryChange(Number(e.target.value))}
-              className="rounded border border-edge bg-surface px-2.5 py-1.5 text-sm text-content focus:border-accent focus:outline-none"
+              className="rounded border border-edge bg-surface px-2.5 py-1.5 text-[13px] text-content focus:border-accent focus:outline-none"
               data-testid="settings-max-keymap-history-selector"
             >
               {[10, 25, 50, 100, 200, 500].map((n) => (
@@ -377,7 +305,7 @@ export function SettingsToolsTab({
         <div className="flex flex-col gap-3">
           <div className={ROW_CLASS} data-testid="settings-auto-lock-time-row">
             <div className="flex flex-col gap-0.5">
-              <label htmlFor="settings-auto-lock-time-selector" className="text-sm font-medium text-content">
+              <label htmlFor="settings-auto-lock-time-selector" className="text-[13px] font-medium text-content">
                 {t('settings.autoLockTime')}
               </label>
               <span className="text-xs text-content-muted">
@@ -388,7 +316,7 @@ export function SettingsToolsTab({
               id="settings-auto-lock-time-selector"
               value={autoLockTime}
               onChange={(e) => onAutoLockTimeChange(Number(e.target.value) as AutoLockMinutes)}
-              className="rounded border border-edge bg-surface px-2.5 py-1.5 text-sm text-content focus:border-accent focus:outline-none"
+              className="rounded border border-edge bg-surface px-2.5 py-1.5 text-[13px] text-content focus:border-accent focus:outline-none"
               data-testid="settings-auto-lock-time-selector"
             >
               {TIME_STEPS.map((m) => (
@@ -405,18 +333,6 @@ export function SettingsToolsTab({
       open={keyLabelsOpen}
       onClose={() => setKeyLabelsOpen(false)}
       currentDisplayName={hubDisplayName}
-      hubCanWrite={hubCanWrite}
-    />
-    <LanguagePacksModal
-      open={languagePacksOpen}
-      onClose={() => setLanguagePacksOpen(false)}
-      currentDisplayName={hubDisplayName}
-      hubCanWrite={hubCanWrite}
-    />
-    <ThemePacksModal
-      open={themePacksOpen}
-      onClose={() => setThemePacksOpen(false)}
-      onThemeChange={onThemeChange}
       hubCanWrite={hubCanWrite}
     />
     </>
