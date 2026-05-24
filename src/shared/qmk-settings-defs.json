@@ -2,85 +2,92 @@
     "tabs": [
         {
             "name": "Magic",
+            "titleKey": "qmk.tabs.magic",
             "fields": [
-                { "type": "boolean", "title": "Swap Caps Lock and Left Control", "qsid": 21, "width": 4, "bit": 0 },
-                { "type": "boolean", "title": "Treat Caps Lock as Control", "qsid": 21, "width": 4, "bit": 1 },
-                { "type": "boolean", "title": "Swap Left Alt and GUI", "qsid": 21, "width": 4, "bit": 2 },
-                { "type": "boolean", "title": "Swap Right Alt and GUI", "qsid": 21, "width": 4, "bit": 3 },
-                { "type": "boolean", "title": "Disable the GUI keys", "qsid": 21, "width": 4, "bit": 4 },
-                { "type": "boolean", "title": "Swap ` and Escape", "qsid": 21, "width": 4, "bit": 5 },
-                { "type": "boolean", "title": "Swap \\ and Backspace", "qsid": 21, "width": 4, "bit": 6 },
-                { "type": "boolean", "title": "Enable N-key rollover", "qsid": 21, "width": 4, "bit": 7 },
-                { "type": "boolean", "title": "Swap Left Control and GUI", "qsid": 21, "width": 4, "bit": 8 },
-                { "type": "boolean", "title": "Swap Right Control and GUI", "qsid": 21, "width": 4, "bit": 9 }
+                { "type": "boolean", "titleKey": "qmk.fields.swap_caps_lock_left_control", "qsid": 21, "width": 4, "bit": 0 },
+                { "type": "boolean", "titleKey": "qmk.fields.treat_caps_lock_as_control", "qsid": 21, "width": 4, "bit": 1 },
+                { "type": "boolean", "titleKey": "qmk.fields.swap_left_alt_gui", "qsid": 21, "width": 4, "bit": 2 },
+                { "type": "boolean", "titleKey": "qmk.fields.swap_right_alt_gui", "qsid": 21, "width": 4, "bit": 3 },
+                { "type": "boolean", "titleKey": "qmk.fields.disable_gui_keys", "qsid": 21, "width": 4, "bit": 4 },
+                { "type": "boolean", "titleKey": "qmk.fields.swap_grave_escape", "qsid": 21, "width": 4, "bit": 5 },
+                { "type": "boolean", "titleKey": "qmk.fields.swap_backslash_backspace", "qsid": 21, "width": 4, "bit": 6 },
+                { "type": "boolean", "titleKey": "qmk.fields.enable_nkey_rollover", "qsid": 21, "width": 4, "bit": 7 },
+                { "type": "boolean", "titleKey": "qmk.fields.swap_left_control_gui", "qsid": 21, "width": 4, "bit": 8 },
+                { "type": "boolean", "titleKey": "qmk.fields.swap_right_control_gui", "qsid": 21, "width": 4, "bit": 9 }
             ]
         },
         {
             "name": "Grave Escape",
+            "titleKey": "qmk.tabs.grave_escape",
             "fields": [
-                { "type": "boolean", "title": "Always send Escape if Alt is pressed", "qsid": 1, "bit": 0 },
-                { "type": "boolean", "title": "Always send Escape if Control is pressed", "qsid": 1, "bit": 1 },
-                { "type": "boolean", "title": "Always send Escape if GUI is pressed", "qsid": 1, "bit": 2 },
-                { "type": "boolean", "title": "Always send Escape if Shift is pressed", "qsid": 1, "bit": 3 }
+                { "type": "boolean", "titleKey": "qmk.fields.grave_escape_alt", "qsid": 1, "bit": 0 },
+                { "type": "boolean", "titleKey": "qmk.fields.grave_escape_control", "qsid": 1, "bit": 1 },
+                { "type": "boolean", "titleKey": "qmk.fields.grave_escape_gui", "qsid": 1, "bit": 2 },
+                { "type": "boolean", "titleKey": "qmk.fields.grave_escape_shift", "qsid": 1, "bit": 3 }
             ]
         },
         {
             "name": "Tap-Hold",
+            "titleKey": "qmk.tabs.tap_hold",
             "fields": [
-                { "type": "integer", "title": "Tapping Term", "qsid": 7, "min": 0, "max": 10000, "width": 2 },
-                { "type": "boolean", "title": "Permissive Hold", "qsid": 8, "bit": 0 },
-                { "type": "boolean", "title": "Ignore Mod Tap Interrupt", "qsid": 8, "bit": 1 },
-                { "type": "boolean", "title": "Tapping Force Hold", "qsid": 8, "bit": 2 },
-                { "type": "boolean", "title": "Retro Tapping", "qsid": 8, "bit": 3 },
-                { "type": "boolean", "title": "Permissive Hold", "qsid": 22 },
-                { "type": "boolean", "title": "Hold On Other Key Press", "qsid": 23 },
-                { "type": "boolean", "title": "Retro Tapping", "qsid": 24 },
-                { "type": "integer", "title": "Quick Tap Term", "qsid": 25, "min": 0, "max": 10000, "width": 2 },
-                { "type": "integer", "title": "Tap Code Delay", "qsid": 18, "min": 0, "max": 1000, "width": 2 },
-                { "type": "integer", "title": "Tap Hold Caps Delay", "qsid": 19, "min": 0, "max": 1000, "width": 2 },
-                { "type": "integer", "title": "Tapping Toggle", "qsid": 20, "min": 0, "max": 100, "width": 1 },
-                { "type": "boolean", "title": "Chordal Hold", "qsid": 26 },
-                { "type": "integer", "title": "Flow Tap", "qsid": 27, "min": 0, "max": 10000, "width": 2 }
+                { "type": "integer", "titleKey": "qmk.fields.tapping_term", "qsid": 7, "min": 0, "max": 10000, "width": 2 },
+                { "type": "boolean", "titleKey": "qmk.fields.permissive_hold", "qsid": 8, "bit": 0 },
+                { "type": "boolean", "titleKey": "qmk.fields.ignore_mod_tap_interrupt", "qsid": 8, "bit": 1 },
+                { "type": "boolean", "titleKey": "qmk.fields.tapping_force_hold", "qsid": 8, "bit": 2 },
+                { "type": "boolean", "titleKey": "qmk.fields.retro_tapping", "qsid": 8, "bit": 3 },
+                { "type": "boolean", "titleKey": "qmk.fields.permissive_hold", "qsid": 22 },
+                { "type": "boolean", "titleKey": "qmk.fields.hold_on_other_key_press", "qsid": 23 },
+                { "type": "boolean", "titleKey": "qmk.fields.retro_tapping", "qsid": 24 },
+                { "type": "integer", "titleKey": "qmk.fields.quick_tap_term", "qsid": 25, "min": 0, "max": 10000, "width": 2 },
+                { "type": "integer", "titleKey": "qmk.fields.tap_code_delay", "qsid": 18, "min": 0, "max": 1000, "width": 2 },
+                { "type": "integer", "titleKey": "qmk.fields.tap_hold_caps_delay", "qsid": 19, "min": 0, "max": 1000, "width": 2 },
+                { "type": "integer", "titleKey": "qmk.fields.tapping_toggle", "qsid": 20, "min": 0, "max": 100, "width": 1 },
+                { "type": "boolean", "titleKey": "qmk.fields.chordal_hold", "qsid": 26 },
+                { "type": "integer", "titleKey": "qmk.fields.flow_tap", "qsid": 27, "min": 0, "max": 10000, "width": 2 }
             ]
         },
         {
             "name": "Auto Shift",
+            "titleKey": "qmk.tabs.auto_shift",
             "fields": [
-                { "type": "boolean", "title": "Enable", "qsid": 3, "bit": 0 },
-                { "type": "boolean", "title": "Enable for modifiers", "qsid": 3, "bit": 1 },
-                { "type": "integer", "title": "Timeout", "qsid": 4, "min": 0, "max": 1000, "width": 2 },
-                { "type": "boolean", "title": "Do not Auto Shift special keys", "qsid": 3, "bit": 2 },
-                { "type": "boolean", "title": "Do not Auto Shift numeric keys", "qsid": 3, "bit": 3 },
-                { "type": "boolean", "title": "Do not Auto Shift alpha characters", "qsid": 3, "bit": 4 },
-                { "type": "boolean", "title": "Enable keyrepeat", "qsid": 3, "bit": 5 },
-                { "type": "boolean", "title": "Disable keyrepeat when timeout is exceeded", "qsid": 3, "bit": 6 }
+                { "type": "boolean", "titleKey": "qmk.fields.auto_shift_enable", "qsid": 3, "bit": 0 },
+                { "type": "boolean", "titleKey": "qmk.fields.auto_shift_enable_modifiers", "qsid": 3, "bit": 1 },
+                { "type": "integer", "titleKey": "qmk.fields.auto_shift_timeout", "qsid": 4, "min": 0, "max": 1000, "width": 2 },
+                { "type": "boolean", "titleKey": "qmk.fields.auto_shift_disable_special", "qsid": 3, "bit": 2 },
+                { "type": "boolean", "titleKey": "qmk.fields.auto_shift_disable_numeric", "qsid": 3, "bit": 3 },
+                { "type": "boolean", "titleKey": "qmk.fields.auto_shift_disable_alpha", "qsid": 3, "bit": 4 },
+                { "type": "boolean", "titleKey": "qmk.fields.auto_shift_enable_keyrepeat", "qsid": 3, "bit": 5 },
+                { "type": "boolean", "titleKey": "qmk.fields.auto_shift_disable_keyrepeat_timeout", "qsid": 3, "bit": 6 }
             ]
         },
         {
             "name": "Combo",
+            "titleKey": "qmk.tabs.combo",
             "fields": [
-                { "type": "integer", "title": "Time out period", "qsid": 2, "min": 0, "max": 10000, "width": 2 }
+                { "type": "integer", "titleKey": "qmk.fields.combo_timeout", "qsid": 2, "min": 0, "max": 10000, "width": 2 }
             ]
         },
         {
             "name": "One Shot Keys",
+            "titleKey": "qmk.tabs.one_shot_keys",
             "fields": [
-                { "type": "integer", "title": "Tapping this number of times holds the key until tapped once again", "qsid": 5, "min": 0, "max": 50, "width": 1 },
-                { "type": "integer", "title": "Time (in ms) before the one shot key is released", "qsid": 6, "min": 0, "max": 60000, "width": 2 }
+                { "type": "integer", "titleKey": "qmk.fields.one_shot_tapping_count", "qsid": 5, "min": 0, "max": 50, "width": 1 },
+                { "type": "integer", "titleKey": "qmk.fields.one_shot_timeout", "qsid": 6, "min": 0, "max": 60000, "width": 2 }
             ]
         },
         {
             "name": "Mouse keys",
+            "titleKey": "qmk.tabs.mouse_keys",
             "fields": [
-                { "type": "integer", "title": "Delay between pressing a movement key and cursor movement", "qsid": 9, "min": 0, "max": 10000, "width": 2 },
-                { "type": "integer", "title": "Time between cursor movements in milliseconds", "qsid": 10, "min": 0, "max": 10000, "width": 2 },
-                { "type": "integer", "title": "Step size", "qsid": 11, "min": 0, "max": 1000, "width": 2 },
-                { "type": "integer", "title": "Maximum cursor speed at which acceleration stops", "qsid": 12, "min": 0, "max": 1000, "width": 2 },
-                { "type": "integer", "title": "Time until maximum cursor speed is reached", "qsid": 13, "min": 0, "max": 1000, "width": 2 },
-                { "type": "integer", "title": "Delay between pressing a wheel key and wheel movement", "qsid": 14, "min": 0, "max": 10000, "width": 2 },
-                { "type": "integer", "title": "Time between wheel movements", "qsid": 15, "min": 0, "max": 10000, "width": 2 },
-                { "type": "integer", "title": "Maximum number of scroll steps per scroll action", "qsid": 16, "min": 0, "max": 1000, "width": 2 },
-                { "type": "integer", "title": "Time until maximum scroll speed is reached", "qsid": 17, "min": 0, "max": 1000, "width": 2 }
+                { "type": "integer", "titleKey": "qmk.fields.mouse_keys_movement_delay", "qsid": 9, "min": 0, "max": 10000, "width": 2 },
+                { "type": "integer", "titleKey": "qmk.fields.mouse_keys_movement_interval", "qsid": 10, "min": 0, "max": 10000, "width": 2 },
+                { "type": "integer", "titleKey": "qmk.fields.mouse_keys_step_size", "qsid": 11, "min": 0, "max": 1000, "width": 2 },
+                { "type": "integer", "titleKey": "qmk.fields.mouse_keys_max_speed", "qsid": 12, "min": 0, "max": 1000, "width": 2 },
+                { "type": "integer", "titleKey": "qmk.fields.mouse_keys_time_to_max", "qsid": 13, "min": 0, "max": 1000, "width": 2 },
+                { "type": "integer", "titleKey": "qmk.fields.mouse_keys_wheel_delay", "qsid": 14, "min": 0, "max": 10000, "width": 2 },
+                { "type": "integer", "titleKey": "qmk.fields.mouse_keys_wheel_interval", "qsid": 15, "min": 0, "max": 10000, "width": 2 },
+                { "type": "integer", "titleKey": "qmk.fields.mouse_keys_wheel_max_steps", "qsid": 16, "min": 0, "max": 1000, "width": 2 },
+                { "type": "integer", "titleKey": "qmk.fields.mouse_keys_wheel_time_to_max", "qsid": 17, "min": 0, "max": 1000, "width": 2 }
             ]
         }
     ]

@@ -606,6 +606,21 @@ function buildV6(): VersionedKeycodeMap {
     QK_LAYER_LOCK: 0x7c7b,
 
     QK_KB: 0x7e00,
+    
+    DIAL_L:  0x7fb2,
+    DIAL_BUT: 0x7fb1,
+    DIAL_R: 0x7fb3,
+    DIAL_LC: 0x7fb4,
+    DIAL_RC: 0x7fb5,
+        
+    USB_TOG: 0x7784,
+    RF_TOG: 0x7785,
+    BLE_TOG: 0x7786,
+    BLE_SW1: 0x7793,
+    BLE_SW2: 0x7794,
+    BLE_SW3: 0x7795,
+    BLE_RST: 0x7E5C,
+    BLE_OFF: 0x7E5D,
 
     QMK_LM_SHIFT: 5,
     QMK_LM_MASK: 0x1f,

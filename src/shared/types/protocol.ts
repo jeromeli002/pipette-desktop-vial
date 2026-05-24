@@ -108,6 +108,7 @@ export interface UnlockStatus {
 export interface QmkSettingsField {
   type: 'boolean' | 'integer'
   title: string
+  titleKey?: string
   qsid: number
   width?: number
   bit?: number
@@ -115,9 +116,9 @@ export interface QmkSettingsField {
   max?: number
 }
 
-/** QMK Settings tab */
 export interface QmkSettingsTab {
   name: string
+  titleKey?: string
   fields: QmkSettingsField[]
 }
 

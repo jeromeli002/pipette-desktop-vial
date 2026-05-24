@@ -48,7 +48,6 @@ export function QmkSettings({
 
   const tabs = (settingsDefs as { tabs: QmkSettingsTab[] }).tabs
 
-  // Collect all unique QSIDs from settings definition
   const allQsids = useMemo(() => {
     const ids = new Set<number>()
     for (const tab of tabs) {
@@ -57,7 +56,6 @@ export function QmkSettings({
     return ids
   }, [tabs])
 
-  // Load values for supported QSIDs
   useEffect(() => {
     const load = async () => {
       setLoading(true)
@@ -82,7 +80,6 @@ export function QmkSettings({
     load()
   }, [supportedQsids, qmkSettingsGet, allQsids, tabs, onSettingsUpdate])
 
-  // Filter tabs to only show those with supported fields
   const visibleTabs = useMemo(() => {
     return tabs.filter((tab) => tab.fields.some((f) => supportedQsids.has(f.qsid)))
   }, [tabs, supportedQsids])
@@ -143,7 +140,6 @@ export function QmkSettings({
 
   const handleReset = useCallback(async () => {
     await qmkSettingsReset()
-    // Reload values after reset
     const vals = new Map<number, number>()
     for (const qsid of allQsids) {
       if (supportedQsids.has(qsid)) {
@@ -176,32 +172,35 @@ export function QmkSettings({
       <div className="space-y-3">
         {currentTab.fields
           .filter((f) => supportedQsids.has(f.qsid))
-          .map((field, i) => (
-            <div key={`${field.qsid}-${field.bit ?? i}`} className="flex items-start gap-3">
-              <label className="flex-1 min-w-0 pt-1 text-sm">{field.title}</label>
-              {field.type === 'boolean' ? (
-                <input
-                  type="checkbox"
-                  checked={
-                    (((editedValues.get(field.qsid) ?? 0) >> (field.bit ?? 0)) & 1) !== 0
-                  }
-                  onChange={(e) => handleBooleanChange(field, e.target.checked)}
-                  className="h-4 w-4"
-                />
-              ) : (
-                <input
-                  type="number"
-                  min={field.min ?? 0}
-                  max={field.max}
-                  value={editedValues.get(field.qsid) ?? 0}
-                  onChange={(e) =>
-                    handleIntegerChange(field, parseInt(e.target.value, 10) || 0)
-                  }
-                  className="w-28 rounded border border-edge px-2 py-1 text-sm focus:border-accent focus:outline-none"
-                />
-              )}
-            </div>
-          ))}
+          .map((field, i) => {
+            const titleKey = (field as { titleKey?: string }).titleKey
+            return (
+              <div key={`${field.qsid}-${field.bit ?? i}`} className="flex items-start gap-3">
+                <label className="flex-1 min-w-0 pt-1 text-sm">{titleKey ? t(titleKey) : ''}</label>
+                {field.type === 'boolean' ? (
+                  <input
+                    type="checkbox"
+                    checked={
+                      (((editedValues.get(field.qsid) ?? 0) >> (field.bit ?? 0)) & 1) !== 0
+                    }
+                    onChange={(e) => handleBooleanChange(field, e.target.checked)}
+                    className="h-4 w-4"
+                  />
+                ) : (
+                  <input
+                    type="number"
+                    min={field.min ?? 0}
+                    max={field.max}
+                    value={editedValues.get(field.qsid) ?? 0}
+                    onChange={(e) =>
+                      handleIntegerChange(field, parseInt(e.target.value, 10) || 0)
+                    }
+                    className="w-28 rounded border border-edge px-2 py-1 text-sm focus:border-accent focus:outline-none"
+                  />
+                )}
+              </div>
+            )
+          })}
       </div>
 
       <div className="flex justify-end gap-2 pt-2">
