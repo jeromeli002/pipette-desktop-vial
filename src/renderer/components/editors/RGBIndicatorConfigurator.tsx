@@ -5,15 +5,22 @@ import { useTranslation } from 'react-i18next'
 import { ColorWheelPicker, hsvToRgb, rgbToHex } from './ColorWheelPicker'
 import { useConfirmAction } from '../../hooks/useConfirmAction'
 import { ConfirmButton } from './ConfirmButton'
-import type { LedConfig, RGBIndicatorConfig } from '../../../protocol'
-import {
-  setRgbIndicatorCaps,
-  setRgbIndicatorNum,
-  setRgbIndicatorScrl,
-  setRgbIndicatorLayer,
-  setRgbIndicatorSleepTime,
-  saveRgbIndicatorConfig,
-} from '../../../protocol'
+
+interface LedConfig {
+  index: number
+  count: number
+  h: number
+  s: number
+  v: number
+}
+
+interface RGBIndicatorConfig {
+  caps: LedConfig
+  num: LedConfig
+  scrl: LedConfig
+  layers: LedConfig[]
+  rgbTimeout: number
+}
 
 interface Props {
   layerCount: number
@@ -111,7 +118,7 @@ function LedConfigEditor({
   const handleColorChange = (h: number, s: number, v: number) => onChange({ ...config, h, s, v })
 
   return (
-    <div className={`rounded border p-3 ${enabled ? 'border-edge' : 'border-border-subtle opacity-50'}`}>
+    <div className={`rounded border p-3 ${enabled ? 'border-edge' : 'border-transparent opacity-50'}`}>
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <button
@@ -247,20 +254,20 @@ export function RGBIndicatorConfigurator({ layerCount, initialConfig, onConfigCh
     try {
       switch (indicator) {
         case 'caps':
-          await setRgbIndicatorCaps(sendConfig)
+          await window.vialAPI.setRgbIndicatorCaps(sendConfig)
           break
         case 'num':
-          await setRgbIndicatorNum(sendConfig)
+          await window.vialAPI.setRgbIndicatorNum(sendConfig)
           break
         case 'scrl':
-          await setRgbIndicatorScrl(sendConfig)
+          await window.vialAPI.setRgbIndicatorScrl(sendConfig)
           break
         case 'layer':
-          await setRgbIndicatorLayer(index, sendConfig)
+          await window.vialAPI.setRgbIndicatorLayer(index, sendConfig)
           break
       }
       if (save) {
-        await saveRgbIndicatorConfig()
+        await window.vialAPI.saveRgbIndicatorConfig()
       }
     } catch (err) {
       console.error('[RGBIndicator] Send failed:', err)
@@ -285,8 +292,8 @@ export function RGBIndicatorConfigurator({ layerCount, initialConfig, onConfigCh
 
   const applyTimeout = useCallback(async () => {
     try {
-      await setRgbIndicatorSleepTime(config.rgbTimeout)
-      await saveRgbIndicatorConfig()
+      await window.vialAPI.setRgbIndicatorSleepTime(config.rgbTimeout)
+      await window.vialAPI.saveRgbIndicatorConfig()
     } catch (err) {
       console.error('[RGBIndicator] Apply timeout failed:', err)
     }
@@ -340,7 +347,7 @@ export function RGBIndicatorConfigurator({ layerCount, initialConfig, onConfigCh
     
     if (realTimeSync) {
       try {
-        setRgbIndicatorSleepTime(rgbTimeout)
+        window.vialAPI.setRgbIndicatorSleepTime(rgbTimeout)
       } catch (err) {
         console.error('[RGBIndicator] Send timeout failed:', err)
       }
@@ -371,16 +378,16 @@ export function RGBIndicatorConfigurator({ layerCount, initialConfig, onConfigCh
   const handleSave = useCallback(async () => {
     setSaving(true)
     try {
-      await setRgbIndicatorCaps(enabledIndicators.caps ? config.caps : { ...config.caps, count: 0 })
-      await setRgbIndicatorNum(enabledIndicators.num ? config.num : { ...config.num, count: 0 })
-      await setRgbIndicatorScrl(enabledIndicators.scrl ? config.scrl : { ...config.scrl, count: 0 })
+      await window.vialAPI.setRgbIndicatorCaps(enabledIndicators.caps ? config.caps : { ...config.caps, count: 0 })
+      await window.vialAPI.setRgbIndicatorNum(enabledIndicators.num ? config.num : { ...config.num, count: 0 })
+      await window.vialAPI.setRgbIndicatorScrl(enabledIndicators.scrl ? config.scrl : { ...config.scrl, count: 0 })
       
       for (let i = 0; i < config.layers.length && i < layerCount; i++) {
-        await setRgbIndicatorLayer(i, enabledIndicators.layers[i] ? config.layers[i] : { ...config.layers[i], count: 0 })
+        await window.vialAPI.setRgbIndicatorLayer(i, enabledIndicators.layers[i] ? config.layers[i] : { ...config.layers[i], count: 0 })
       }
       
-      await setRgbIndicatorSleepTime(config.rgbTimeout)
-      await saveRgbIndicatorConfig()
+      await window.vialAPI.setRgbIndicatorSleepTime(config.rgbTimeout)
+      await window.vialAPI.saveRgbIndicatorConfig()
     } catch (err) {
       console.error('[RGBIndicator] Save failed:', err)
     } finally {

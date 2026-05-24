@@ -156,6 +156,20 @@ const vialAPI = {
   setVialRGBMode: (mode: number, speed: number, hue: number, sat: number, val: number): Promise<void> =>
     protocol.setVialRGBMode(mode, speed, hue, sat, val),
 
+  // --- RGB Indicator ---
+  setRgbIndicatorCaps: (config: { index: number; count: number; h: number; s: number; v: number }): Promise<void> =>
+    protocol.setRgbIndicatorCaps(config),
+  setRgbIndicatorNum: (config: { index: number; count: number; h: number; s: number; v: number }): Promise<void> =>
+    protocol.setRgbIndicatorNum(config),
+  setRgbIndicatorScrl: (config: { index: number; count: number; h: number; s: number; v: number }): Promise<void> =>
+    protocol.setRgbIndicatorScrl(config),
+  setRgbIndicatorLayer: (layerIndex: number, config: { index: number; count: number; h: number; s: number; v: number }): Promise<void> =>
+    protocol.setRgbIndicatorLayer(layerIndex, config),
+  setRgbIndicatorSleepTime: (seconds: number): Promise<void> =>
+    protocol.setRgbIndicatorSleepTime(seconds),
+  saveRgbIndicatorConfig: (): Promise<void> =>
+    protocol.saveRgbIndicatorConfig(),
+
   // --- Lock/Unlock ---
   getUnlockStatus: (): Promise<{ unlocked: boolean; inProgress: boolean; keys: [number, number][] }> =>
     protocol.getUnlockStatus(),

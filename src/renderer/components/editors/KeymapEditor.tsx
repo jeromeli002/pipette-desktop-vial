@@ -97,7 +97,7 @@ export const KeymapEditor = forwardRef<import('./keymap-editor-types').KeymapEdi
   autoAdvance = true, onAutoAdvanceChange,
   basicViewType, onBasicViewTypeChange, splitKeyMode, onSplitKeyModeChange,
   quickSelect, onQuickSelectChange, keyboardLayout: _keyboardLayout = 'qwerty', onKeyboardLayoutChange: _onKeyboardLayoutChange,
-  onLock, onMatrixModeChange, onOpenLighting,
+  onLock, onMatrixModeChange, onOpenLighting, onOpenRGBIndicator,
   comboEntries, onOpenCombo, onSetComboEntry,
   keyOverrideEntries, onOpenKeyOverride, onSetKeyOverrideEntry,
   altRepeatKeyEntries, onOpenAltRepeatKey, onSetAltRepeatKeyEntry,
@@ -650,6 +650,7 @@ export const KeymapEditor = forwardRef<import('./keymap-editor-types').KeymapEdi
       { tab: 'keyOverride', key: 'koJsonEditor', label: t('editor.tapDance.editJson'), onClick: () => setShowKoJsonEditor(true), testId: 'ko-json-editor-btn', enabled: !!keyOverrideEntries && keyOverrideEntries.length > 0 },
       { tab: 'altRepeatKey', key: 'arkJsonEditor', label: t('editor.tapDance.editJson'), onClick: () => setShowArkJsonEditor(true), testId: 'ark-json-editor-btn', enabled: !!altRepeatKeyEntries && altRepeatKeyEntries.length > 0 },
       { tab: 'lighting', key: 'lighting', label: t('common.configuration'), onClick: onOpenLighting, testId: 'lighting-settings-btn', enabled: !!onOpenLighting },
+      { tab: 'lighting', key: 'rgbIndicator', label: t('editor.rgbIndicator.title'), onClick: onOpenRGBIndicator, testId: 'rgb-indicator-settings-btn', enabled: !!onOpenRGBIndicator },
     ]
     const content: Record<string, React.ReactNode> = {}
     const grouped = new Map<string, typeof buttonDefs>()
@@ -663,7 +664,7 @@ export const KeymapEditor = forwardRef<import('./keymap-editor-types').KeymapEdi
       )
     }
     return content
-  }, [tapDanceEntries, comboEntries, keyOverrideEntries, altRepeatKeyEntries, deserializedMacros, tapHoldSupported, mouseKeysSupported, magicSupported, autoShiftSupported, graveEscapeSupported, oneShotKeysSupported, comboSettingsSupported, onOpenLighting, t, openSettings])
+  }, [tapDanceEntries, comboEntries, keyOverrideEntries, altRepeatKeyEntries, deserializedMacros, tapHoldSupported, mouseKeysSupported, magicSupported, autoShiftSupported, graveEscapeSupported, oneShotKeysSupported, comboSettingsSupported, onOpenLighting, onOpenRGBIndicator, t, openSettings])
 
   const tabContentOverride = useTileContentOverride({
     tapDanceEntries,

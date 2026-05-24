@@ -48,6 +48,7 @@ export function useEditorUIState(options: Options) {
 
   // Modals
   const [showLightingModal, setShowLightingModal] = useState(false)
+  const [showRGBIndicatorModal, setShowRGBIndicatorModal] = useState(false)
   const [comboInitialIndex, setComboInitialIndex] = useState<number | null>(null)
   const [altRepeatKeyInitialIndex, setAltRepeatKeyInitialIndex] = useState<number | null>(null)
   const [keyOverrideInitialIndex, setKeyOverrideInitialIndex] = useState<number | null>(null)
@@ -84,6 +85,7 @@ export function useEditorUIState(options: Options) {
   // Close modals when feature support lost
   useEffect(() => {
     if (!lightingSupported) setShowLightingModal(false)
+    if (!lightingSupported) setShowRGBIndicatorModal(false)
     if (!comboSupported) setComboInitialIndex(null)
     if (!altRepeatKeySupported) setAltRepeatKeyInitialIndex(null)
     if (!keyOverrideSupported) setKeyOverrideInitialIndex(null)
@@ -118,6 +120,8 @@ export function useEditorUIState(options: Options) {
     // Modals
     showLightingModal,
     setShowLightingModal,
+    showRGBIndicatorModal,
+    setShowRGBIndicatorModal,
     comboInitialIndex,
     setComboInitialIndex,
     altRepeatKeyInitialIndex,

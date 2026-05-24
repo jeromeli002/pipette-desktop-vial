@@ -186,7 +186,7 @@ function toggleButtonClass(active: boolean): string {
   return `${base} border-edge text-content-secondary hover:text-content`
 }
 
-type PickerMode = 'palette' | 'hsv'
+type PickerMode = 'palette' | 'hsv' | 'wheel'
 
 export function HSVColorPicker({
   hue,
@@ -200,6 +200,7 @@ export function HSVColorPicker({
   const { t } = useTranslation()
   const svRef = useRef<HTMLDivElement>(null)
   const hueRef = useRef<HTMLDivElement>(null)
+  const wheelRef = useRef<SVGSVGElement>(null)
   const [mode, setMode] = useState<PickerMode>('palette')
 
   const hueDeg = (hue / 255) * 360
@@ -229,6 +230,66 @@ export function HSVColorPicker({
   const hueHandlers = usePointerDrag(hueRef, updateHue)
 
   const hexStr = rgbToHex(...hsvToRgb(hue, saturation, value))
+
+  const wheelSize = 180
+  const wheelRadius = 84
+  const centerPos = wheelSize / 2
+
+  const updateWheel = useCallback(
+    (clientX: number, clientY: number) => {
+      const el = wheelRef.current
+      if (!el) return
+      const rect = el.getBoundingClientRect()
+      const scaleX = wheelSize / rect.width
+      const scaleY = wheelSize / rect.height
+      const x = (clientX - rect.left) * scaleX
+      const y = (clientY - rect.top) * scaleY
+      const dx = x - centerPos
+      const dy = y - centerPos
+      let angle = Math.atan2(dy, dx)
+      angle += Math.PI / 2
+      if (angle < 0) angle += 2 * Math.PI
+      let hDeg = (angle / (2 * Math.PI)) * 360
+      if (hDeg >= 360) hDeg -= 360
+      const radius = Math.sqrt(dx * dx + dy * dy)
+      const normalizedRadius = Math.min(radius / wheelRadius, 1)
+      const newHue = Math.round((hDeg / 360) * 255)
+      const newSaturation = Math.round(normalizedRadius * 255)
+      if (onColorChange) {
+        onColorChange(newHue, newSaturation, value)
+      } else {
+        onHueChange(newHue)
+        onSaturationChange(newSaturation)
+      }
+    },
+    [value, onHueChange, onSaturationChange, onColorChange, wheelSize, wheelRadius, centerPos],
+  )
+
+  const wheelHandlers = usePointerDrag(wheelRef, updateWheel)
+
+  const handleValueChange = useCallback(
+    (newValue: number) => {
+      if (onColorChange) {
+        onColorChange(hue, saturation, newValue)
+      } else {
+        onValueChange(newValue)
+      }
+    },
+    [hue, saturation, onValueChange, onColorChange],
+  )
+
+  const hueRad = (hue / 255) * 2 * Math.PI - Math.PI / 2
+  const wheelCenterX = (saturation / 255) * Math.cos(hueRad) * 75 + centerPos
+  const wheelCenterY = (saturation / 255) * Math.sin(hueRad) * 75 + centerPos
+
+  const hueStops = useMemo(() => {
+    const stops = []
+    for (let i = 0; i <= 6; i++) {
+      const angle = (i / 6) * 360
+      stops.push({ angle, color: `hsl(${angle}, 100%, 50%)` })
+    }
+    return stops
+  }, [])
 
   // Nearest palette color index by HSV distance with circular hue
   const nearestIdx = useMemo(() => {
@@ -280,6 +341,13 @@ export function HSVColorPicker({
         >
           {t('editor.lighting.colorPicker.hsv')}
         </button>
+        <button
+          type="button"
+          className={toggleButtonClass(mode === 'wheel')}
+          onClick={() => setMode('wheel')}
+        >
+          {t('editor.rgbIndicator.colorWheel')}
+        </button>
       </div>
 
       {mode === 'palette' ? (
@@ -308,6 +376,63 @@ export function HSVColorPicker({
                 />
               )
             })}
+          </div>
+
+          {/* Color preview */}
+          <div
+            data-testid="color-preview"
+            className="h-8 w-full rounded border border-edge"
+            style={{ backgroundColor: hexStr }}
+          />
+        </>
+      ) : mode === 'wheel' ? (
+        <>
+          <div className="flex justify-center">
+            <div
+              className="relative rounded-full"
+              style={{
+                width: `${wheelSize}px`,
+                height: `${wheelSize}px`,
+                background: `conic-gradient(from 0deg, ${hueStops.map(s => s.color).join(', ')})`,
+              }}
+            >
+              <div
+                className="absolute inset-3 rounded-full"
+                style={{
+                  background: 'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)',
+                }}
+              />
+              <div
+                className="absolute inset-0 rounded-full"
+                style={{
+                  border: '2px solid rgba(0,0,0,0.3)',
+                }}
+              />
+              <svg
+                ref={wheelRef}
+                className="absolute inset-0 cursor-crosshair"
+                viewBox={`0 0 ${wheelSize} ${wheelSize}`}
+                style={{ touchAction: 'none' }}
+                {...wheelHandlers}
+              >
+                <circle
+                  cx={wheelCenterX}
+                  cy={wheelCenterY}
+                  r="12"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="3"
+                  className="pointer-events-none"
+                />
+                <circle
+                  cx={wheelCenterX}
+                  cy={wheelCenterY}
+                  r="6"
+                  fill="black"
+                  className="pointer-events-none"
+                />
+              </svg>
+            </div>
           </div>
 
           {/* Color preview */}
