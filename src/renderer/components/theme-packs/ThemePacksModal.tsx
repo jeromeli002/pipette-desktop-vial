@@ -487,7 +487,7 @@ export function ThemePacksModal({
               className="rounded border border-edge bg-surface px-3 py-1.5 text-sm font-medium text-content hover:bg-surface-hover"
               data-testid="theme-packs-import-button"
             >
-              {t('i18n.import')}
+              {t('themePacks.import')}
             </button>
           </div>
         )}

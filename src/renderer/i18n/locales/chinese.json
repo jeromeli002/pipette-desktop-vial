@@ -507,6 +507,7 @@
   "themePacks": {
     "manageRow": "主题包管理",
     "title": "主题包",
+    "edit": "管理主题包",
     "import": "导入主题包",
     "parseError": "解析文件失败",
     "selectTheme": "选择 {{name}}",
@@ -1458,10 +1459,10 @@
   "i18n": {
     "modalTitle": "系统语言包",
     "manageRow": "外置语言包管理",
-    "edit": "翻译主视图",
+    "edit": "管理语言包",
     "hubEmpty": "公共社区中心未能检索到对应的第三方语言翻译包",
     "search": "全网搜索语言",
-    "import": "导入 .json 语言包",
+    "import": "导入语言包",
     "errorGeneric": "执行语言包动作失败",
     "errorInvalidJson": "所选的文件未包含符合规范的 JSON 文本对象结构",
     "notSetKeys": "缺失翻译的键值",

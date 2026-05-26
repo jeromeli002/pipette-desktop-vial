@@ -507,6 +507,7 @@
   "themePacks": {
     "manageRow": "テーマパック管理",
     "title": "テーマパック",
+    "edit": "テーマパックを管理",
     "import": "テーマパックをインポート",
     "parseError": "ファイルの解析に失敗しました",
     "selectTheme": "{{name}} を選択",
@@ -1456,7 +1457,7 @@
     "missingClose": "閉じる"
   },
   "i18n": {
-    "edit": "編集",
+    "edit": "管理",
     "errorGeneric": "操作に失敗しました",
     "errorInvalidJson": "選択したファイルは有効な JSON ではありません",
     "hubEmpty": "Hub に該当する言語パックはありません",

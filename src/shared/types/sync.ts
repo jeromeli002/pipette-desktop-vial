@@ -101,6 +101,10 @@ export interface LocalResetTargets {
   appSettings: boolean
   i18nPacks?: boolean
   themePacks?: boolean
+  snapshots?: boolean
+  keyLabels?: boolean
+  typingAnalytics?: boolean
+  settings?: boolean
 }
 
 export interface UndecryptableFile {

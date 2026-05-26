@@ -47,7 +47,7 @@ export function pickHubProps(props: HubIntegrationProps): HubIntegrationProps {
 // Shell props
 // ---------------------------------------------------------------------------
 
-export interface KeycodeEntryModalShellProps<TEntry extends Record<string, unknown>> {
+export interface KeycodeEntryModalShellProps<TEntry extends Record<string, any>> {
   adapter: KeycodeEntryModalAdapter<TEntry>
   hook: KeycodeEntryModalReturn<TEntry>
   index: number
@@ -69,7 +69,7 @@ export interface KeycodeEntryModalShellProps<TEntry extends Record<string, unkno
 // Shell component
 // ---------------------------------------------------------------------------
 
-export function KeycodeEntryModalShell<TEntry extends Record<string, unknown>>({
+export function KeycodeEntryModalShell<TEntry extends Record<string, any>>({
   adapter,
   hook,
   index,

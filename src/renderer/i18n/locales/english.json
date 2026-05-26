@@ -507,6 +507,7 @@
   "themePacks": {
     "manageRow": "Theme Packs Manage",
     "title": "Theme Packs",
+    "edit": "Manage Theme Packs",
     "import": "Import Theme Pack",
     "parseError": "Failed to parse file",
     "selectTheme": "Select {{name}}",
@@ -1458,7 +1459,7 @@
   "i18n": {
     "modalTitle": "Language Packs",
     "manageRow": "Language Packs Manage",
-    "edit": "Edit",
+    "edit": "Manage",
     "hubEmpty": "No matching language packs on the Hub",
     "search": "Search",
     "import": "Import",

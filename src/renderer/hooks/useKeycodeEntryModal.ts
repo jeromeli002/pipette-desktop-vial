@@ -24,7 +24,7 @@ export interface KeycodeFieldDescriptor<TEntry> {
   labelOpts?: Record<string, unknown>
 }
 
-export interface KeycodeEntryModalAdapter<TEntry extends Record<string, unknown>> {
+export interface KeycodeEntryModalAdapter<TEntry extends Record<string, any>> {
   /** data-testid prefix, e.g. "combo", "ko", "ar", "td" */
   testIdPrefix: string
   /** data-testid for the body container, e.g. "editor-combo". Defaults to `editor-${testIdPrefix}` */
@@ -60,7 +60,7 @@ export interface KeycodeEntryModalAdapter<TEntry extends Record<string, unknown>
 // Options — passed by the modal component that uses the hook
 // ---------------------------------------------------------------------------
 
-export interface KeycodeEntryModalOptions<TEntry extends Record<string, unknown>> {
+export interface KeycodeEntryModalOptions<TEntry extends Record<string, any>> {
   entry: TEntry | undefined
   index: number
   onSave: (index: number, entry: TEntry) => Promise<void>
@@ -82,7 +82,7 @@ export interface KeycodeEntryModalOptions<TEntry extends Record<string, unknown>
 // Return type
 // ---------------------------------------------------------------------------
 
-export interface KeycodeEntryModalReturn<TEntry extends Record<string, unknown>> {
+export interface KeycodeEntryModalReturn<TEntry extends Record<string, any>> {
   // State
   editedEntry: TEntry | null
   setEditedEntry: React.Dispatch<React.SetStateAction<TEntry | null>>
@@ -124,7 +124,7 @@ export interface KeycodeEntryModalReturn<TEntry extends Record<string, unknown>>
 // Hook implementation
 // ---------------------------------------------------------------------------
 
-export function useKeycodeEntryModal<TEntry extends Record<string, unknown>>(
+export function useKeycodeEntryModal<TEntry extends Record<string, any>>(
   adapter: KeycodeEntryModalAdapter<TEntry>,
   options: KeycodeEntryModalOptions<TEntry>,
 ): KeycodeEntryModalReturn<TEntry> {
