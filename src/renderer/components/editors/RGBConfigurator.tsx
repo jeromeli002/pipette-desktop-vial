@@ -304,7 +304,7 @@ export function RGBConfigurator({
             >
               {QMK_RGBLIGHT_EFFECTS.map((fx) => (
                 <option key={fx.index} value={fx.index}>
-                  {fx.name}
+                  {t(`editor.lighting.rgblightEffects.${fx.index}`)}
                 </option>
               ))}
             </select>
@@ -394,7 +394,7 @@ export function RGBConfigurator({
             >
               {filteredVialRGBEffects.map((fx) => (
                 <option key={fx.index} value={fx.index}>
-                  {fx.name}
+                  {t(`editor.lighting.vialRGBEffects.${fx.index}`)}
                 </option>
               ))}
             </select>
