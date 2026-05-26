@@ -168,18 +168,31 @@ export function useKeymapSelectionHandlers({
   // --- Auto-advance ---
   const advancableKeys = useMemo(() => {
     if (!layout) return []
-    return layout.keys.filter((k) => !k.decal && k.encoderIdx < 0)
+    return layout.keys.filter((k) => !k.decal)
   }, [layout])
 
   const advanceToNextKey = useCallback(() => {
-    if (!autoAdvance || !selectedKey || advancableKeys.length === 0) return
-    const currentIdx = advancableKeys.findIndex((k) => k.row === selectedKey.row && k.col === selectedKey.col)
+    if (!autoAdvance || advancableKeys.length === 0) return
+
+    let currentIdx = -1
+    if (selectedKey) {
+      currentIdx = advancableKeys.findIndex((k) => k.row === selectedKey.row && k.col === selectedKey.col && k.encoderIdx < 0)
+    } else if (selectedEncoder) {
+      currentIdx = advancableKeys.findIndex((k) => k.encoderIdx === selectedEncoder.idx && k.encoderDir === selectedEncoder.dir)
+    }
+
     if (currentIdx >= 0 && currentIdx < advancableKeys.length - 1) {
       const next = advancableKeys[currentIdx + 1]
-      setSelectedKey({ row: next.row, col: next.col })
+      if (next.encoderIdx < 0) {
+        setSelectedKey({ row: next.row, col: next.col })
+        setSelectedEncoder(null)
+      } else {
+        setSelectedEncoder({ idx: next.encoderIdx, dir: next.encoderDir as 0 | 1 })
+        setSelectedKey(null)
+      }
       setSelectedMaskPart(false)
     }
-  }, [autoAdvance, advancableKeys, selectedKey])
+  }, [autoAdvance, advancableKeys, selectedKey, selectedEncoder])
 
   // --- TD/Macro modal openers ---
   const openTdModal = useCallback((rawCode: number) => {
@@ -297,6 +310,8 @@ export function useKeymapSelectionHandlers({
       const finalCode = resolveKeycode(currentCode, code, isMaskKey)
       await onSetEncoder(currentLayer, selectedEncoder.idx, selectedEncoder.dir, finalCode)
       history.push({ kind: 'encoder', layer: currentLayer, idx: selectedEncoder.idx, dir: selectedEncoder.dir, oldKeycode: currentCode, newKeycode: finalCode, maskPart: isMaskKey ? 'inner' : undefined })
+      if (!isMaskKey && isMask(kc.qmkId) && autoAdvance) setSelectedMaskPart(true)
+      else advanceToNextKey()
     } else {
       openTdModal(code); openMacroModal(code)
     }
