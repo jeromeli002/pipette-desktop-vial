@@ -1,7 +1,7 @@
 // USB HID parameters
 export const MSG_LEN = 32
 export const BUFFER_FETCH_CHUNK = 28
-export const HID_USAGE_PAGE = 0xff60
+export const HID_USAGE_PAGES = [0xff60, 0xff69]
 export const HID_USAGE = 0x61
 export const HID_REPORT_ID = 0x00
 

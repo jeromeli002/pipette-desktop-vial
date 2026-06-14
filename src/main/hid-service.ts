@@ -6,7 +6,7 @@ import HID from 'node-hid'
 import {
   MSG_LEN,
   BUFFER_FETCH_CHUNK,
-  HID_USAGE_PAGE,
+  HID_USAGE_PAGES,
   HID_USAGE,
   HID_REPORT_ID,
   HID_TIMEOUT_MS,
@@ -66,7 +66,7 @@ function acquireMutex(): { prev: Promise<void>; release: () => void } {
 function classifyDevice(serialNumber: string): DeviceType {
   if (serialNumber.includes(BOOTLOADER_SERIAL_MAGIC)) return 'bootloader'
   if (serialNumber.includes(VIAL_SERIAL_MAGIC)) return 'vial'
-  // Usage page 0xFF60 is Vial-specific; default to 'vial' when serial is unrecognized
+  // Usage page 0xFF60 and 0xFF69 are Vial-specific; default to 'vial' when serial is unrecognized
   return 'vial'
 }
 
@@ -90,14 +90,14 @@ function normalizeResponse(buf: Buffer, expectedLen: number): number[] {
 
 /**
  * List available Vial/VIA HID devices.
- * Filters by usage page 0xFF60 and usage 0x61.
+ * Filters by usage page 0xFF60/0xFF69 and usage 0x61.
  */
 export async function listDevices(): Promise<DeviceInfo[]> {
   const devices = await HID.devicesAsync()
   const result: DeviceInfo[] = []
 
   for (const d of devices) {
-    if (d.usagePage !== HID_USAGE_PAGE || d.usage !== HID_USAGE) continue
+    if (!HID_USAGE_PAGES.includes(d.usagePage) || d.usage !== HID_USAGE) continue
 
     const serial = d.serialNumber ?? ''
     const type = classifyDevice(serial)
@@ -139,7 +139,7 @@ export async function openHidDevice(vendorId: number, productId: number): Promis
     (d) =>
       d.vendorId === vendorId &&
       d.productId === productId &&
-      d.usagePage === HID_USAGE_PAGE &&
+      HID_USAGE_PAGES.includes(d.usagePage) &&
       d.usage === HID_USAGE,
   )
 
@@ -286,7 +286,7 @@ export async function probeDevice(vendorId: number, productId: number, serialNum
     (d) =>
       d.vendorId === vendorId &&
       d.productId === productId &&
-      d.usagePage === HID_USAGE_PAGE &&
+      HID_USAGE_PAGES.includes(d.usagePage) &&
       d.usage === HID_USAGE &&
       d.path !== openDevicePath && // Exclude the primary device
       (!serialNumber || (d.serialNumber ?? '') === serialNumber),

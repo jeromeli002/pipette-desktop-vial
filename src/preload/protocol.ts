@@ -837,3 +837,32 @@ export async function testRgbIndicatorOff(): Promise<void> {
   const pkt = buildRgbIndicatorPacket(RGB_INDICATOR_OFF)
   await sendReceive(Array.from(pkt))
 }
+
+/**
+ * Sync RGB indicator config from device.
+ * Sends: AB 81 00
+ * Receives: AB 82 00 XX (where XX is indicator type: 00=caps, 01=num, 02=scrl, 03=sleep, 10+=layer)
+ * Returns parsed config for caps lock indicator
+ */
+export async function syncRgbIndicatorCaps(): Promise<LedConfig> {
+  // Send sync command: AB 81 00
+  const pkt = new Uint8Array(MSG_LEN)
+  pkt[0] = RGB_INDICATOR_PREFIX
+  pkt[1] = 0x81
+  pkt[2] = 0x00
+  const resp = await sendReceive(Array.from(pkt))
+
+  // Parse response: AB 82 00 index count h s v
+  // Expected: [AB, 82, 00, index, count, h, s, v, ...]
+  if (resp[0] === RGB_INDICATOR_PREFIX && resp[1] === 0x82 && resp[2] === 0x00) {
+    return {
+      index: resp[3],
+      count: resp[4],
+      h: resp[5],
+      s: resp[6],
+      v: resp[7],
+    }
+  }
+
+  throw new Error('Invalid sync response')
+}
