@@ -146,9 +146,11 @@ Without this permission, Monitor App silently records `null` for every minute on
 | Import / Export (`.vil` · `.pipette` · `keymap.c` · PDF) | ✅ | ✅ |
 | Offline editing (`.pipette` without a keyboard) | ✅ | ✅ |
 | Typing Test & Typing View | ✅ | ✅ |
+| Analyze — typing analytics (heatmaps · ergonomics · bigrams · layout comparison · per-app) | ✅ | ✅ |
 | Download community language / theme / key-label packs from Hub | ✅ | ✅ |
 | Cloud Sync — snapshots / favorites / settings across devices | ❌ | ✅ |
 | Download remote-only keyboards on demand | ❌ | ✅ |
+| Sync typing analytics across devices | ❌ | ✅ |
 | Share keymaps to Hub | ❌ | ✅ (Hub) |
 | Share favorites (tap dance · macro · combo · …) to Hub | ❌ | ✅ (Hub) |
 | Share typing analytics to Hub | ❌ | ✅ (Hub) |
