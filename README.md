@@ -146,7 +146,7 @@ Without this permission, Monitor App silently records `null` for every minute on
 | Import / Export (`.vil` · `.pipette` · `keymap.c` · PDF) | ✅ | ✅ |
 | Offline editing (`.pipette` without a keyboard) | ✅ | ✅ |
 | Typing Test & Typing View | ✅ | ✅ |
-| **Download** community language / theme / key-label packs from Hub | ✅ | ✅ |
+| Download community language / theme / key-label packs from Hub | ✅ | ✅ |
 | Cloud Sync — snapshots / favorites / settings across devices | ❌ | ✅ |
 | Download remote-only keyboards on demand | ❌ | ✅ |
 | Share keymaps to Hub | ❌ | ✅ (Hub) |
