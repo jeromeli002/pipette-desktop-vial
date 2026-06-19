@@ -9,6 +9,7 @@ Screenshots were taken using a GPK60-63R keyboard unless otherwise noted.
 
 ## Table of Contents
 
+- [Feature Availability](#feature-availability)
 - [1. Device Connection](#1-device-connection)
   - [1.1 Device Selection Screen](#11-device-selection-screen)
   - [1.2 Connecting a Keyboard](#12-connecting-a-keyboard)
@@ -66,6 +67,32 @@ Screenshots were taken using a GPK60-63R keyboard unless otherwise noted.
 
 ---
 
+## Feature Availability
+
+What you can do depends on whether you connect a Google account. Editing and most local features work with no integration at all; signing in unlocks cross-device Cloud Sync, and connecting Pipette Hub additionally lets you share to the community.
+
+| Feature | No Integration | Google Account Integration |
+|---|:---:|:---:|
+| Keymap / macro / tap-dance / combo / key-override / alt-repeat editing | ✅ | ✅ |
+| RGB lighting · QMK settings · Matrix tester | ✅ | ✅ |
+| Snapshots & Favorites (local save / load) | ✅ | ✅ |
+| Import / Export (`.vil` · `.pipette` · `keymap.c` · PDF) | ✅ | ✅ |
+| Offline editing (`.pipette` without a keyboard) | ✅ | ✅ |
+| Typing Test & Typing View | ✅ | ✅ |
+| Analyze — typing analytics (heatmaps · ergonomics · bigrams · layout comparison · per-app) | ✅ | ✅ |
+| Download community language / theme / key-label packs from Hub | ✅ | ✅ |
+| Cloud Sync — snapshots / favorites / settings across devices | ❌ | ✅ |
+| Download remote-only keyboards on demand | ❌ | ✅ |
+| Sync typing analytics across devices | ❌ | ✅ |
+| Share keymaps to Hub | ❌ | ✅ (Hub) |
+| Share favorites (tap dance · macro · combo · …) to Hub | ❌ | ✅ (Hub) |
+| Share typing analytics to Hub | ❌ | ✅ (Hub) |
+| Publish your own language / theme / key-label packs | ❌ | ✅ (Hub) |
+
+> **Pipette Hub requires a connected Google account.** Rows marked **(Hub)** need Hub connected (set a Display Name in Settings → Data) in addition to Google sign-in. Cloud Sync also needs a sync encryption password. **Downloading community packs from Hub needs no sign-in at all.**
+
+---
+
 ## 1. Device Connection
 
 ### 1.1 Device Selection Screen
@@ -91,6 +118,8 @@ The File tab allows offline editing of `.pipette` files without a physical keybo
 
 > **Use case:** You want to tweak your keyboard's keymap, but the keyboard isn't with you right now. If you've previously saved its data, you can load it from the File tab, make your edits offline, and later connect the keyboard and load the modified data to apply your changes.
 
+> **Tip — Save a shared file under your own name:** Load a community or shared `.pipette` file (for example, one downloaded from Pipette Hub or sent by a friend), then open the Save panel (§3.14) and use **Save Current State** to store it under a name of your choice. It joins your saved keyboards and becomes selectable as a **File** source in the Keyboard tab (§3.13) — even for hardware you don't own.
+
 **Feature Availability: Device vs File Mode**
 
 | Feature | Device (USB) | File (.pipette) |
@@ -104,8 +133,8 @@ The File tab allows offline editing of `.pipette` files without a physical keybo
 | Lighting control | Yes | No |
 | Matrix Tester | Yes | No |
 | Lock / Unlock | Yes | No |
-| Snapshot save / load | Yes | No |
-| Hub upload | Yes | No |
+| Snapshot save / load | Yes | Yes |
+| Hub upload | Yes | Yes |
 | JSON sideload | Yes | No |
 | Device probe (Keyboard tab) | Yes | No |
 | Cloud Sync | Yes | No |
@@ -137,7 +166,7 @@ The left sidebar provides a **tree navigation** with the following structure:
 
 Per-entry actions in the favorites list:
 - Click to rename, delete, or **Export** individual entries
-- **Hub actions**: When Hub is connected, each entry shows **Upload to Hub** / **Update on Hub** / **Remove from Hub** buttons
+- **Hub actions**: When Hub is connected, each entry shows **Upload to Hub** / **Update on Hub** / **Remove from Hub** buttons. Uploading opens a Public / Private confirmation dialog (§7.2)
 - **Import** / **Export All** buttons at the footer for bulk operations
 
 A **breadcrumb navigation** at the top of the content area shows the current path (e.g., "Local › Favorites › Tap Dance")
@@ -196,7 +225,7 @@ The bookmark icon in the panel header opens the **Saved search conditions** side
 - Loading an entry written by a newer Pipette release shows an unsupported-version error rather than guessing at unknown fields
 - **Overwrite**: typing a label that already exists swaps the Save button to a danger-styled **Overwrite?** + Cancel pair. Editing the label clears the pending confirmation so you cannot overwrite a different entry by accident
 - **Load behavior**: loading a saved entry always opens on the **Summary** tab regardless of which tab was active when the condition was saved
-- **Hub actions**: when Pipette Hub is connected, each saved entry shows an additional Hub row with **Upload to Hub** / **Update on Hub** / **Remove from Hub** + **Open in Browser** — the same pattern as the keymap and favorites save panels (see §7.4)
+- **Hub actions**: when Pipette Hub is connected, each saved entry shows an additional Hub row with **Upload to Hub** / **Update on Hub** / **Remove from Hub** + **Open in Browser**. The row is labelled **Hub (Public)** or **Hub (Private)**, and uploading opens the Public / Private confirmation dialog — the same pattern as the keymap and favorites save panels (see §7.2, §7.4)
 
 #### Summary
 
@@ -888,6 +917,8 @@ Click the **File** button at the bottom to switch to the file source. This shows
 
 > **Note**: Only V2 format (`.pipette`) files are supported in the key picker. If a legacy V1 format file is selected, a warning is displayed prompting you to connect the keyboard and open the keymap to migrate the data.
 
+> **Tip — Build from keyboards you don't own:** The reference keyboard doesn't have to be one you physically own. Save a shared `.pipette` file under a name (§1.1), pick it as the **File** source here, then Ctrl+click / Shift+click to multi-select keys on the reference keyboard and click a key on your own keymap to paste them in. This lets you copy assignments from other people's layouts — or any keyboard you've collected — straight into yours, with no hardware connected.
+
 **Composite Keycodes**
 
 When clicking a composite key (e.g., `LT1(KC_SPC)`) in the picker, the full keycode is assigned as-is. Inner/outer parts are not split — the complete keycode is copied to the target key.
@@ -1197,8 +1228,8 @@ When Pipette Hub is connected, each saved entry also shows Hub actions:
 
 ![Inline Favorites — Hub Actions](screenshots/hub-fav-inline.png)
 
-- **Upload to Hub**: Upload the favorite entry to Pipette Hub as a feature post
-- **Update on Hub**: Re-upload the latest configuration to update the existing Hub post
+- **Upload to Hub**: Upload the favorite entry to Pipette Hub as a feature post — opens the Public / Private confirmation dialog (§7.2)
+- **Update on Hub**: Re-upload the latest configuration; the dialog can also switch the post between Public and Private
 - **Remove from Hub**: Delete the entry from Pipette Hub (two-step confirmation)
 - **Open in Browser**: Open the individual Hub post page in your browser
 
@@ -1611,13 +1642,26 @@ To upload a keymap to Hub:
 ![Upload Button](screenshots/hub-03-upload-button.png)
 
 4. Click the **Upload** button on the saved snapshot entry
-5. After uploading, the entry shows **Uploaded** status with **Open in Browser**, **Update**, and **Remove** buttons
+5. A confirmation dialog opens — choose **Public** or **Private** (see *Public vs Private* below), then click **Confirm**
+
+![Upload confirmation dialog](screenshots/hub-upload-confirm.png)
+
+6. After uploading, the entry's Hub row is labelled **Hub (Public)** or **Hub (Private)** and shows **Open in Browser**, **Update**, and **Remove** buttons
 
 ![Uploaded](screenshots/hub-04-uploaded.png)
 
-- **Open in Browser**: Opens the Hub page for this keymap
-- **Update**: Re-uploads the current keyboard state to update the existing Hub post
-- **Remove**: Removes the keymap from Hub
+- **Open in Browser**: For a public post, opens its Hub page. For a private post, copies/opens the secret share link.
+- **Update**: Opens the same confirmation dialog so you can re-upload **and** switch visibility (see below)
+- **Remove**: Removes the post from Hub (the private link stops working immediately)
+
+#### Public vs Private (Unlisted)
+
+Every upload (and every **Update**) opens a confirmation dialog with two choices:
+
+- **Public** — listed and searchable on Hub, just like before.
+- **Private (Unlisted)** — reachable only by a secret link; never listed or searchable. When you pick Private you also choose a **link expiry** (1 / 3 / 7 / 30 / 60 / 90 / 180 days; default 7 days). Private links always expire — the maximum is 180 days. The dialog previews the exact expiry date. The private link is stored locally and synced across your devices, so **Open in Browser** can hand it out at any time.
+
+**Switching visibility with Update.** Because a private post has no public page (and vice-versa), switching between Public and Private — or re-uploading a Private post — is performed as *delete + recreate*. This produces a **new share link and expiry**, so the dialog warns you before continuing. A plain Public → Public update keeps the same URL.
 
 > **Note**: Hub uploads include a `.pipette` file alongside the standard export formats, allowing other users to load the full keyboard state directly.
 
@@ -1629,9 +1673,9 @@ Individual favorite entries (Tap Dance, Macro, Combo, Key Override, Alt Repeat K
 
 1. Open any editor modal with the inline favorites panel, or use the Data modal from the device selection screen
 2. In the favorites list, each entry shows an **Upload to Hub** button when Hub is connected
-3. Click **Upload to Hub** to share the configuration
-4. After uploading, **Open in Browser**, **Update on Hub**, and **Remove from Hub** buttons appear
-5. Renaming a favorite that is uploaded to Hub also updates the title on Hub automatically
+3. Click **Upload to Hub** — the Public / Private confirmation dialog opens (see §7.2 *Public vs Private*)
+4. After uploading, the row is labelled **Hub (Public)** or **Hub (Private)** with **Open in Browser**, **Update on Hub**, and **Remove from Hub** buttons (Update re-opens the dialog and can switch visibility)
+5. Renaming a favorite that is uploaded to a public Hub post also updates the title on Hub automatically
 
 > **Note**: A Display Name must be set before uploading. If no Display Name is configured, a warning is shown instead of the Upload button.
 
@@ -1646,7 +1690,8 @@ Saved Analyze conditions can be uploaded to Hub, sharing your typing analytics c
 3. When Hub is connected, a **Hub** action row appears under each saved entry with an **Upload to Hub** button
 4. Click **Upload to Hub** — the category-picker modal opens in upload mode (see §1.4 Export / Upload)
 5. Select which chart categories to include, pick Layout Comparison targets and Per-app data if desired, then click **Upload**
-6. After uploading, the entry shows **Open in Browser**, **Update on Hub**, and **Remove from Hub** buttons
+6. The Public / Private confirmation dialog opens (see §7.2 *Public vs Private*); choose visibility (and, for Private, an expiry) and **Confirm**
+7. After uploading, the entry's Hub row is labelled **Hub (Public)** or **Hub (Private)** with **Open in Browser**, **Update on Hub**, and **Remove from Hub** buttons
 
 **Validation rules**
 
