@@ -29,6 +29,16 @@ import {
 import { logHidPacket } from './logger'
 import type { DeviceInfo, DeviceType, KeyboardDefinition, ProbeResult } from '../shared/types/protocol'
 import { decompressLzma, decompressXz, hasXzMagic } from './lzma'
+import {
+  isVirtualDeviceEnabled,
+  isVirtualDeviceExclusive,
+  getVirtualDeviceInfo,
+  matchesVirtualDevice,
+  openVirtualDevice,
+  closeVirtualDevice,
+  isVirtualDeviceOpen,
+  handleVirtualReport,
+} from './virtual-device'
 
 let openDevice: HID.HIDAsync | null = null
 let openDevicePath: string | null = null
@@ -93,6 +103,12 @@ function normalizeResponse(buf: Buffer, expectedLen: number): number[] {
  * Filters by usage page 0xFF60/0xFF69 and usage 0x61.
  */
 export async function listDevices(): Promise<DeviceInfo[]> {
+  // 'only' mode: hide real hardware so device lists (and doc screenshots)
+  // are reproducible regardless of what is plugged into the workstation.
+  if (isVirtualDeviceExclusive()) {
+    return [getVirtualDeviceInfo()]
+  }
+
   const devices = await HID.devicesAsync()
   const result: DeviceInfo[] = []
 
@@ -108,6 +124,10 @@ export async function listDevices(): Promise<DeviceInfo[]> {
       serialNumber: serial,
       type,
     })
+  }
+
+  if (isVirtualDeviceEnabled()) {
+    result.push(getVirtualDeviceInfo())
   }
 
   return result
@@ -130,8 +150,11 @@ function isTransientError(err: Error): boolean {
  * Retries with a delay to work around transient open failures on all platforms.
  */
 export async function openHidDevice(vendorId: number, productId: number): Promise<boolean> {
-  if (openDevice) {
-    await closeHidDevice()
+  await closeHidDevice()
+
+  if (isVirtualDeviceEnabled() && matchesVirtualDevice(vendorId, productId)) {
+    await openVirtualDevice()
+    return true
   }
 
   const devices = await HID.devicesAsync()
@@ -175,6 +198,12 @@ export async function closeHidDevice(): Promise<void> {
   }
   openDevice = null
   openDevicePath = null
+
+  // Always clear the virtual-open flag, not just when the feature flag is
+  // currently set: sendReceive()/send()/isDeviceOpen() route on
+  // isVirtualDeviceOpen() alone, so a stale open flag would keep hijacking
+  // HID calls if the env var changes between open and close.
+  closeVirtualDevice()
 }
 
 /**
@@ -205,6 +234,14 @@ export function sendReceive(data: number[]): Promise<number[]> {
 
   return prev.then(async () => {
     try {
+      if (isVirtualDeviceOpen()) {
+        const padded = padToMsgLen(data)
+        logHidPacket('TX', new Uint8Array(padded))
+        const result = handleVirtualReport(padded)
+        logHidPacket('RX', new Uint8Array(result))
+        return result
+      }
+
       if (!openDevice) {
         throw new Error('No HID device is open')
       }
@@ -249,6 +286,13 @@ export function send(data: number[]): Promise<void> {
 
   return prev.then(() => {
     try {
+      if (isVirtualDeviceOpen()) {
+        const padded = padToMsgLen(data)
+        logHidPacket('TX', new Uint8Array(padded))
+        handleVirtualReport(padded)
+        return
+      }
+
       if (!openDevice) {
         throw new Error('No HID device is open')
       }
@@ -267,6 +311,7 @@ export function send(data: number[]): Promise<void> {
  * Re-enumerates USB devices to detect physical disconnection.
  */
 export async function isDeviceOpen(): Promise<boolean> {
+  if (isVirtualDeviceOpen()) return true
   if (!openDevice || !openDevicePath) return false
   const devices = await HID.devicesAsync()
   const present = devices.some((d) => d.path === openDevicePath)

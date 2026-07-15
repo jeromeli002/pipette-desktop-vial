@@ -8,10 +8,13 @@ import type { Keycode } from '../../../shared/keycodes/keycodes'
 import type { BulkKeyEntry } from '../../hooks/useKeyboard'
 import { useUnlockGate } from '../../hooks/useUnlockGate'
 import type { TapDanceEntry } from '../../../shared/types/protocol'
+import type { ViewMatrixCell } from '../../../shared/types/pipette-settings'
+import type { MacroAction } from '../../../preload/macro'
 import { hasModifierKey } from './KeyboardPane'
 import type { PopoverState } from './keymap-editor-types'
 import type { UseKeymapMultiSelectReturn } from './useKeymapMultiSelect'
 import type { UseKeymapHistoryReturn, SingleHistoryEntry, HistoryEntry } from './useKeymapHistory'
+import { sortKeysByViewMatrix } from './view-matrix'
 
 /** Match a history entry against the current popover position, returning the keycode if matched. */
 function matchPopoverEntry(
@@ -35,6 +38,10 @@ export interface UseKeymapSelectionOptions {
   selectableKeys: KleKey[]
   // Key operations
   autoAdvance: boolean
+  /** Auto Move order override — see `PipetteSettings.viewMatrix`. Sorts
+   *  `advancableKeys` by each key's effective (override ?? physical)
+   *  position instead of raw definition order. */
+  viewMatrix?: Record<string, ViewMatrixCell>
   onSetKey: (layer: number, row: number, col: number, keycode: number) => Promise<void>
   onSetKeysBulk: (entries: BulkKeyEntry[]) => Promise<void>
   onSetEncoder: (layer: number, idx: number, dir: number, keycode: number) => Promise<void>
@@ -51,7 +58,7 @@ export interface UseKeymapSelectionOptions {
   macroCount?: number
   macroBufferSize?: number
   macroBuffer?: number[]
-  onSaveMacros?: (buffer: number[], parsedMacros?: unknown) => Promise<void>
+  onSaveMacros?: (buffer: number[], parsedMacros?: MacroAction[][]) => Promise<void>
 }
 
 export function useKeymapSelectionHandlers({
@@ -61,6 +68,7 @@ export function useKeymapSelectionHandlers({
   currentLayer,
   selectableKeys,
   autoAdvance,
+  viewMatrix,
   onSetKey,
   onSetKeysBulk,
   onSetEncoder,
@@ -79,8 +87,8 @@ export function useKeymapSelectionHandlers({
   const {
     multiSelectedKeys, setMultiSelectedKeys,
     selectionAnchor, setSelectionAnchor,
-    _selectionSourcePane, setSelectionSourcePane,
-    _selectionMode, setSelectionMode,
+    selectionSourcePane: _selectionSourcePane, setSelectionSourcePane,
+    selectionMode: _selectionMode, setSelectionMode,
     pickerSelected,
     clearMultiSelection,
     clearPickerSelection,
@@ -168,8 +176,9 @@ export function useKeymapSelectionHandlers({
   // --- Auto-advance ---
   const advancableKeys = useMemo(() => {
     if (!layout) return []
-    return layout.keys.filter((k) => !k.decal)
-  }, [layout])
+    const filtered = layout.keys.filter((k) => !k.decal && k.encoderIdx < 0)
+    return sortKeysByViewMatrix(filtered, viewMatrix)
+  }, [layout, viewMatrix])
 
   const advanceToNextKey = useCallback(() => {
     if (!autoAdvance || advancableKeys.length === 0) return
@@ -295,7 +304,12 @@ export function useKeymapSelectionHandlers({
   }, [handleDeselect])
 
   // --- Keycode handlers ---
-  const handleKeycodeSelect = useCallback(async (kc: Keycode) => {
+  // Only `.qmkId` is read below, so accept the picker's ad-hoc fallback
+  // shape too (findKeycode(qmkId) ?? { qmkId, label, keycode } in
+  // useLayoutPicker.tsx) — that fallback deliberately isn't a real
+  // `Keycode` instance since constructing one would register it in the
+  // class's global qmkId lookup maps for what may be a one-off/custom code.
+  const handleKeycodeSelect = useCallback(async (kc: Pick<Keycode, 'qmkId'>) => {
     clearPickerSelection(); clearPending()
     const code = deserialize(kc.qmkId)
     if (selectedKey) {

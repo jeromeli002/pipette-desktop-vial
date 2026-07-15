@@ -2,11 +2,26 @@
 
 // Screenshot capture script for Pipette operation guide documentation.
 // Usage: pnpm build && pnpm doc:screenshots
-import { _electron as electron } from '@playwright/test'
 import type { ElectronApplication, Page, Locator } from '@playwright/test'
-import { mkdirSync, writeFileSync, readFileSync, unlinkSync, existsSync } from 'node:fs'
+import { mkdirSync, writeFileSync, readFileSync, unlinkSync, existsSync, readdirSync, renameSync, rmdirSync, statSync, copyFileSync, constants as fsConstants } from 'node:fs'
 import { resolve, join } from 'node:path'
-import { dismissNotificationModal, isAvailable } from './doc-capture-common'
+import {
+  backupVirtualDeviceSettings,
+  clickThroughUnlock,
+  connectToDevice,
+  dismissNotificationModal,
+  escapeRegex,
+  isAvailable,
+  launchCaptureApp,
+  resetToEditorMode,
+  restoreVirtualDeviceSettings,
+  selectKeyboardViaFilterModal,
+  selectSnapshotViaFilterModal,
+  VIRTUAL_DEVICE_DISPLAY_NAME,
+  VIRTUAL_DEVICE_UID,
+  waitForTypingTestCountdown,
+  waitForUnlockDialog,
+} from './doc-capture-common'
 import {
   DUMMY_SNAPSHOTS,
   DUMMY_TA_UID,
@@ -20,11 +35,7 @@ import {
 
 const PROJECT_ROOT = resolve(import.meta.dirname, '../..')
 const SCREENSHOT_DIR = resolve(PROJECT_ROOT, 'docs/screenshots')
-const DEVICE_NAME = 'GPK60-63R'
-
-function escapeRegex(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&')
-}
+const DEVICE_NAME = VIRTUAL_DEVICE_DISPLAY_NAME
 
 // Click a tree-nav branch button only when it reports aria-expanded=false, so
 // repeat runs don't collapse an already-expanded branch via the toggle handler.
@@ -87,19 +98,29 @@ async function captureNamed(
   await takeScreenshot(page, `${name}.png`, '--', opts)
 }
 
-async function waitForUnlockDialog(page: Page): Promise<void> {
-  // The unlock dialog has no close button — it requires physical key presses.
-  // Wait up to 60 seconds for the dialog to disappear (user unlocks).
-  const unlockHeading = page.locator('h2', { hasText: /Unlock|unlock|アンロック/ })
-  if (!(await isAvailable(unlockHeading))) return
-
-  console.log('  Unlock dialog detected — waiting for physical unlock (up to 60s)...')
-  try {
-    await unlockHeading.waitFor({ state: 'detached', timeout: 60_000 })
-    console.log('  Keyboard unlocked!')
+// Clicks a segmented control's "on" option, runs `shot` to capture that
+// state, then clicks the "off" option back so later capture steps (and
+// a re-run of this helper) don't inherit the alternate segment. Shared
+// by the Heatmap Speed mode and Bigrams 3-gram captures, which only
+// differ in what `shot` screenshots.
+async function captureSegmentVariant(
+  page: Page,
+  onTestId: string,
+  offTestId: string,
+  shot: () => Promise<void>,
+): Promise<void> {
+  const onToggle = page.locator(`[data-testid="${onTestId}"]`)
+  if (!(await isAvailable(onToggle))) {
+    console.log(`  [warn] ${onTestId} not available — capture skipped`)
+    return
+  }
+  await onToggle.click()
+  await page.waitForTimeout(800)
+  await shot()
+  const offToggle = page.locator(`[data-testid="${offTestId}"]`)
+  if (await isAvailable(offToggle)) {
+    await offToggle.click()
     await page.waitForTimeout(500)
-  } catch {
-    console.log('  [warn] Unlock timed out')
   }
 }
 
@@ -137,39 +158,20 @@ async function switchOverlayTab(page: Page, tabTestId: string): Promise<boolean>
   return true
 }
 
-async function connectDevice(page: Page): Promise<boolean> {
-
-  const deviceList = page.locator('[data-testid="device-list"]')
-  const noDeviceMsg = page.locator('[data-testid="no-device-message"]')
-
-  try {
-    await Promise.race([
-      deviceList.waitFor({ state: 'visible', timeout: 10_000 }),
-      noDeviceMsg.waitFor({ state: 'visible', timeout: 10_000 }),
-    ])
-  } catch {
-    console.log('Timed out waiting for device list.')
+async function connectDevice(app: ElectronApplication, page: Page): Promise<boolean> {
+  if (!(await connectToDevice(page, DEVICE_NAME, { raceNoDeviceMessage: true }))) {
     return false
   }
-
-  if (!(await deviceList.isVisible())) {
-    console.log('No devices found.')
-    return false
-  }
-
-  const targetBtn = page
-    .locator('[data-testid="device-button"]')
-    .filter({ has: page.locator('.font-semibold', { hasText: new RegExp(`^${escapeRegex(DEVICE_NAME)}$`) }) })
-
-  if (!(await isAvailable(targetBtn))) {
-    console.log(`Device "${DEVICE_NAME}" not found.`)
-    return false
-  }
-
-  await targetBtn.click()
-  await page.locator('[data-testid="editor-content"]').waitFor({ state: 'visible', timeout: 20_000 })
-  await page.waitForTimeout(2000)
   console.log(`Connected to ${DEVICE_NAME}`)
+
+  // Per-keyboard view-mode auto-restore may reopen Typing View or Typing
+  // Test left behind by a prior helper run (doc-capture-typing-test.ts ends
+  // in Typing View). The virtual device resets to *locked* on every launch,
+  // so that persisted viewMode can also surface the Unlock dialog before the
+  // auto-restore can complete — clear it first, then reset back to the
+  // keymap editor so every phase starts from the same state.
+  await waitForUnlockDialog(app, page)
+  await resetToEditorMode(page)
   return true
 }
 
@@ -219,6 +221,11 @@ const DUMMY_FAVORITES: Record<string, { type: string; entries: { id: string; lab
       { id: 'doc-mc-2', label: 'Git Commit', filename: 'doc-mc-2.json', savedAt: '2026-02-22T16:00:00.000Z' },
     ],
   },
+  // Seeded empty so favorites saved locally on the capture machine cannot
+  // leak into the combo / key-override / alt-repeat detail screenshots.
+  combo: { type: 'combo', entries: [] },
+  keyOverride: { type: 'keyOverride', entries: [] },
+  altRepeatKey: { type: 'altRepeatKey', entries: [] },
 }
 
 // Playwright's electron.launch() uses a different userData path than the installed app.
@@ -255,6 +262,149 @@ function restoreFavorites(backups: Map<string, string | null>, favBase: string):
       try { unlinkSync(fp) } catch { /* ignore */ }
     }
   }
+}
+
+// --- Foreign keyboard-dir isolation (File tab reproducibility) ---
+
+interface ForeignKeyboardIsolation {
+  backupBase: string
+  moves: Array<{ from: string; to: string }>
+}
+
+// Any sync/keyboards/{uid} directory this capture session does not own is
+// leftover local user data (e.g. saves from a real keyboard once plugged into
+// the workstation). The File tab lists every keyboard with saved files that
+// is not currently connected, so such dirs would leak machine-specific
+// entries into file-tab.png. Move them aside for the session; moved back in
+// the cleanup path (also on failure — it runs in main()'s finally).
+function isolateForeignKeyboardDirs(userDataPath: string): ForeignKeyboardIsolation {
+  const kbBase = join(userDataPath, 'sync', 'keyboards')
+  const backupBase = join(userDataPath, `doc-capture-kb-backup-${process.pid}`)
+  const isolation: ForeignKeyboardIsolation = { backupBase, moves: [] }
+  if (!existsSync(kbBase)) return isolation
+
+  const allowed = new Set<string>([
+    ...DUMMY_SNAPSHOTS.map((kb) => kb.uid),
+    DUMMY_TA_UID,
+    VIRTUAL_DEVICE_UID,
+  ])
+  for (const name of readdirSync(kbBase)) {
+    if (allowed.has(name)) continue
+    const from = join(kbBase, name)
+    if (!statSync(from).isDirectory()) continue
+    mkdirSync(backupBase, { recursive: true })
+    const to = join(backupBase, name)
+    renameSync(from, to)
+    isolation.moves.push({ from, to })
+  }
+  if (isolation.moves.length > 0) {
+    console.log(`Isolated ${isolation.moves.length} foreign keyboard dir(s): ${isolation.moves.map((m) => m.from.split('/').pop()).join(', ')}`)
+  }
+  return isolation
+}
+
+// Move the contents of `src` (a backup dir) into `dest` (the restored
+// original location), merging entry-by-entry when `dest` already exists.
+// This happens when cloud sync recreated `sync/keyboards/{uid}/` mid-run and
+// wrote a fresh file into it — a plain directory-level renameSync would then
+// fail with ENOTEMPTY and strand the whole backup.
+//
+// - `dest` absent → fast-path rename the whole tree.
+// - `dest` present → for each entry in `src`: move it in if `dest` has no
+//   same-named entry; if both are directories, recurse one level so nested
+//   partial conflicts (e.g. `snapshots/`, `devices/`) get the same
+//   per-entry treatment; otherwise leave the entry in `src` (sync's copy is
+//   newer) and log the leftover path prominently so the user can reconcile.
+// `src` is removed only once fully emptied; a non-empty leftover is logged
+// so it is never silently stranded.
+function mergeDirInto(src: string, dest: string): void {
+  // Fast-path rename when `dest` is absent. The existsSync check is not a
+  // clobber guard — it only picks the cheap path. If `dest` races into
+  // existence between the check and the rename, renameSync on a *directory*
+  // fails safely rather than overwriting data: POSIX rename() over an
+  // existing non-empty dir → ENOTEMPTY, over a file → ENOTDIR; only an
+  // existing *empty* dir is replaced, which loses nothing. On such a
+  // failure we fall through to the per-entry merge.
+  if (!existsSync(dest)) {
+    try {
+      renameSync(src, dest)
+      return
+    } catch (err) {
+      if (!existsSync(dest)) {
+        console.error(`  [restore] failed to move ${src} to ${dest}:`, err)
+        return
+      }
+      // dest appeared concurrently — merge entry by entry below.
+    }
+  }
+
+  let entries: string[]
+  try {
+    entries = readdirSync(src)
+  } catch (err) {
+    console.error(`  [restore] failed to read backup dir ${src}:`, err)
+    return
+  }
+
+  for (const name of entries) {
+    const srcEntry = join(src, name)
+    const destEntry = join(dest, name)
+
+    if (statSync(srcEntry).isDirectory()) {
+      if (existsSync(destEntry) && !statSync(destEntry).isDirectory()) {
+        console.error(
+          `  [restore][conflict] ${destEntry} already exists as a file (written during this run) — kept it; your prior directory is preserved at ${srcEntry}, reconcile manually`,
+        )
+        continue
+      }
+      // Recurse: mergeDirInto's own fast path covers the absent-dest rename,
+      // and its directory renameSync cannot silently clobber (see above).
+      mergeDirInto(srcEntry, destEntry)
+      try {
+        if (readdirSync(srcEntry).length === 0) rmdirSync(srcEntry)
+      } catch { /* moved wholesale, or still holds unresolved conflicts */ }
+    } else {
+      // File entry: atomic no-clobber move. COPYFILE_EXCL makes the copy
+      // fail with EEXIST instead of overwriting, closing the TOCTOU window
+      // an existsSync-then-rename would leave open (rename() silently
+      // replaces an existing destination file, so a sync/app write landing
+      // between check and move would be lost). The backup copy is only
+      // unlinked after the copy succeeded.
+      try {
+        copyFileSync(srcEntry, destEntry, fsConstants.COPYFILE_EXCL)
+        unlinkSync(srcEntry)
+      } catch (err) {
+        if ((err as NodeJS.ErrnoException).code === 'EEXIST') {
+          console.error(
+            `  [restore][conflict] ${destEntry} already exists (written during this run) — kept the newer destination copy; your prior data is preserved at ${srcEntry}, reconcile manually`,
+          )
+        } else {
+          console.error(`  [restore] failed to move ${srcEntry} to ${destEntry}:`, err)
+        }
+      }
+    }
+  }
+
+  let remaining: string[] = []
+  try {
+    remaining = readdirSync(src)
+  } catch { /* already gone */ }
+  if (remaining.length === 0) {
+    try { rmdirSync(src) } catch { /* ignore */ }
+  } else {
+    console.error(`  [restore] ${remaining.length} unresolved conflict(s) left at ${src} — reconcile manually`)
+  }
+}
+
+function restoreForeignKeyboardDirs(isolation: ForeignKeyboardIsolation): void {
+  for (const { from, to } of isolation.moves) {
+    try {
+      mergeDirInto(to, from)
+    } catch (err) {
+      console.error(`  [restore] failed to merge ${to} back into ${from}:`, err)
+    }
+  }
+  try { rmdirSync(isolation.backupBase) } catch { /* absent or non-empty (failed restore) — keep it */ }
 }
 
 async function captureDataModal(page: Page): Promise<void> {
@@ -426,17 +576,17 @@ async function captureAnalyzePage(page: Page): Promise<void> {
     return
   }
 
-  // Analyze only lists keyboards with recorded data — skip cleanly if none.
-  const firstKbOption = page.locator('[data-testid^="analyze-kb-"]').first()
-  const firstKbValue = (await isAvailable(firstKbOption))
-    ? await firstKbOption.getAttribute('value')
-    : null
-  if (firstKbValue) {
-    await page.locator('[data-testid="analyze-filter-keyboard"]').selectOption(firstKbValue)
-    await page.waitForTimeout(500)
-  } else {
-    console.log('  [warn] no keyboards listed — capturing overview only')
+  // Keyboard selection lives in the staged filter modal behind the
+  // summary chip (chip -> keyboard select -> Apply). Every capture below
+  // must land on the seeded dummy keyboard (DUMMY_TA_UID) specifically —
+  // picking "whichever sorts first" can silently select a real, thin
+  // "GPK60-63R" dataset instead of the seeded "GPK60-63R (docs)" one,
+  // since the list is alphabetical and the plain name sorts first.
+  const selected = await selectKeyboardViaFilterModal(page, DUMMY_TA_UID)
+  if (!selected) {
+    console.log('  [warn] seeded keyboard not selectable — capturing overview only')
   }
+  const filterChip = page.locator('[data-testid="analyze-filter-chip"]')
 
   // Summary: default landing tab. Capture the four-card overview, then
   // surface the Goal Achievements modal from the Streak / Goal card.
@@ -465,18 +615,31 @@ async function captureAnalyzePage(page: Page): Promise<void> {
     console.log('  [skip] analyze-tab-summary not found')
   }
 
-  // App filter popover — opens the multi-select dropdown for the App
-  // chip in the common filter row. Captured as a full-page screenshot
-  // so the open state and the row context land together.
-  const appFilter = page.locator('[data-testid="analyze-filter-app"]')
-  if (await isAvailable(appFilter)) {
-    await appFilter.click()
-    await page.waitForTimeout(300)
-    await captureNamed(page, 'analyze-app-filter', { fullPage: true })
-    await page.keyboard.press('Escape')
-    await page.waitForTimeout(200)
+  // App filter popover — the multi-select now lives in the staged filter
+  // modal behind the summary chip. Captured as a full-page screenshot so
+  // the open popover and the modal context land together, then both are
+  // closed (Escape may close popover+modal together depending on event
+  // propagation, so the modal close is guarded).
+  if (await isAvailable(filterChip)) {
+    await filterChip.click()
+    await page.waitForTimeout(400)
+    const appFilter = page.locator('[data-testid="analyze-filter-app"]')
+    if (await isAvailable(appFilter)) {
+      await appFilter.click()
+      await page.waitForTimeout(300)
+      await captureNamed(page, 'analyze-app-filter', { fullPage: true })
+      await page.keyboard.press('Escape')
+      await page.waitForTimeout(200)
+    } else {
+      console.log('  [skip] analyze-filter-app not found')
+    }
+    const modalClose = page.locator('[data-testid="analyze-filter-modal-close"]')
+    if (await isAvailable(modalClose)) {
+      await modalClose.click()
+      await page.waitForTimeout(300)
+    }
   } else {
-    console.log('  [skip] analyze-filter-app not found')
+    console.log('  [skip] analyze-filter-chip not found — app filter capture skipped')
   }
 
   // Filter Store side panel — toggle open, capture the panel as an
@@ -497,21 +660,10 @@ async function captureAnalyzePage(page: Page): Promise<void> {
     console.log('  [skip] analyze-filter-store-toggle not found')
   }
 
-  // Snapshot timeline — focused element capture, no tab switch needed.
-  // The element is a `<label>` wrapper that Playwright may report as not
-  // visible when nothing is rendered inside; treat the failure as a skip
-  // so the rest of the Analyze captures keep running.
-  const snapTimeline = page.locator('[data-testid="analyze-snapshot-timeline"]')
-  if (await isAvailable(snapTimeline)) {
-    try {
-      await captureNamed(page, 'analyze-snapshot-timeline', { element: snapTimeline })
-    } catch (err) {
-      const msg = err instanceof Error ? err.message.split('\n')[0] : 'unknown'
-      console.log(`  [warn] analyze-snapshot-timeline capture failed — ${msg}`)
-    }
-  } else {
-    console.log('  [skip] analyze-snapshot-timeline not found')
-  }
+  // The standalone snapshot-timeline capture was removed with the inline
+  // quick-selector: the snapshot pick now lives in the filter modal's
+  // Keymap row and `analyze-snapshot-timeline.png` was never referenced
+  // by the operation guides.
 
   // Heatmap: requires a snapshot; empty state is captured if none exists.
   const heatmapTab = page.locator('[data-testid="analyze-tab-keyHeatmap"]')
@@ -519,6 +671,15 @@ async function captureAnalyzePage(page: Page): Promise<void> {
     await heatmapTab.click()
     await page.waitForTimeout(800)
     await captureNamed(page, 'analyze-heatmap', { fullPage: true })
+
+    // Speed mode: switch the Count/Speed toggle, capture, then switch back
+    // to Count. Mirrors the bigrams gram-toggle capture below.
+    await captureSegmentVariant(
+      page,
+      'analyze-keyheatmap-mode-toggle-speed',
+      'analyze-keyheatmap-mode-toggle-count',
+      () => captureNamed(page, 'analyze-heatmap-speed', { fullPage: true }),
+    )
   } else {
     console.log('  [skip] analyze-tab-keyHeatmap not found')
   }
@@ -609,24 +770,18 @@ async function captureAnalyzePage(page: Page): Promise<void> {
     if (await isAvailable(viewModeSelect)) {
       await viewModeSelect.selectOption('learning')
       await page.waitForTimeout(800)
-      const snapshotSelect = page.locator('[data-testid="analyze-snapshot-timeline-select"]')
-      const optionCount = (await snapshotSelect.locator('option').count().catch(() => 0))
-      if (optionCount >= 2) {
-        const olderValue = await snapshotSelect.locator('option').nth(1).getAttribute('value')
-        if (olderValue) {
-          await snapshotSelect.selectOption(olderValue)
-          // Wait for the range update + matrix-cells-by-day re-fetch to settle.
-          await page.waitForTimeout(1500)
-        }
-      } else {
+      // Snapshot pivot goes through the staged filter modal (chip ->
+      // Keymap row -> Apply); settleMs covers the range update +
+      // matrix-cells-by-day re-fetch.
+      const pivoted = await selectSnapshotViaFilterModal(page, 1, { settleMs: 1500 })
+      if (!pivoted) {
         console.log('  [warn] only one snapshot present — learning curve may render empty')
       }
       await captureNamed(page, 'analyze-ergonomics-learning', { fullPage: true })
-      if (optionCount >= 2) {
+      if (pivoted) {
         // Reset to "Current keymap" (option index 0) so the captures
         // that follow keep the latest snapshot's 4-hour active window.
-        await snapshotSelect.selectOption({ index: 0 })
-        await page.waitForTimeout(800)
+        await selectSnapshotViaFilterModal(page, 0, { settleMs: 800 })
       }
       await viewModeSelect.selectOption('snapshot')
       await page.waitForTimeout(400)
@@ -670,6 +825,23 @@ async function captureAnalyzePage(page: Page): Promise<void> {
     } else {
       console.log('  [warn] analyze-bigrams-content not visible — capture skipped')
     }
+
+    // 3-gram view: switch the gram toggle, capture the root (toggle +
+    // content) so the "3-gram" segment reads as active in the shot, then
+    // switch back to 2-gram.
+    await captureSegmentVariant(
+      page,
+      'analyze-bigrams-gram-toggle-3',
+      'analyze-bigrams-gram-toggle-2',
+      async () => {
+        const bigramsRoot = page.locator('[data-testid="analyze-bigrams-root"]')
+        if (await isAvailable(bigramsRoot)) {
+          await captureNamed(page, 'analyze-bigrams-trigram', { element: bigramsRoot })
+        } else {
+          console.log('  [warn] analyze-bigrams-root not visible — trigram capture skipped')
+        }
+      },
+    )
   } else {
     console.log('  [skip] analyze-tab-bigrams not found')
   }
@@ -880,8 +1052,14 @@ async function captureKeyboardTab(page: Page): Promise<void> {
   // Capture device list view
   await captureNamed(page, 'keyboard-tab-device-list', { fullPage: true })
 
-  // Click the connected device to show its keymap
-  const deviceBtn = editorContent.locator('button', { hasText: new RegExp(escapeRegex(DEVICE_NAME)) })
+  // Click the connected device to show its keymap. The tile's text is
+  // "{productName}›" (name span + chevron span), so an anchored regex on the
+  // whole button would never match — anchor the exact name against the inner
+  // `.font-medium` name span instead, mirroring connectToDevice's structure,
+  // so a device whose name merely contains DEVICE_NAME can't match.
+  const deviceBtn = editorContent
+    .locator('button')
+    .filter({ has: page.locator('.font-medium', { hasText: new RegExp(`^${escapeRegex(DEVICE_NAME)}$`) }) })
   if (await isAvailable(deviceBtn)) {
     await deviceBtn.first().click()
     await page.waitForTimeout(500)
@@ -898,7 +1076,7 @@ async function captureKeyboardTab(page: Page): Promise<void> {
 
 // --- Phase 5: Toolbar / Sidebar ---
 
-async function captureSidebarTools(page: Page): Promise<void> {
+async function captureSidebarTools(app: ElectronApplication, page: Page): Promise<void> {
   console.log('\n--- Phase 5: Toolbar ---')
 
   await captureNamed(page, 'toolbar', { fullPage: true })
@@ -921,9 +1099,9 @@ async function captureSidebarTools(page: Page): Promise<void> {
 
   const typingTestBtn = page.locator('[data-testid="typing-test-button"]')
   if (await isAvailable(typingTestBtn)) {
-    await typingTestBtn.click()
-    await waitForUnlockDialog(page)
-    await page.waitForTimeout(1000)
+    await clickThroughUnlock(app, page, typingTestBtn)
+    await waitForTypingTestCountdown(page)
+    await page.waitForTimeout(500)
     await captureNamed(page, 'typing-test', { fullPage: true })
     await dismissNotificationModal(page)
     // Forcefully remove all fixed overlay/modal elements that block interaction
@@ -1424,11 +1602,24 @@ async function captureMacroEditModal(page: Page): Promise<void> {
   await page.waitForTimeout(300)
 
   // Prefer an already-configured macro so the screenshot reflects a real list/edit UI
-  // without mutating device state. If none are configured we skip.
-  const configuredTile = page.locator('[data-testid^="macro-tile-"][data-configured]').first()
-  if (!(await isAvailable(configuredTile))) {
+  // without mutating device state. If none are configured we skip. Macro tile 0 is
+  // seeded as a text-only macro ("Hello") with no keycode field, so the edit-mode
+  // capture below would find nothing to click — skip it in favor of another
+  // configured tile (e.g. macro tile 1, seeded as a tap-KC_A action) whenever one
+  // exists.
+  const configuredTiles = page.locator('[data-testid^="macro-tile-"][data-configured]')
+  const configuredCount = await configuredTiles.count()
+  if (configuredCount === 0) {
     console.log('  [skip] No configured macro tile found — configure a macro on the device first')
     return
+  }
+  let configuredTile = configuredTiles.first()
+  for (let i = 0; i < configuredCount; i++) {
+    const candidate = configuredTiles.nth(i)
+    if ((await candidate.getAttribute('data-testid')) !== 'macro-tile-0') {
+      configuredTile = candidate
+      break
+    }
   }
 
   // Deselect any keymap key left selected by earlier phases; otherwise clicking a
@@ -1481,37 +1672,79 @@ async function captureMacroEditModal(page: Page): Promise<void> {
 async function main(): Promise<void> {
   mkdirSync(SCREENSHOT_DIR, { recursive: true })
 
-  console.log('Launching Electron app...')
-  const app = await electron.launch({
-    args: [
-      resolve(PROJECT_ROOT, 'out/main/index.js'),
-      '--no-sandbox',
-      '--disable-gpu-sandbox',
-    ],
-    cwd: PROJECT_ROOT,
-  })
-
-  // Resolve actual userData path from the running Electron process
-  const userDataPath = await app.evaluate(async ({ app: a }) => a.getPath('userData'))
-  const favBase = join(userDataPath, 'sync', 'favorites')
+  // Resolve the real userData path with a throwaway launch, then close it
+  // before seeding. `ensureCacheIsFresh` (typing-analytics' SQLite cache
+  // rebuild) runs once, fire-and-forget, during this same process's
+  // `app.whenReady()` — it races the seed writes below whenever they land in
+  // the same process's boot window, and there is no periodic recheck
+  // afterward (see analyze-seed.ts: sync_state.json is only consulted "on
+  // next launch"). If that boot-time rebuild wins the race, it captures an
+  // empty JSONL snapshot and the seeded keyboard never appears in this
+  // process's cache for the rest of its life, no matter what we write to
+  // disk afterward — this is what silently emptied the Analyze screenshots.
+  // Closing this throwaway app and relaunching fresh (below) after every
+  // seed file is already on disk removes the race entirely: the real
+  // capture session's own boot is guaranteed to see the seeded JSONL files
+  // and the already-deleted sync_state.json together.
+  console.log('Launching Electron app (virtual device) to resolve userData...')
+  const primerApp = await launchCaptureApp()
+  let userDataPath: string
+  try {
+    userDataPath = await primerApp.evaluate(async ({ app: a }) => a.getPath('userData'))
+  } finally {
+    // Fail closed: a primer that refuses to die could still run its
+    // fire-and-forget analytics rebuild and recreate sync_state.json AFTER
+    // the seeding below deletes it, silently reintroducing the boot race
+    // this primer exists to prevent. Aborting is safer than continuing.
+    await primerApp.close()
+  }
   console.log(`userData: ${userDataPath}`)
 
-  // Seed dummy data into the correct directories
-  const favBackups = seedDummyFavorites(favBase)
-  const kbBase = join(userDataPath, 'sync', 'keyboards')
-  const snapBackups = seedDummySnapshots(kbBase)
-  const taBackup = await seedDummyTypingAnalytics(userDataPath, Date.now())
-  const filterStoreBackups = seedDummyFilterStore(kbBase)
-  console.log(
-    `Seeded dummy data: fav=${favBackups.size} entries, snap=${DUMMY_SNAPSHOTS.length} keyboards, typing-analytics=${DUMMY_TA_UID}, filter-store=${filterStoreBackups.size} files`,
-  )
+  const favBase = join(userDataPath, 'sync', 'favorites')
 
-  const page = await app.firstWindow()
-  await page.waitForLoadState('domcontentloaded')
-  await page.setViewportSize({ width: 1320, height: 960 })
-  await page.waitForTimeout(3000)
+  // Move aside keyboard dirs this session does not own. From this point on
+  // the try/finally below owns putting them back: every seed/capture step —
+  // including the seeding itself — runs inside the try, and each cleanup
+  // step in the finally is guarded independently so no single failure can
+  // strand user data in the backup dir.
+  const kbBase = join(userDataPath, 'sync', 'keyboards')
+  const foreignKbIsolation = isolateForeignKeyboardDirs(userDataPath)
+
+  // The virtual device's uid is allowlisted above (never isolated), so this
+  // is independent of foreignKbIsolation. Phase 5 (captureSidebarTools)
+  // toggles Typing Test on the virtual device and persists `viewMode` into
+  // its pipette_settings.json; e2e/virtual-device.test.ts shares the same
+  // default userData and would otherwise auto-restore that leaked mode on
+  // its next connect. Snapshot it now and restore in the finally below.
+  const virtualDeviceSettingsBackup = backupVirtualDeviceSettings(userDataPath)
+
+  let favBackups: Map<string, string | null> | null = null
+  let snapBackups: Map<string, string | null> | null = null
+  let taBackup: Awaited<ReturnType<typeof seedDummyTypingAnalytics>> | null = null
+  let filterStoreBackups: Map<string, string | null> | null = null
+  let app: ElectronApplication | null = null
 
   try {
+    favBackups = seedDummyFavorites(favBase)
+    snapBackups = seedDummySnapshots(kbBase)
+    taBackup = await seedDummyTypingAnalytics(userDataPath, Date.now())
+    filterStoreBackups = seedDummyFilterStore(kbBase)
+    console.log(
+      `Seeded dummy data: fav=${favBackups.size} entries, snap=${DUMMY_SNAPSHOTS.length} keyboards, typing-analytics=${DUMMY_TA_UID}, filter-store=${filterStoreBackups.size} files`,
+    )
+
+    // Every seed file (including the deleted sync_state.json) is on disk
+    // now, so this launch's own `ensureCacheIsFresh` deterministically
+    // rebuilds the typing-analytics cache from it before the renderer
+    // queries the keyboard list — no race with the seed writes above.
+    console.log('Launching Electron app (virtual device) for capture...')
+    app = await launchCaptureApp()
+
+    const page = await app.firstWindow()
+    await page.waitForLoadState('domcontentloaded')
+    await page.setViewportSize({ width: 1320, height: 960 })
+    await page.waitForTimeout(3000)
+
     // First post-launch call: wait a bit for the async startup-notification
     // fetch to land so we don't race past it and capture a later screen with
     // the modal still up.
@@ -1519,9 +1752,9 @@ async function main(): Promise<void> {
     await captureDeviceSelection(page)       // 01
     await captureDataModal(page)             // 02
     await captureSettingsModal(page)         // named: settings-troubleshooting, settings-defaults
-    await captureAnalyzePage(page)           // named: analyze-heatmap, analyze-wpm-time-series, analyze-wpm-time-of-day, analyze-interval-time-series, analyze-interval-distribution, analyze-activity-keystrokes, analyze-activity-calendar, analyze-ergonomics, analyze-ergonomics-learning, analyze-finger-assignment-modal, analyze-layer-keystrokes, analyze-layer-activations
+    await captureAnalyzePage(page)           // named: analyze-heatmap, analyze-heatmap-speed, analyze-wpm-time-series, analyze-wpm-time-of-day, analyze-interval-time-series, analyze-interval-distribution, analyze-activity-keystrokes, analyze-activity-calendar, analyze-ergonomics, analyze-ergonomics-learning, analyze-finger-assignment-modal, analyze-layer-keystrokes, analyze-layer-activations
 
-    const connected = await connectDevice(page)
+    const connected = await connectDevice(app, page)
     if (!connected) {
       console.log('Failed to connect. Only device selection screenshots captured.')
       return
@@ -1532,7 +1765,7 @@ async function main(): Promise<void> {
     await captureLayerNavigation(page)       // 04-06
     await captureKeycodeCategories(page)     // 07+ (count varies by keyboard features)
     await captureKeyboardTab(page)           // keyboard-tab-device-list, keyboard-tab-keymap
-    await captureSidebarTools(page)          // toolbar, zoom, typing-test
+    await captureSidebarTools(app, page)     // toolbar, zoom, typing-test
     await captureModalEditors(page)          // lighting, combo, ko, ar (when available)
     await captureJsonEditors(page)           // json-editor-tap-dance, json-editor-macro
     await captureEditorSettings(page)        // editor-settings-save
@@ -1547,11 +1780,25 @@ async function main(): Promise<void> {
 
     console.log(`\nAll screenshots saved to: ${SCREENSHOT_DIR}`)
   } finally {
-    await app.close()
-    restoreFavorites(favBackups, favBase)
-    restoreSnapshots(snapBackups)
-    restoreTypingAnalytics(taBackup)
-    restoreFilterStore(filterStoreBackups)
+    // Each cleanup step is guarded on its own: a failure is logged but never
+    // prevents the remaining steps from running.
+    const cleanup = (label: string, fn: () => void): void => {
+      try {
+        fn()
+      } catch (err) {
+        console.error(`  [cleanup] ${label} failed:`, err)
+      }
+    }
+    if (app) await app.close().catch((err: unknown) => console.error('  [cleanup] app.close failed:', err))
+    // User data first: foreign dirs are disjoint from every seeded path, and
+    // the cache/sync_state deletion inside restoreTypingAnalytics only forces
+    // a rebuild on next boot — order relative to it is safe.
+    cleanup('restore foreign keyboard dirs', () => restoreForeignKeyboardDirs(foreignKbIsolation))
+    cleanup('restore virtual device settings', () => restoreVirtualDeviceSettings(virtualDeviceSettingsBackup))
+    cleanup('restore favorites', () => { if (favBackups) restoreFavorites(favBackups, favBase) })
+    cleanup('restore snapshots', () => { if (snapBackups) restoreSnapshots(snapBackups) })
+    cleanup('restore typing analytics', () => { if (taBackup) restoreTypingAnalytics(taBackup) })
+    cleanup('restore filter store', () => { if (filterStoreBackups) restoreFilterStore(filterStoreBackups) })
   }
 }
 

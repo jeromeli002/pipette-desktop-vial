@@ -85,7 +85,10 @@ export const IpcChannels = {
 
   // Pipette Settings Store (renderer → main → renderer)
   PIPETTE_SETTINGS_GET: 'pipette-settings:get',
-  PIPETTE_SETTINGS_SET: 'pipette-settings:set',
+  PIPETTE_SETTINGS_PATCH: 'pipette-settings:patch',
+  // Typing-test results pooled across every locally-stored keyboard, for the
+  // Measurement-row comparison baseline (keyboard-agnostic).
+  PIPETTE_SETTINGS_LIST_ALL_TYPING_RESULTS: 'pipette-settings:list-all-typing-results',
 
   // Typing Analytics (renderer ↔ main)
   TYPING_ANALYTICS_EVENT: 'typing-analytics:event',
@@ -148,6 +151,8 @@ export const IpcChannels = {
    * collected into the `appScopes` array passed to every per-app-aware
    * range query. */
   TYPING_ANALYTICS_LIST_APPS_FOR_RANGE: 'typing-analytics:list-apps-for-range',
+  TYPING_ANALYTICS_LIST_TYPING_TESTS_FOR_RANGE: 'typing-analytics:list-typing-tests-for-range',
+  TYPING_ANALYTICS_LIST_TYPING_TEST_RUNS_FOR_RANGE: 'typing-analytics:list-typing-test-runs-for-range',
   /** Per-app keystroke / activeMs aggregate over the analyze range.
    * Backs the App Usage Distribution pie chart. */
   TYPING_ANALYTICS_GET_APP_USAGE_FOR_RANGE: 'typing-analytics:get-app-usage-for-range',
@@ -155,14 +160,29 @@ export const IpcChannels = {
    * analyze range. Backs the "WPM by App" bar chart. */
   TYPING_ANALYTICS_GET_WPM_BY_APP_FOR_RANGE: 'typing-analytics:get-wpm-by-app-for-range',
 
+  // Typing Test Text Store (renderer → main → renderer)
+  TYPING_TEST_TEXT_LIST: 'typing-test-text:list',
+  TYPING_TEST_TEXT_GET: 'typing-test-text:get',
+  TYPING_TEST_TEXT_RENAME: 'typing-test-text:rename',
+  TYPING_TEST_TEXT_DELETE: 'typing-test-text:delete',
+  TYPING_TEST_TEXT_IMPORT: 'typing-test-text:import',
+  TYPING_TEST_TEXT_IMPORT_CONFIRM: 'typing-test-text:import-confirm',
+
   // Language Store (renderer → main → renderer)
   LANG_LIST: 'lang:list',
   LANG_GET: 'lang:get',
   LANG_DOWNLOAD: 'lang:download',
   LANG_DELETE: 'lang:delete',
+  TYPING_DATASET_CHECK: 'typing-dataset:check',
+  TYPING_DATASET_UPDATE: 'typing-dataset:update',
+
+  // Aozora Bunko catalog import (renderer → main → renderer)
+  AOZORA_IMPORT: 'aozora:import',
 
   // Data management (renderer → main → renderer)
   LIST_STORED_KEYBOARDS: 'data:list-stored-keyboards',
+  // Record a keyboard's display name on connect, only when it has none yet.
+  KEYBOARD_META_NAME_IF_MISSING: 'data:keyboard-meta-name-if-missing',
   RESET_KEYBOARD_DATA: 'data:reset-keyboard',
   RESET_LOCAL_TARGETS: 'data:reset-local-targets',
   EXPORT_LOCAL_DATA: 'data:export-local',
@@ -283,4 +303,10 @@ export const IpcChannels = {
   WINDOW_SET_MIN_SIZE: 'window:set-min-size',
   WINDOW_IS_ALWAYS_ON_TOP_SUPPORTED: 'window:is-always-on-top-supported',
   WINDOW_SET_ZOOM: 'window:set-zoom',
+  WINDOW_SHOW: 'window:show',
+  WINDOW_HIDE: 'window:hide',
+  WINDOW_STARTED_HIDDEN: 'window:started-hidden',
+
+  // Tray status (renderer → main)
+  TRAY_STATUS_UPDATE: 'tray:status-update',
 } as const

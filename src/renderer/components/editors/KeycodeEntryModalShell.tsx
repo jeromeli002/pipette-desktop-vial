@@ -47,7 +47,7 @@ export function pickHubProps(props: HubIntegrationProps): HubIntegrationProps {
 // Shell props
 // ---------------------------------------------------------------------------
 
-export interface KeycodeEntryModalShellProps<TEntry extends Record<string, any>> {
+export interface KeycodeEntryModalShellProps<TEntry> {
   adapter: KeycodeEntryModalAdapter<TEntry>
   hook: KeycodeEntryModalReturn<TEntry>
   index: number
@@ -69,7 +69,7 @@ export interface KeycodeEntryModalShellProps<TEntry extends Record<string, any>>
 // Shell component
 // ---------------------------------------------------------------------------
 
-export function KeycodeEntryModalShell<TEntry extends Record<string, any>>({
+export function KeycodeEntryModalShell<TEntry>({
   adapter,
   hook,
   index,
@@ -161,7 +161,7 @@ export function KeycodeEntryModalShell<TEntry extends Record<string, any>>({
     return (
       <KeyPopover
         anchorRect={popoverState.anchorRect}
-        currentKeycode={editedEntry[popoverState.field] as number}
+        currentKeycode={(editedEntry as Record<string, unknown>)[popoverState.field] as number}
         onKeycodeSelect={handlePopoverKeycodeSelect}
         onRawKeycodeSelect={handlePopoverRawKeycodeSelect}
         onClose={closePopover}
