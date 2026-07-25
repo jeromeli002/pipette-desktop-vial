@@ -1,5 +1,5 @@
 {
-  "version": "0.1.19",
+  "version": "0.1.43",
   "name": "Japanese - 京言葉",
   "common": {
     "save": "保存しますえ",
@@ -27,6 +27,7 @@
     "exported": "書き出しましたえ",
     "imported": "入れましたえ",
     "load": "読み込みますえ",
+    "confirmLoad": "読み込んでもよろしおすか？",
     "labelPlaceholder": "ラベル",
     "noLabel": "（ラベルおへん）",
     "synced": "同期しましたえ",
@@ -35,7 +36,15 @@
     "installed": "入れてありますえ",
     "searchPlaceholder": "Pipette Hub を検索しますえ（2文字以上で）…",
     "done": "完了しましたえ",
-    "edit": "編集しますえ"
+    "edit": "編集しますえ",
+    "sortByName": "お名前どすえ",
+    "importing": "インポートしてますえ…",
+    "importedNamed": "{{name}} を入れましたえ",
+    "updatedNamed": "{{name}} を更新しましたえ",
+    "importBatchFailed_one": "{{count}} 件、インポートできまへんでしたわ",
+    "importBatchFailed_other": "{{count}} 件、インポートできまへんでしたわ",
+    "importSummary_one": "{{count}} 件インポートしましたえ (成功{{success}}、失敗{{failure}})",
+    "importSummary_other": "{{count}} 件インポートしましたえ (成功{{success}}、失敗{{failure}})"
   },
   "app": {
     "title": "Pipette",
@@ -98,6 +107,7 @@
       "previousLayers": "前のレイヤーどすえ",
       "nextLayers": "次のレイヤーどすえ",
       "layerN": "Layer {{n}}",
+      "layerPreview": "プレビューどすえ - {{label}}",
       "undo": "元に戻しますえ",
       "redo": "やり直しますえ",
       "zoomIn": "大きゅうしますえ",
@@ -376,7 +386,6 @@
       "alwaysOnTop": "最前面どすえ",
       "recordStart": "始めますえ",
       "recordStop": "止めますえ",
-      "viewAnalytics": "分析ビュー",
       "tab": {
         "window": "ウィンドウ",
         "rec": "REC"
@@ -620,7 +629,6 @@
     "autoAdvance": "自動移動",
     "locked": "ロック中どすえ",
     "unlocked": "アンロックどすえ",
-    "keyTester": "キーテスター",
     "sync": {
       "pending": "同期待ちどすえ",
       "syncing": "同期してますえ…",
@@ -740,7 +748,6 @@
     "defaultLayout": "キーラベル",
     "defaultAutoAdvance": "自動移動",
     "defaultLayerPanelOpen": "レイヤーリスト展開",
-    "defaultBasicViewType": "Basic タブ表示",
     "defaultSplitKeyMode": "キーピッカーでShiftキーを分離",
     "defaultQuickSelect": "キーの即時選択",
     "basicViewTypeList": "LIST",
@@ -1620,14 +1627,14 @@
     "importCurrent": "インポート"
   },
   "keyLabels": {
-    "title": "Key Labels",
-    "manageRow": "Key Labels 管理",
+    "title": "キーラベル",
+    "manageRow": "キーラベル管理",
     "edit": "編集しますえ",
     "hubEmpty": "ハブに合うラベルがおへんなぁ",
     "search": "検索しますえ",
     "searching": "検索してますえ…",
     "import": "インポート",
-    "empty": "Key Label がまだおへんなぁ。検索か Import で追加しておくれやす。",
+    "empty": "キーラベルがまだおへんなぁ。検索か Import で追加しておくれやす。",
     "actionUpload": "アップロード",
     "actionUpdate": "更新",
     "actionSync": "同期",
@@ -1635,16 +1642,29 @@
     "actionDownload": "ダウンロード",
     "actionDelete": "消しますえ",
     "actionExport": ".json",
+    "typeKeymapWrite": "書き換えできますえ",
+    "typeViewOnly": "見るだけどす",
+    "typeKeymapWriteShort": "書換どす",
+    "typeViewOnlyShort": "拝見どす",
+    "qwertyDefaultName": "QWERTY（デフォルトどす）",
+    "qwertyDefaultShort": "デフォルトどす",
     "hubRemoved": "（消されましたえ）",
     "errorDuplicate": "同じ名前のラベルがもうありますえ",
-    "errorImportFailed": "Key Label のインポートがあきまへんでしたえ",
+    "errorImportFailed": "キーラベルのインポートがあきまへんでしたえ",
     "errorInvalidName": "ラベル名がおかしゅうございますえ",
     "errorSearchFailed": "Pipette Hub の検索があきまへんでしたえ",
     "errorGeneric": "あきまへんでしたえ",
-    "missingTitle": "Key Label が見つかりまへんなぁ",
-    "missingMessage": "Key Label「{{name}}」が入ってまへんさかい、QWERTY ラベルで表示しますえ。",
+    "missingTitle": "キーラベルが見つかりまへんなぁ",
+    "missingMessage": "キーラベル「{{name}}」が入ってまへんさかい、QWERTY ラベルで表示しますえ。",
     "missingHint": "「{{name}}」は {{settings}} > {{tools}} > {{keyLabels}}、またはキーピッカー右上の Edit ボタンから入れられますえ。",
-    "missingClose": "閉じますえ"
+    "missingClose": "閉じますえ",
+    "keymapApply": {
+      "title": "「{{name}}」をキーマップにも適用しますか？",
+      "saveRecommendation": "書き換えるまえに、いまのキーマップを保存しておかはるのがよろしおすえ。書き換えは全レイヤーのキーコードを変えてしまいますし、Undo と Redo の履歴も消えてしまいますよって、戻したいときは保存しといたファイルから復元するしかおへんえ。",
+      "confirmApply": "適用してもよろしおすか？",
+      "tabsLabel": "見た目の切り替えどす",
+      "errorPartial": "一部のキーが書き換えられまへんでしたえ。ここで止めときますよって、要りようなら前に保存した .vil ファイルかスナップショットから復元しておくれやす。"
+    }
   },
   "i18n": {
     "edit": "編集しますえ",

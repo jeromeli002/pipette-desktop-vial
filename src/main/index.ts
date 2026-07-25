@@ -52,6 +52,13 @@ const isDev = !!process.env.ELECTRON_RENDERER_URL
 
 app.setDesktopName('pipette')
 
+// Single-instance guard: a second launch exits immediately and silently
+// (app.exit skips before-quit/will-quit — nothing is set up yet at this
+// point); the running instance is left untouched.
+if (!app.requestSingleInstanceLock()) {
+  app.exit(0)
+}
+
 // Distinguishes a user-initiated quit from a plain window close so the
 // tray-resident close handler knows whether to hide the window instead of
 // letting it (and the app) close.
@@ -127,6 +134,16 @@ function createWindow(): void {
   }
   setWindowStartedHidden(startHidden)
   const win = new BrowserWindow(winOpts)
+
+  // document.visibilityState is unreliable for windows created with
+  // show: false (notably on Linux, it still reports 'visible'), so the
+  // renderer needs main-process visibility truth pushed to it directly.
+  win.on('show', () => {
+    win.webContents.send(IpcChannels.WINDOW_VISIBILITY_CHANGED, true)
+  })
+  win.on('hide', () => {
+    win.webContents.send(IpcChannels.WINDOW_VISIBILITY_CHANGED, false)
+  })
 
   win.on('close', (e) => {
     if (normalWindowSize) {
@@ -330,8 +347,8 @@ function setupWindowIpc(): void {
     },
   )
 
-  secureHandle(IpcChannels.WINDOW_SHOW, () => {
-    showWindow(getFirstWindow)
+  secureHandle(IpcChannels.WINDOW_SHOW, (): boolean => {
+    return showWindow(getFirstWindow)
   })
 
   secureHandle(IpcChannels.WINDOW_HIDE, () => {
@@ -339,6 +356,8 @@ function setupWindowIpc(): void {
   })
 
   secureHandle(IpcChannels.WINDOW_STARTED_HIDDEN, (): boolean => getWindowStartedHidden())
+
+  secureHandle(IpcChannels.WINDOW_IS_VISIBLE, (): boolean => getFirstWindow()?.isVisible() ?? false)
 
   secureHandle(IpcChannels.TRAY_STATUS_UPDATE, (_event, status: unknown) => {
     if (!isValidTrayStatus(status)) return

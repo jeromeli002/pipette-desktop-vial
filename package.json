@@ -1,6 +1,6 @@
 {
   "name": "pipette-JL",
-  "version": "0.4.10",
+  "version": "0.4.13",
   "description": "Pipette — Vial-compatible keyboard configurator built with Electron and TypeScript",
   "license": "GPL-3.0-or-later",
   "type": "module",
@@ -93,7 +93,8 @@
     },
     "files": [
       "out/**/*",
-      "package.json"
+      "package.json",
+      "build/icon.png"
     ],
     "artifactName": "${productName}-${os}-${arch}.${ext}",
     "generateUpdatesFilesForAllChannels": false,

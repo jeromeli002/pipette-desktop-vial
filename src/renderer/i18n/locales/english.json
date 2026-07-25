@@ -1,5 +1,5 @@
 {
-  "version": "0.1.19",
+  "version": "0.1.43",
   "name": "English",
   "common": {
     "save": "Save",
@@ -27,6 +27,7 @@
     "exported": "Exported",
     "imported": "Imported",
     "load": "Load",
+    "confirmLoad": "Load?",
     "labelPlaceholder": "Label",
     "noLabel": "(No label)",
     "synced": "Synced",
@@ -35,7 +36,15 @@
     "done": "Done",
     "findOnHub": "Find on Hub",
     "searchPlaceholder": "Search Pipette Hub (type 2 or more characters)...",
-    "findOnHubHint": "Browse uploaded files on <hub>Pipette Hub</hub>."
+    "findOnHubHint": "Browse uploaded files on <hub>Pipette Hub</hub>.",
+    "sortByName": "Name",
+    "importing": "Importing...",
+    "importedNamed": "Imported {{name}}",
+    "updatedNamed": "Updated {{name}}",
+    "importBatchFailed_one": "{{count}} file could not be imported:",
+    "importBatchFailed_other": "{{count}} files could not be imported:",
+    "importSummary_one": "Imported {{count}} file (success {{success}}, failure {{failure}})",
+    "importSummary_other": "Imported {{count}} files (success {{success}}, failure {{failure}})"
   },
   "app": {
     "title": "Pipette-JL",
@@ -98,6 +107,7 @@
       "previousLayers": "Previous layers",
       "nextLayers": "Next layers",
       "layerN": "Layer {{n}}",
+      "layerPreview": "Preview - {{label}}",
       "undo": "Undo",
       "redo": "Redo",
       "zoomIn": "Zoom In",
@@ -492,7 +502,6 @@
       "alwaysOnTop": "top",
       "recordStart": "Start",
       "recordStop": "Stop",
-      "viewAnalytics": "View Analytics",
       "tab": {
         "window": "Window",
         "rec": "REC"
@@ -737,7 +746,6 @@
     "autoAdvance": "Auto Move",
     "locked": "Locked",
     "unlocked": "Unlocked",
-    "keyTester": "Key Tester",
     "sync": {
       "pending": "Pending",
       "syncing": "Syncing...",
@@ -868,7 +876,6 @@
     "defaultLayout": "Key Labels",
     "defaultAutoAdvance": "Auto Move",
     "defaultLayerPanelOpen": "Layer List Open",
-    "defaultBasicViewType": "Basic Tab View",
     "defaultSplitKeyMode": "Separate Shift in Key Picker",
     "defaultQuickSelect": "Instant Key Selection",
     "basicViewTypeList": "LIST",
@@ -1763,6 +1770,12 @@
     "actionDownload": "Download",
     "actionDelete": "Delete",
     "actionExport": ".json",
+    "typeKeymapWrite": "Keymap Write",
+    "typeViewOnly": "View Only",
+    "typeKeymapWriteShort": "Write",
+    "typeViewOnlyShort": "View",
+    "qwertyDefaultName": "QWERTY (Default)",
+    "qwertyDefaultShort": "Default",
     "hubRemoved": "(removed)",
     "errorDuplicate": "A label with the same name already exists",
     "errorImportFailed": "Failed to import key label",
@@ -1772,7 +1785,14 @@
     "missingTitle": "Key Label not found",
     "missingMessage": "The key label \"{{name}}\" is not installed. Showing keymap with QWERTY labels.",
     "missingHint": "You can download \"{{name}}\" from {{settings}} > {{tools}} > {{keyLabels}}, or from the keypicker overlay's Edit button.",
-    "missingClose": "Close"
+    "missingClose": "Close",
+    "keymapApply": {
+      "title": "Apply {{name}} to the Keymap?",
+      "saveRecommendation": "Save your current keymap first. Rewrite replaces keycodes on every layer and clears the undo/redo history; restoring your saved file is the only way back.",
+      "confirmApply": "Apply?",
+      "tabsLabel": "Keymap view",
+      "errorPartial": "Some keys could not be rewritten. The change stops here — restore from a previously saved .vil file or snapshot if needed."
+    }
   },
   "i18n": {
     "modalTitle": "Language Packs",

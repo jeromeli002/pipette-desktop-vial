@@ -1,5 +1,5 @@
 {
-  "version": "0.1.19",
+  "version": "0.1.43",
   "name": "Japanese - ギャル",
   "common": {
     "save": "保存☆",
@@ -18,7 +18,7 @@
     "refreshing": "アプデなう…",
     "disconnect": "バイバイ☆",
     "loading": "読み込みちう…",
-    "apply": "おけまる☆",
+    "apply": "適用しちゃう☆",
     "notConfigured": "まだっしょ",
     "settingsLabel": "セッティング☆:",
     "configuration": "コンフィグっしょ",
@@ -27,6 +27,7 @@
     "exported": "書き出したよん！",
     "imported": "入れたよん！",
     "load": "読み込み☆",
+    "confirmLoad": "読み込んじゃう？",
     "labelPlaceholder": "ラベル",
     "noLabel": "（ラベルなし）",
     "synced": "同期おけ！",
@@ -35,7 +36,15 @@
     "installed": "入れたよん！",
     "searchPlaceholder": "Pipette Hub で検索っしょ（2文字以上で♡）…",
     "done": "完了っしょ☆",
-    "edit": "編集っしょ"
+    "edit": "編集っしょ",
+    "sortByName": "名前っ♡",
+    "importing": "インポートちう…",
+    "importedNamed": "{{name}} 入れたよん☆",
+    "updatedNamed": "{{name}} 更新したよん☆",
+    "importBatchFailed_one": "{{count}}個、入れられんかったよ…",
+    "importBatchFailed_other": "{{count}}個、入れられんかったよ…",
+    "importSummary_one": "{{count}}個入れたよん☆(成功{{success}}、失敗{{failure}})",
+    "importSummary_other": "{{count}}個入れたよん☆(成功{{success}}、失敗{{failure}})"
   },
   "app": {
     "title": "Pipette☆",
@@ -98,6 +107,7 @@
       "previousLayers": "前のレイヤーっしょ",
       "nextLayers": "次のレイヤー☆",
       "layerN": "レイヤー {{n}}",
+      "layerPreview": "プレビューっしょ☆ - {{label}}",
       "undo": "巻き戻し☆",
       "redo": "やり直しっしょ！",
       "zoomIn": "デカくする☆",
@@ -376,7 +386,6 @@
       "alwaysOnTop": "最前面☆",
       "recordStart": "記録開始！",
       "recordStop": "ストップ☆",
-      "viewAnalytics": "分析ビュー☆",
       "tab": {
         "window": "ウィンドウ",
         "rec": "REC☆"
@@ -620,7 +629,6 @@
     "autoAdvance": "自動移動☆",
     "locked": "ロックちう",
     "unlocked": "アンロックっしょ",
-    "keyTester": "キーテスター☆",
     "sync": {
       "pending": "同期待ちっしょ",
       "syncing": "同期ちう…",
@@ -740,7 +748,6 @@
     "defaultLayout": "キーラベル☆",
     "defaultAutoAdvance": "自動移動っしょ",
     "defaultLayerPanelOpen": "レイヤーリスト広げる☆",
-    "defaultBasicViewType": "Basic タブ表示っしょ",
     "defaultSplitKeyMode": "Shiftキーを分離☆",
     "defaultQuickSelect": "速攻で選択！",
     "basicViewTypeList": "LIST",
@@ -1620,14 +1627,14 @@
     "importCurrent": "インポート"
   },
   "keyLabels": {
-    "title": "Key Labels☆",
+    "title": "キーラベル☆",
     "manageRow": "管理っしょ☆",
     "edit": "編集っしょ",
-    "hubEmpty": "ハブにラベルないじゃんｗ",
+    "hubEmpty": "ハブにキーラベルないじゃんｗ",
     "search": "検索っしょ",
     "searching": "検索なう…",
     "import": "インポート",
-    "empty": "ラベルないしｗ検索かImportで足してね♡",
+    "empty": "キーラベルないしｗ検索かImportで足してね♡",
     "actionUpload": "アップ☆",
     "actionUpdate": "アプデっしょ",
     "actionSync": "同期☆",
@@ -1635,16 +1642,29 @@
     "actionDownload": "落とすっしょ",
     "actionDelete": "ポイっちょ☆",
     "actionExport": ".json",
+    "typeKeymapWrite": "書き換えOKっしょ☆",
+    "typeViewOnly": "見るだけっしょ",
+    "typeKeymapWriteShort": "書換OK☆",
+    "typeViewOnlyShort": "見るだけ",
+    "qwertyDefaultName": "QWERTY（デフォっしょ☆）",
+    "qwertyDefaultShort": "デフォっしょ",
     "hubRemoved": "(消されたｗ)",
     "errorDuplicate": "名前かぶってるんだけど！",
-    "errorImportFailed": "ラベルのインポート失敗…サゲ。。",
+    "errorImportFailed": "キーラベルのインポート失敗…サゲ。。",
     "errorInvalidName": "名前バグってね？",
     "errorSearchFailed": "Hub検索失敗…マジサゲ。。",
     "errorGeneric": "失敗したｗ",
-    "missingTitle": "ラベル見つかんないじゃん",
+    "missingTitle": "キーラベル見つかんないじゃん",
     "missingMessage": "「{{name}}」がないからQWERTYでいくっしょ☆",
     "missingHint": "「{{name}}」は {{settings}} > {{tools}} > {{keyLabels}} か、キーピッカーの Edit ボタンから落とせるよん☆",
-    "missingClose": "閉じるっしょ"
+    "missingClose": "閉じるっしょ",
+    "keymapApply": {
+      "title": "「{{name}}」キーマップも書き換えちゃう？",
+      "saveRecommendation": "書き換える前に今のキーマップ保存しとくのがマジ安心っしょ。書き換えは全レイヤーのキーコードがガラッと変わっちゃうし、Undo/Redoの履歴も消えちゃうから、戻したいなら保存したファイルから復元するしかないっしょ！",
+      "confirmApply": "適用しちゃう？☆",
+      "tabsLabel": "見え方っしょ",
+      "errorPartial": "一部のキー書き換え失敗…マジサゲ。。そこでストップしたから、必要なら前に保存した.vilファイルかスナップショットから復元してっしょ"
+    }
   },
   "themePacks": {
     "title": "テーマパック☆",

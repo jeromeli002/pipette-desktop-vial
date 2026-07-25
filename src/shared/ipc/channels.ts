@@ -233,6 +233,7 @@ export const IpcChannels = {
   I18N_PACK_STORE_DELETE: 'i18n-pack-store:delete',
   I18N_PACK_STORE_SET_HUB_POST_ID: 'i18n-pack-store:set-hub-post-id',
   I18N_PACK_STORE_HAS_NAME: 'i18n-pack-store:has-name',
+  I18N_PACK_STORE_REORDER: 'i18n-pack-store:reorder',
   I18N_PACK_IMPORT: 'i18n-pack:import',
   I18N_PACK_IMPORT_APPLY: 'i18n-pack:import-apply',
   I18N_PACK_EXPORT: 'i18n-pack:export',
@@ -283,6 +284,7 @@ export const IpcChannels = {
   THEME_PACK_STORE_DELETE: 'theme-pack-store:delete',
   THEME_PACK_STORE_SET_HUB_POST_ID: 'theme-pack-store:set-hub-post-id',
   THEME_PACK_STORE_HAS_NAME: 'theme-pack-store:has-name',
+  THEME_PACK_STORE_REORDER: 'theme-pack-store:reorder',
   THEME_PACK_IMPORT: 'theme-pack:import',
   THEME_PACK_IMPORT_APPLY: 'theme-pack:import-apply',
   THEME_PACK_EXPORT: 'theme-pack:export',
@@ -306,6 +308,10 @@ export const IpcChannels = {
   WINDOW_SHOW: 'window:show',
   WINDOW_HIDE: 'window:hide',
   WINDOW_STARTED_HIDDEN: 'window:started-hidden',
+  WINDOW_IS_VISIBLE: 'window:is-visible',
+
+  // Window visibility (main → renderer)
+  WINDOW_VISIBILITY_CHANGED: 'window:visibility-changed',
 
   // Tray status (renderer → main)
   TRAY_STATUS_UPDATE: 'tray:status-update',

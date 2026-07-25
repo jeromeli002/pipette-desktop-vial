@@ -13,7 +13,7 @@ import type { TrayStatus } from '../shared/types/vial-api'
 import type { SnapshotMeta } from '../shared/types/snapshot-store'
 import type { AnalyzeFilterSnapshotMeta } from '../shared/types/analyze-filter-store'
 import type { SavedFavoriteMeta, FavoriteImportResult } from '../shared/types/favorite-store'
-import type { KeyLabelMeta, KeyLabelRecord, KeyLabelStoreResult } from '../shared/types/key-label-store'
+import type { KeyLabelMeta, KeyLabelRecord, KeyLabelStoreResult, KeyLabelImportBatchResult } from '../shared/types/key-label-store'
 import type { TypingTestTextMeta, TypingTestTextRecord, TypingTestTextStoreResult } from '../shared/types/typing-test-text-store'
 import type { HubKeyLabelItem, HubKeyLabelListResponse, HubKeyLabelListParams, HubKeyLabelTimestampsResponse } from '../shared/types/hub-key-label'
 import type {
@@ -292,7 +292,7 @@ const vialAPI = {
     ipcRenderer.invoke(IpcChannels.KEY_LABEL_STORE_RENAME, id, newName),
   keyLabelStoreDelete: (id: string): Promise<KeyLabelStoreResult<void>> =>
     ipcRenderer.invoke(IpcChannels.KEY_LABEL_STORE_DELETE, id),
-  keyLabelStoreImport: (): Promise<KeyLabelStoreResult<KeyLabelMeta>> =>
+  keyLabelStoreImport: (): Promise<KeyLabelStoreResult<KeyLabelImportBatchResult>> =>
     ipcRenderer.invoke(IpcChannels.KEY_LABEL_STORE_IMPORT),
   keyLabelStoreExport: (id: string): Promise<KeyLabelStoreResult<{ filePath: string }>> =>
     ipcRenderer.invoke(IpcChannels.KEY_LABEL_STORE_EXPORT, id),
@@ -346,10 +346,12 @@ const vialAPI = {
     ipcRenderer.invoke(IpcChannels.I18N_PACK_STORE_SET_ENABLED, id, enabled),
   i18nPackDelete: (id: string): Promise<I18nPackStoreResult<void>> =>
     ipcRenderer.invoke(IpcChannels.I18N_PACK_STORE_DELETE, id),
-  i18nPackSetHubPostId: (id: string, hubPostId: string | null): Promise<I18nPackStoreResult<I18nPackMeta>> =>
-    ipcRenderer.invoke(IpcChannels.I18N_PACK_STORE_SET_HUB_POST_ID, id, hubPostId),
+  i18nPackSetHubPostId: (id: string, hubPostId: string | null, uploaderName?: string, hubUpdatedAt?: string): Promise<I18nPackStoreResult<I18nPackMeta>> =>
+    ipcRenderer.invoke(IpcChannels.I18N_PACK_STORE_SET_HUB_POST_ID, id, hubPostId, uploaderName, hubUpdatedAt),
   i18nPackHasName: (name: string, excludeId?: string): Promise<I18nPackStoreResult<boolean>> =>
     ipcRenderer.invoke(IpcChannels.I18N_PACK_STORE_HAS_NAME, name, excludeId),
+  i18nPackReorder: (orderedIds: string[]): Promise<I18nPackStoreResult<void>> =>
+    ipcRenderer.invoke(IpcChannels.I18N_PACK_STORE_REORDER, orderedIds),
   i18nPackImport: (): Promise<I18nPackImportDialogResult> =>
     ipcRenderer.invoke(IpcChannels.I18N_PACK_IMPORT),
   i18nPackImportApply: (raw: unknown, options?: I18nPackImportApplyOptions): Promise<I18nPackStoreResult<I18nPackMeta>> =>
@@ -373,10 +375,12 @@ const vialAPI = {
     ipcRenderer.invoke(IpcChannels.THEME_PACK_STORE_RENAME, id, newName),
   themePackDelete: (id: string): Promise<ThemePackStoreResult<void>> =>
     ipcRenderer.invoke(IpcChannels.THEME_PACK_STORE_DELETE, id),
-  themePackSetHubPostId: (id: string, hubPostId: string | null): Promise<ThemePackStoreResult<ThemePackMeta>> =>
-    ipcRenderer.invoke(IpcChannels.THEME_PACK_STORE_SET_HUB_POST_ID, id, hubPostId),
+  themePackSetHubPostId: (id: string, hubPostId: string | null, uploaderName?: string, hubUpdatedAt?: string): Promise<ThemePackStoreResult<ThemePackMeta>> =>
+    ipcRenderer.invoke(IpcChannels.THEME_PACK_STORE_SET_HUB_POST_ID, id, hubPostId, uploaderName, hubUpdatedAt),
   themePackHasName: (name: string, excludeId?: string): Promise<ThemePackStoreResult<boolean>> =>
     ipcRenderer.invoke(IpcChannels.THEME_PACK_STORE_HAS_NAME, name, excludeId),
+  themePackReorder: (orderedIds: string[]): Promise<ThemePackStoreResult<void>> =>
+    ipcRenderer.invoke(IpcChannels.THEME_PACK_STORE_REORDER, orderedIds),
   themePackImport: (): Promise<ThemePackImportDialogResult> =>
     ipcRenderer.invoke(IpcChannels.THEME_PACK_IMPORT),
   themePackImportApply: (raw: unknown, options?: ThemePackImportApplyOptions): Promise<ThemePackStoreResult<ThemePackMeta>> =>
@@ -772,12 +776,21 @@ const vialAPI = {
     ipcRenderer.invoke(IpcChannels.WINDOW_IS_ALWAYS_ON_TOP_SUPPORTED),
   setWindowZoom: (zoom: number): Promise<void> =>
     ipcRenderer.invoke(IpcChannels.WINDOW_SET_ZOOM, zoom),
-  windowShow: (): Promise<void> =>
+  windowShow: (): Promise<boolean> =>
     ipcRenderer.invoke(IpcChannels.WINDOW_SHOW),
   windowHide: (): Promise<void> =>
     ipcRenderer.invoke(IpcChannels.WINDOW_HIDE),
   windowStartedHidden: (): Promise<boolean> =>
     ipcRenderer.invoke(IpcChannels.WINDOW_STARTED_HIDDEN),
+  windowIsVisible: (): Promise<boolean> =>
+    ipcRenderer.invoke(IpcChannels.WINDOW_IS_VISIBLE),
+  onWindowVisibilityChanged: (callback: (visible: boolean) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, visible: boolean): void => {
+      callback(visible)
+    }
+    ipcRenderer.on(IpcChannels.WINDOW_VISIBILITY_CHANGED, handler)
+    return () => ipcRenderer.removeListener(IpcChannels.WINDOW_VISIBILITY_CHANGED, handler)
+  },
 
   // --- Tray status ---
   trayStatusUpdate: (status: TrayStatus): Promise<void> =>

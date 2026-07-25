@@ -1,5 +1,5 @@
 {
-  "version": "0.1.19",
+  "version": "0.1.43",
   "name": "Japanese",
   "common": {
     "save": "保存",
@@ -18,7 +18,7 @@
     "refreshing": "更新中...",
     "disconnect": "切断",
     "loading": "読み込み中...",
-    "apply": "適用",
+    "apply": "適用する",
     "notConfigured": "未設定",
     "settingsLabel": "設定:",
     "configuration": "構成",
@@ -27,6 +27,7 @@
     "exported": "エクスポート済み",
     "imported": "インポート済み",
     "load": "読み込み",
+    "confirmLoad": "読み込みますか？",
     "labelPlaceholder": "ラベル",
     "noLabel": "（ラベルなし）",
     "synced": "同期しました",
@@ -35,7 +36,15 @@
     "findOnHub": "Hub で探す",
     "findOnHubHint": "アップロードされたファイルを <hub>Pipette Hub</hub> で確認できます。",
     "installed": "インストール済み",
-    "searchPlaceholder": "Pipette Hub を検索 (2 文字以上で入力)…"
+    "searchPlaceholder": "Pipette Hub を検索 (2 文字以上で入力)…",
+    "sortByName": "名前",
+    "importing": "インポート中...",
+    "importedNamed": "{{name}} をインポートしました",
+    "updatedNamed": "{{name}} を更新しました",
+    "importBatchFailed_one": "{{count}} 件のファイルをインポートできませんでした：",
+    "importBatchFailed_other": "{{count}} 件のファイルをインポートできませんでした：",
+    "importSummary_one": "{{count}} 件インポートしました (成功 {{success}}, 失敗 {{failure}})",
+    "importSummary_other": "{{count}} 件インポートしました (成功 {{success}}, 失敗 {{failure}})"
   },
   "app": {
     "title": "Pipette-JL",
@@ -97,7 +106,12 @@
       "comboLabel": "Combo",
       "previousLayers": "前のレイヤー",
       "nextLayers": "次のレイヤー",
+<<<<<<< HEAD
       "layerN": "レイヤー {{n}}",
+=======
+      "layerN": "Layer {{n}}",
+      "layerPreview": "プレビュー - {{label}}",
+>>>>>>> upstream/main
       "undo": "元に戻す",
       "redo": "やり直し",
       "zoomIn": "拡大",
@@ -492,7 +506,6 @@
       "alwaysOnTop": "最前面",
       "recordStart": "開始",
       "recordStop": "停止",
-      "viewAnalytics": "分析ビュー",
       "tab": {
         "window": "ウィンドウ",
         "rec": "録"
@@ -737,7 +750,6 @@
     "autoAdvance": "自動移動",
     "locked": "ロック中",
     "unlocked": "アンロック",
-    "keyTester": "キーテスター",
     "sync": {
       "pending": "同期待ち",
       "syncing": "同期中...",
@@ -868,7 +880,6 @@
     "defaultLayout": "キーラベル",
     "defaultAutoAdvance": "自動移動",
     "defaultLayerPanelOpen": "レイヤーリスト展開",
-    "defaultBasicViewType": "Basic タブ表示",
     "defaultSplitKeyMode": "キーピッカーでShiftキーを分離",
     "defaultQuickSelect": "キーの即時選択",
     "basicViewTypeList": "LIST",
@@ -1755,7 +1766,7 @@
     "search": "検索",
     "searching": "検索中…",
     "import": "インポート",
-    "empty": "Key Label がまだありません。検索または Import で追加してください。",
+    "empty": "キーラベルがまだありません。検索または Import で追加してください。",
     "actionUpload": "アップロード",
     "actionUpdate": "更新",
     "actionSync": "同期",
@@ -1763,16 +1774,29 @@
     "actionDownload": "ダウンロード",
     "actionDelete": "削除",
     "actionExport": ".json",
+    "typeKeymapWrite": "キーマップ書き換え可",
+    "typeViewOnly": "表示のみ",
+    "typeKeymapWriteShort": "書換可",
+    "typeViewOnlyShort": "表示のみ",
+    "qwertyDefaultName": "QWERTY（デフォルト）",
+    "qwertyDefaultShort": "デフォルト",
     "hubRemoved": "(削除済み)",
     "errorDuplicate": "同じ名前のラベルがすでに存在します",
-    "errorImportFailed": "Key Label のインポートに失敗しました",
+    "errorImportFailed": "キーラベルのインポートに失敗しました",
     "errorInvalidName": "ラベル名が不正です",
     "errorSearchFailed": "Pipette Hub の検索に失敗しました",
     "errorGeneric": "操作に失敗しました",
-    "missingTitle": "Key Label が見つかりません",
-    "missingMessage": "Key Label「{{name}}」がインストールされていないため、QWERTY ラベルで表示します。",
+    "missingTitle": "キーラベルが見つかりません",
+    "missingMessage": "キーラベル「{{name}}」がインストールされていないため、QWERTY ラベルで表示します。",
     "missingHint": "「{{name}}」は {{settings}} > {{tools}} > {{keyLabels}}、またはキーピッカー右上の Edit ボタンからダウンロードできます。",
-    "missingClose": "閉じる"
+    "missingClose": "閉じる",
+    "keymapApply": {
+      "title": "「{{name}}」をキーマップにも適用しますか？",
+      "saveRecommendation": "書き換える前に、現在のキーマップを保存しておくことをおすすめします。書き換えは全レイヤーのキーコードを置き換え、Undo/Redo の履歴も消去します。元に戻す方法は保存したファイルの復元のみです。",
+      "confirmApply": "適用しますか？",
+      "tabsLabel": "キーマップ表示",
+      "errorPartial": "一部のキーは書き換えられませんでした。ここで処理を止めています。必要であれば、以前保存した .vil ファイルやスナップショットから復元してください。"
+    }
   },
   "i18n": {
     "edit": "管理",

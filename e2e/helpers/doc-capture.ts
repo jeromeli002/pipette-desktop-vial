@@ -13,7 +13,10 @@ import {
   escapeRegex,
   isAvailable,
   launchCaptureApp,
+  nullifyLastDeviceConfig,
   resetToEditorMode,
+  resetVirtualDeviceKeyboardLayout,
+  restoreLastDeviceConfig,
   restoreVirtualDeviceSettings,
   selectKeyboardViaFilterModal,
   selectSnapshotViaFilterModal,
@@ -261,6 +264,73 @@ function restoreFavorites(backups: Map<string, string | null>, favBase: string):
       const fp = join(dir, entry.filename)
       try { unlinkSync(fp) } catch { /* ignore */ }
     }
+  }
+}
+
+// --- Key Label "apply to keymap" seed (Phase 8b) ---
+
+const DOC_CAPTURE_COLEMAK_ID = 'doc-capture-colemak'
+const DOC_CAPTURE_COLEMAK_NAME = 'Colemak (doc-capture)'
+const DOC_CAPTURE_COLEMAK_FILENAME = `${DOC_CAPTURE_COLEMAK_ID}.json`
+// Real Colemak permutation (same fixture used in shared/keymap/__tests__/keymap-apply.test.ts)
+// so buildKeymapRewriteTable actually succeeds and the confirm modal opens.
+const DOC_CAPTURE_COLEMAK_MAP: Record<string, string> = {
+  KC_E: 'F', KC_R: 'P', KC_T: 'G', KC_Y: 'J', KC_U: 'L', KC_I: 'U', KC_O: 'Y',
+  KC_P: ';', KC_S: 'R', KC_D: 'S', KC_F: 'T', KC_G: 'D', KC_J: 'N', KC_K: 'E',
+  KC_L: 'I', KC_SCOLON: 'O', KC_N: 'K',
+}
+
+interface KeyLabelSeedBackup {
+  indexPath: string
+  originalIndex: string | null
+  entryPath: string
+  entryExisted: boolean
+}
+
+// Seeds a `keymapApplicable: true` Colemak entry into `sync/key-labels/` so
+// captureKeyLabelKeymapApply can drive the footer's confirm modal without a
+// real Hub download. Backs up index.json and replaces it wholesale (same
+// idiom as seedDummyFavorites) rather than merging into whatever real
+// entries the machine already has installed — the running app lazily adds
+// the built-in QWERTY row itself on first list, so seeding does not need to
+// reproduce that, and a real user's other installed labels never leak into
+// the screenshot.
+function seedDummyKeyLabel(keyLabelsBase: string): KeyLabelSeedBackup {
+  mkdirSync(keyLabelsBase, { recursive: true })
+  const indexPath = join(keyLabelsBase, 'index.json')
+  const originalIndex = existsSync(indexPath) ? readFileSync(indexPath, 'utf-8') : null
+
+  const now = new Date().toISOString()
+  const entries = [{
+    id: DOC_CAPTURE_COLEMAK_ID,
+    name: DOC_CAPTURE_COLEMAK_NAME,
+    uploaderName: 'pipette',
+    filename: DOC_CAPTURE_COLEMAK_FILENAME,
+    savedAt: now,
+    updatedAt: now,
+  }]
+  writeFileSync(indexPath, JSON.stringify({ entries }, null, 2), 'utf-8')
+
+  const entryPath = join(keyLabelsBase, DOC_CAPTURE_COLEMAK_FILENAME)
+  const entryExisted = existsSync(entryPath)
+  if (!entryExisted) {
+    writeFileSync(
+      entryPath,
+      JSON.stringify({ name: DOC_CAPTURE_COLEMAK_NAME, map: DOC_CAPTURE_COLEMAK_MAP, keymapApplicable: true }, null, 2),
+      'utf-8',
+    )
+  }
+  return { indexPath, originalIndex, entryPath, entryExisted }
+}
+
+function restoreDummyKeyLabel(backup: KeyLabelSeedBackup): void {
+  if (backup.originalIndex != null) {
+    writeFileSync(backup.indexPath, backup.originalIndex, 'utf-8')
+  } else {
+    try { unlinkSync(backup.indexPath) } catch { /* ignore */ }
+  }
+  if (!backup.entryExisted) {
+    try { unlinkSync(backup.entryPath) } catch { /* ignore */ }
   }
 }
 
@@ -1347,6 +1417,96 @@ async function captureStatusBar(page: Page): Promise<void> {
   }
 }
 
+// --- Phase 8b: Simulation/Base tabs + Key Label "Apply to Keymap" confirm
+// modal (Plan-qwerty-select-no-rewrite v7 — シミュレーションタブ方式) ---
+
+// Drives the footer's Keyboard Layout select to the seeded `keymapApplicable`
+// Colemak entry (see seedDummyKeyLabel above). Selecting it no longer opens
+// any modal by itself — it switches the display and reveals the vertical
+// simulation/Base tabs on the keymap. This waits for the simulation tab,
+// clicks the Apply button on its layer-indicator row (the only way left to
+// reach the Rewrite confirm modal), and captures it. Dismisses with Cancel,
+// then resets the select back to QWERTY so every capture AFTER this one
+// (Favorites, Key Popover, Basic View variants, ...) runs against the same
+// untabbed QWERTY state every other phase assumes.
+async function captureKeyLabelKeymapApply(page: Page): Promise<void> {
+  console.log('\n--- Phase 8b: Simulation/Base Tabs + Apply-to-Keymap Modal ---')
+
+  const layoutTrigger = page.getByRole('button', { name: 'Key Labels' })
+  const triggerCount = await layoutTrigger.count()
+  if (triggerCount === 0) {
+    console.log('  [skip] Keyboard Layout select trigger not found (button aria-label="Key Labels" — footer may be in Edit mode, or quickSettings/keyboardLayout is unset)')
+    return
+  }
+  if (triggerCount > 1) {
+    console.log(`  [skip] ambiguous match: ${triggerCount} buttons named "Key Labels" (expected exactly 1)`)
+    return
+  }
+  await layoutTrigger.click()
+  await page.waitForTimeout(300)
+
+  const option = page.getByRole('option', { name: DOC_CAPTURE_COLEMAK_NAME })
+  const optionCount = await option.count()
+  if (optionCount === 0) {
+    console.log(`  [skip] seeded option "${DOC_CAPTURE_COLEMAK_NAME}" not found in the layout dropdown (seedDummyKeyLabel may not have landed, or the dropdown didn't open)`)
+    return
+  }
+  await option.click()
+  await page.waitForTimeout(300)
+
+  const simulationTab = page.locator('[data-testid="keymap-pack-tab-simulation"]')
+  try {
+    await simulationTab.waitFor({ state: 'visible', timeout: 3000 })
+  } catch {
+    // No tabs within the timeout means `remapKind` never became 'simulated'
+    // for the seeded entry — either `keymapApplicable` or the map's own
+    // `buildKeymapRewriteTable` build failed.
+    console.log('  [skip] simulation tab did not appear within 3s (remapKind never became "simulated" — check keymapApplicable and buildKeymapRewriteTable on the seeded entry)')
+    return
+  }
+
+  const applyButton = page.locator('[data-testid="keymap-pack-apply-button"]')
+  if (!(await isAvailable(applyButton))) {
+    console.log('  [skip] simulation tab\'s Apply button not found (keymapEditable — keyboard.keymap.size > 0 — was likely false)')
+    return
+  }
+
+  // Capture the tab strip itself, undimmed, before the confirm modal opens.
+  // The modal shot below dims this same background, which is enough for
+  // spatial context but not for judging the simulated-colour key tint the
+  // guide's prose describes — this shot gives that a clean reference.
+  await captureNamed(page, 'key-label-simulation-tabs', { fullPage: true })
+
+  await applyButton.click()
+  await page.waitForTimeout(300)
+
+  const modal = page.locator('[data-testid="keymap-apply-confirm-modal"]')
+  try {
+    await modal.waitFor({ state: 'visible', timeout: 3000 })
+  } catch {
+    console.log('  [skip] apply-to-keymap confirm modal did not open within 3s of clicking Apply')
+    return
+  }
+
+  await captureNamed(page, 'key-label-keymap-apply-modal', { fullPage: true })
+  console.log('  [ok] key-label-keymap-apply-modal.png captured')
+
+  await page.locator('[data-testid="keymap-apply-confirm-cancel"]').click()
+  await page.waitForTimeout(300)
+
+  // Reset the select back to QWERTY (Default) — every capture after this
+  // phase assumes the untabbed, unremapped state.
+  await layoutTrigger.click()
+  await page.waitForTimeout(300)
+  const qwertyOption = page.getByRole('option', { name: 'QWERTY (Default)' })
+  if (await isAvailable(qwertyOption)) {
+    await qwertyOption.click()
+    await page.waitForTimeout(300)
+  } else {
+    console.log('  [warn] could not find the QWERTY (Default) option to reset the layout select — later captures may run against Colemak')
+  }
+}
+
 // --- Phase 9: Inline Favorites ---
 
 async function captureFavorites(page: Page): Promise<void> {
@@ -1700,7 +1860,16 @@ async function main(): Promise<void> {
   }
   console.log(`userData: ${userDataPath}`)
 
+  // Null out a stale `lastDevice` BEFORE the capture app itself launches —
+  // see nullifyLastDeviceConfig's doc comment. This has broken back-to-back
+  // doc-capture runs (and real `pnpm dev` launches) repeatedly: connecting
+  // during a previous run persists `lastDevice`, and `restoreLastSession`
+  // then auto-connects on the very next launch, skipping past the
+  // device-selection screen this script's early phases depend on.
+  const lastDeviceBackup = nullifyLastDeviceConfig(userDataPath)
+
   const favBase = join(userDataPath, 'sync', 'favorites')
+  const keyLabelsBase = join(userDataPath, 'sync', 'key-labels')
 
   // Move aside keyboard dirs this session does not own. From this point on
   // the try/finally below owns putting them back: every seed/capture step —
@@ -1717,11 +1886,17 @@ async function main(): Promise<void> {
   // default userData and would otherwise auto-restore that leaked mode on
   // its next connect. Snapshot it now and restore in the finally below.
   const virtualDeviceSettingsBackup = backupVirtualDeviceSettings(userDataPath)
+  // Reset a stale Keyboard Layout selection left over from a manual
+  // `pnpm dev` session against the virtual device (see the doc comment on
+  // `resetVirtualDeviceKeyboardLayout`) — must run after the backup above so
+  // the original content still restores in the `finally` block below.
+  resetVirtualDeviceKeyboardLayout(userDataPath)
 
   let favBackups: Map<string, string | null> | null = null
   let snapBackups: Map<string, string | null> | null = null
   let taBackup: Awaited<ReturnType<typeof seedDummyTypingAnalytics>> | null = null
   let filterStoreBackups: Map<string, string | null> | null = null
+  let keyLabelBackup: KeyLabelSeedBackup | null = null
   let app: ElectronApplication | null = null
 
   try {
@@ -1729,8 +1904,9 @@ async function main(): Promise<void> {
     snapBackups = seedDummySnapshots(kbBase)
     taBackup = await seedDummyTypingAnalytics(userDataPath, Date.now())
     filterStoreBackups = seedDummyFilterStore(kbBase)
+    keyLabelBackup = seedDummyKeyLabel(keyLabelsBase)
     console.log(
-      `Seeded dummy data: fav=${favBackups.size} entries, snap=${DUMMY_SNAPSHOTS.length} keyboards, typing-analytics=${DUMMY_TA_UID}, filter-store=${filterStoreBackups.size} files`,
+      `Seeded dummy data: fav=${favBackups.size} entries, snap=${DUMMY_SNAPSHOTS.length} keyboards, typing-analytics=${DUMMY_TA_UID}, filter-store=${filterStoreBackups.size} files, key-label=${DOC_CAPTURE_COLEMAK_NAME}`,
     )
 
     // Every seed file (including the deleted sync_state.json) is on disk
@@ -1771,6 +1947,7 @@ async function main(): Promise<void> {
     await captureEditorSettings(page)        // editor-settings-save
     await captureOverlayPanel(page)          // overlay-tools, overlay-save
     await captureStatusBar(page)             // status-bar
+    await captureKeyLabelKeymapApply(page)   // named: key-label-keymap-apply-modal
     await captureFavorites(page)             // inline-favorites
     await captureKeyPopover(page)            // key-popover-key/code/modifier/lt
     await captureBasicViewVariants(page)     // named: basic-{ansi,iso,jis,list}-view
@@ -1795,10 +1972,12 @@ async function main(): Promise<void> {
     // a rebuild on next boot — order relative to it is safe.
     cleanup('restore foreign keyboard dirs', () => restoreForeignKeyboardDirs(foreignKbIsolation))
     cleanup('restore virtual device settings', () => restoreVirtualDeviceSettings(virtualDeviceSettingsBackup))
+    cleanup('restore lastDevice config', () => restoreLastDeviceConfig(lastDeviceBackup))
     cleanup('restore favorites', () => { if (favBackups) restoreFavorites(favBackups, favBase) })
     cleanup('restore snapshots', () => { if (snapBackups) restoreSnapshots(snapBackups) })
     cleanup('restore typing analytics', () => { if (taBackup) restoreTypingAnalytics(taBackup) })
     cleanup('restore filter store', () => { if (filterStoreBackups) restoreFilterStore(filterStoreBackups) })
+    cleanup('restore key label', () => { if (keyLabelBackup) restoreDummyKeyLabel(keyLabelBackup) })
   }
 }
 

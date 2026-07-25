@@ -60,6 +60,12 @@ export interface TypingTestPaneProps {
   keycodes: Map<string, string>
   encoderKeycodes: Map<string, [string, string]>
   remappedKeys: Set<string>
+  /** Encoder analogue of `remappedKeys` — see `KeyboardWidget`'s
+   *  `remappedEncoders`. */
+  remappedEncoders?: Set<string>
+  /** Active Key Label pack's per-key legend override — see
+   *  `KeyboardWidget`'s `remapLabel`. */
+  remapLabel?: (qmkId: string) => string
   layoutOptions: Map<number, number>
   scale: number
   keys: KleKey[]
@@ -171,6 +177,8 @@ export function TypingTestPane({
   keycodes,
   encoderKeycodes,
   remappedKeys,
+  remappedEncoders,
+  remapLabel,
   layoutOptions,
   scale,
   keys,
@@ -786,6 +794,8 @@ export function TypingTestPane({
               pressedKeys={pressedKeys}
               everPressedKeys={undefined}
               remappedKeys={remappedKeys}
+              remappedEncoders={remappedEncoders}
+              remapLabel={remapLabel}
               layoutOptions={layoutOptions}
               heatmapCells={heatmapCells}
               heatmapMaxTotal={heatmapMaxTotal}
@@ -1006,7 +1016,7 @@ export function TypingTestPane({
                       onViewAnalytics('typingView')
                     }}
                   >
-                    {t('editor.typingTest.viewAnalytics')}
+                    {t('app.analyzeTab')}
                   </button>
                 )}
                 {onHeatmapWindowMinChange && (

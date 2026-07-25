@@ -16,7 +16,7 @@ import type {
 import type { SnapshotMeta } from './snapshot-store'
 import type { AnalyzeFilterSnapshotMeta } from './analyze-filter-store'
 import type { FavoriteType, SavedFavoriteMeta, FavoriteImportResult } from './favorite-store'
-import type { KeyLabelMeta, KeyLabelRecord, KeyLabelStoreResult } from './key-label-store'
+import type { KeyLabelMeta, KeyLabelRecord, KeyLabelStoreResult, KeyLabelImportBatchResult } from './key-label-store'
 import type { TypingTestTextMeta, TypingTestTextRecord, TypingTestTextStoreResult } from './typing-test-text-store'
 import type { HubKeyLabelItem, HubKeyLabelListResponse, HubKeyLabelListParams, HubKeyLabelTimestampsResponse } from './hub-key-label'
 import type {
@@ -184,7 +184,7 @@ export interface VialAPI {
   keyLabelStoreGet(id: string): Promise<KeyLabelStoreResult<KeyLabelRecord>>
   keyLabelStoreRename(id: string, newName: string): Promise<KeyLabelStoreResult<KeyLabelMeta>>
   keyLabelStoreDelete(id: string): Promise<KeyLabelStoreResult<void>>
-  keyLabelStoreImport(): Promise<KeyLabelStoreResult<KeyLabelMeta>>
+  keyLabelStoreImport(): Promise<KeyLabelStoreResult<KeyLabelImportBatchResult>>
   keyLabelStoreExport(id: string): Promise<KeyLabelStoreResult<{ filePath: string }>>
   keyLabelStoreReorder(orderedIds: string[]): Promise<KeyLabelStoreResult<void>>
   keyLabelStoreSetHubPostId(id: string, hubPostId: string | null): Promise<KeyLabelStoreResult<KeyLabelMeta>>
@@ -392,8 +392,11 @@ export interface VialAPI {
   i18nPackRename(id: string, newName: string): Promise<I18nPackStoreResult<I18nPackMeta>>
   i18nPackSetEnabled(id: string, enabled: boolean): Promise<I18nPackStoreResult<I18nPackMeta>>
   i18nPackDelete(id: string): Promise<I18nPackStoreResult<void>>
-  i18nPackSetHubPostId(id: string, hubPostId: string | null): Promise<I18nPackStoreResult<I18nPackMeta>>
+  i18nPackSetHubPostId(id: string, hubPostId: string | null, uploaderName?: string, hubUpdatedAt?: string): Promise<I18nPackStoreResult<I18nPackMeta>>
   i18nPackHasName(name: string, excludeId?: string): Promise<I18nPackStoreResult<boolean>>
+  /** Persist a manual drag/sort order for the active packs. Built-in
+   *  English is not a store entry and is never part of `orderedIds`. */
+  i18nPackReorder(orderedIds: string[]): Promise<I18nPackStoreResult<void>>
   i18nPackImport(): Promise<I18nPackImportDialogResult>
   i18nPackImportApply(raw: unknown, options?: I18nPackImportApplyOptions): Promise<I18nPackStoreResult<I18nPackMeta>>
   i18nPackExport(id: string): Promise<I18nPackStoreResult<{ filePath: string }>>
@@ -410,8 +413,12 @@ export interface VialAPI {
   themePackGet(id: string): Promise<ThemePackStoreResult<ThemePackRecord>>
   themePackRename(id: string, newName: string): Promise<ThemePackStoreResult<ThemePackMeta>>
   themePackDelete(id: string): Promise<ThemePackStoreResult<void>>
-  themePackSetHubPostId(id: string, hubPostId: string | null): Promise<ThemePackStoreResult<ThemePackMeta>>
+  themePackSetHubPostId(id: string, hubPostId: string | null, uploaderName?: string, hubUpdatedAt?: string): Promise<ThemePackStoreResult<ThemePackMeta>>
   themePackHasName(name: string, excludeId?: string): Promise<ThemePackStoreResult<boolean>>
+  /** Persist a manual drag/sort order for the active packs. The
+   *  built-in System/Light/Dark selector bar is not a store entry and
+   *  is never part of `orderedIds`. */
+  themePackReorder(orderedIds: string[]): Promise<ThemePackStoreResult<void>>
   themePackImport(): Promise<ThemePackImportDialogResult>
   themePackImportApply(raw: unknown, options?: ThemePackImportApplyOptions): Promise<ThemePackStoreResult<ThemePackMeta>>
   themePackExport(id: string): Promise<ThemePackStoreResult<{ filePath: string }>>
@@ -447,9 +454,11 @@ export interface VialAPI {
   setWindowMinSize(width: number, height: number): Promise<void>
   isAlwaysOnTopSupported(): Promise<boolean>
   setWindowZoom(zoom: number): Promise<void>
-  windowShow(): Promise<void>
+  windowShow(): Promise<boolean>
   windowHide(): Promise<void>
   windowStartedHidden(): Promise<boolean>
+  windowIsVisible(): Promise<boolean>
+  onWindowVisibilityChanged(callback: (visible: boolean) => void): () => void
 
   // Tray status
   trayStatusUpdate(status: TrayStatus): Promise<void>

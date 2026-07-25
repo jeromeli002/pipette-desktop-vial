@@ -185,7 +185,7 @@ The Analyze page shows how you actually type — per-key heatmaps, WPM trends, i
 There are two entry points:
 
 - **Analyze tab** on the device selection screen — open the page without connecting a keyboard. Useful for reviewing data from keyboards that are currently unplugged
-- **View Analytics** button in the Typing Test pane — jumps to Analyze for the keyboard you are currently using, then returns to the typing view when you go back
+- **Analyze** button in the Typing Test pane — jumps to Analyze for the keyboard you are currently using, then returns to the typing view when you go back
 
 **Keyboard selector**
 
@@ -411,14 +411,14 @@ Three bar charts stack vertically:
 
 **Finger assignment**
 
-Each key is auto-assigned to a finger based on the layout's KLE metadata (column position and the standard column-to-finger mapping). Click the **Finger assignment** button at the top of the tab to override any key manually:
+Each key is auto-assigned to a finger based on the layout's KLE metadata (column position and the standard column-to-finger mapping). The **Finger assignment** button sits right-aligned in the tab's filter row on every finger-based tab — Summary, Ergonomics, Bigrams, and Layout Comparison — and shows whenever a keymap snapshot is available. Click it to override any key manually:
 
 ![Analyze — Finger Assignment](screenshots/analyze-finger-assignment-modal.png)
 
 - Each key shows a short finger code (`Lp`, `Lr`, `Lm`, `Li`, `Lt` / `Rt`, `Ri`, `Rm`, `Rr`, `Rp`). Manually overridden keys are prefixed with `*`
 - Click a key → popover to pick a finger
 - **Save** persists the overrides; **Reset all** clears every override (disabled when there are none). **Reset to estimate** in the per-key popover clears just that key
-- Overrides apply immediately once you close the modal — Finger Load, Hand Balance, and Row Usage all recompute
+- Overrides apply immediately once you close the modal. On this tab, Finger Load, Hand Balance, and Row Load (its per-hand split derives from the overridden finger) all recompute right away — only Row Usage stays unchanged, since row categories themselves are never overridden. The same overrides also feed the Summary tab's typing-profile cards, the Bigrams tab's finger classification, and Layout Comparison's simulations
 
 **Learning curve**
 
@@ -517,6 +517,8 @@ Once a target is picked, all three panels render at once so you can read the spa
 | **Finger diff** (bottom-left) | Per-finger signed delta bar chart. Red bars mark fingers that take more load on the candidate, green bars mark fingers that take less |
 | **Metric table** (bottom-right) | Side-by-side share-of-events table with finger load (per finger), hand balance (left / right), row distribution, and home-row stay rate |
 
+Manual finger assignments (see **Finger assignment** under Ergonomics above) are honored here too — the Finger diff and the Metric table's finger load / hand balance use your overrides instead of the automatic column-based estimate. Row distribution is unaffected, since finger overrides don't change row categories.
+
 ![Analyze — Layout Comparison Heatmap Diff](screenshots/analyze-layout-comparison-heatmap-diff.png)
 
 ![Analyze — Layout Comparison Finger Diff](screenshots/analyze-layout-comparison-finger-diff.png)
@@ -576,7 +578,7 @@ The **Export** button on the panel header opens a category-pick modal that write
 - **Ergonomics** — per-finger / per-hand / per-row totals (snapshot-bound)
 - **Bigrams** — Top pairs / Pair interval rows (Count, Avg IKI, SD); Finger IKI has no CSV column. Exports whichever gram size (2-gram or 3-gram) is currently selected in the tab — the id column is named `bigram_id` or `trigram_id` to match
 - **Layer** — per-layer keystroke or activation counts
-- **Layout Comparison** — per-finger / row / hand deltas (snapshot-bound)
+- **Layout Comparison** — per-finger / row / hand deltas (snapshot-bound; reflects manual finger overrides)
 
 The modal lists the active conditions (Device, App, Keymap, Period) above the category list so the file you save is unambiguous about which slice it captures. Heatmap, Ergonomics, and Layout Comparison entries are unavailable when the range has no overlapping snapshot — the modal shows a "snapshot missing" notice for those categories. Manual finger overrides are noted next to the Ergonomics row.
 
@@ -661,8 +663,9 @@ A vertical layer sidebar appears on the left side of the popover, matching the l
 
 - The search input is pre-filled with the current keycode name
 - Type to search by name, keycode name, or alias — results are ranked by relevance
+- With a Key Label pack active that doesn't qualify as a clean, closed QWERTY permutation — the same eligibility check that decides whether a pack can be Rewritten at all (JIS shift-pair legends, kana, and any partial/non-closed swap are common examples), a result whose legend the pack overrides shows that pack's text (colored the same as its remapped keycap in the grid) and is also searchable by it — e.g. searching a symbol the pack draws on a key finds that key even if its default keycode name doesn't contain it. A pack that does qualify as a clean closed permutation (Colemak, Dvorak, Eucalyn, …) leaves these results on their standard legends, same as the keycode grid
 - Click a result to assign it immediately
-- The popover also appears when double-clicking key fields in detail editors (Tap Dance, Combo, Key Override, etc.)
+- The popover also appears when double-clicking key fields in detail editors (Tap Dance, Combo, Key Override, etc.) — those pickers are not Key Label pack-aware
 
 **Code Tab**
 
@@ -1051,7 +1054,7 @@ The keymap editor automatically records a history of keycode changes. You can na
 | **Toolbar buttons** | Full history | Undo / Redo buttons in the left toolbar |
 | **Popover buttons** | Last single change only (must match the open key) | Undo / Redo buttons in the popover footer (see §2.4) |
 
-- History is cleared when switching keyboards or disconnecting
+- History is cleared when switching keyboards, disconnecting, restoring a snapshot / loading a saved layout / importing a `.vil` file, or rewriting the keymap from a Key Label (see **Applying a Key Label to the Keymap** in §6.2) — each of these replaces some or all of the keymap, so there is nothing left in the old history that still applies. A keymap Rewrite is the one case where nothing is pushed back onto the (now-empty) stack afterward — see **Limitations** there
 - The maximum history size can be configured in Settings → Defaults → **Max Keymap History** (see §6.1)
 - All keymap mutation paths are tracked: single key edits, popover selections, mod-mask changes, paste, and copy-layer operations
 
@@ -1311,7 +1314,7 @@ When the Monitor App toggle is on (and REC is in the Stop / recording state), Pi
 
 Directly below Monitor App, the REC tab also has **Stay in System Tray** and **Start Hidden in Tray** toggles — the same settings as Settings → Tools (§6.6), with the same linked-disable behavior (Start Hidden in Tray is disabled while Stay in System Tray is off, and turning Stay in System Tray off also turns Start Hidden in Tray off). They're surfaced here too since the Typing View window is often the last one open before you reach for the tray.
 
-**View Analytics**
+**Analyze**
 
 Jumps directly to the Analyze page for this keyboard so you can review the stream you just recorded. Going back returns you to Typing View.
 
@@ -1556,7 +1559,7 @@ Troubleshooting and data management functions are available in the **Data** pane
 
 The Tools tab in the Settings modal includes a **Defaults** section for setting initial preferences for new keyboard connections:
 
-- **Keyboard Layout**: Default key labels for new keyboards. The dropdown lists every entry currently installed in the **Key Labels** store (see §6.2). QWERTY ships built-in; install more from Pipette Hub or import a `.json` via **Key Labels Manage**. The drop-down preserves the manual order set in the modal — drag a row up or down there and the dropdown follows
+- **Keyboard Layout**: Default key labels for new keyboards. The dropdown lists every entry currently installed in the **Key Labels** store (see §6.2). **QWERTY (Default)** ships built-in; install more from Pipette Hub or import a `.json` via **Key Labels Manage**. The drop-down preserves the manual order set in the modal — drag a row up or down there and the dropdown follows
 - **Auto Move**: Default auto-advance behavior
 - **Instant Key Selection**: Default instant key selection behavior (see §2.2)
 - **Layer Panel Open**: Whether the layer panel starts expanded or collapsed
@@ -1570,14 +1573,21 @@ The Tools tab also exposes a **Key Labels Manage** row (next to the Language Pac
 
 QWERTY is built-in; every other label set (Dvorak, Colemak, French, Brazilian, …) is downloaded from Pipette Hub or imported from a local `.json` file. Installed entries sync across devices via Cloud Sync, so the same drag order and selection appear on every machine signed into the same account.
 
+**Delete removes the Hub post too, for entries you uploaded.** If the entry you delete is linked to a Hub post you own, Delete also takes that post down from Hub — the local copy and the shared upload disappear together, in one action. If the Hub side fails (for example, no network), the local entry is **not** deleted either — an error is shown under the row and the entry stays put so you can try Delete again. A **downloaded** entry (someone else's upload) deletes locally only, even though it still shows Author/Sync — there's no Hub post of yours to remove, so Delete never makes a Hub call for it. Use **Remove** (in the Hub actions row) instead if you only want to detach your own local copy from Hub while keeping both the local entry and the Hub post — Remove never touches the local copy.
+
 **Installed tab**
 
 ![Key Labels — Installed](screenshots/key-labels-installed.png)
 
-Lists every label set already on this device. Each row shows the label name, the uploader name (when the entry came from Hub), the Hub-side last-update time (`YYYY-MM-DD HH:mm`, mirrors what the Hub website displays), an `.json` export shortcut, and a Delete button. Drag the grip handle on the left to reorder rows — the order is propagated to the Settings dropdown and to every Key Labels picker in the editor.
+Lists every label set already on this device. Each row shows the label name, the uploader name (when the entry came from Hub), the Hub-side last-update time (`YYYY-MM-DD HH:mm`, mirrors what the Hub website displays), an `.json` export shortcut, and a Delete button. Drag the grip handle on the left to reorder rows — the order is propagated to the Settings dropdown and to every Key Labels picker in the editor. A **Name** button at the left of the toolbar (opposite Import) sorts the list alphabetically instead — click once for ascending, click again for descending; each click applies the new order immediately, the same way a manual drag would, so drag, dropdowns, and sync all stay consistent.
 
-A second line under each row exposes the Hub actions:
+The Name button has three states: ascending (▲) and descending (▼) each show a triangle for as long as that sort still matches the list's order, and a plain "Name" with no triangle once the order no longer matches either sort — which happens the moment you drag a row by hand. There is no button click that returns to a triangled state; only another click (re-applying asc/desc from scratch) or reopening the modal does.
 
+The **Import** button accepts **one or more** `.json` files at once (the system file picker's native multi-select). While an import is running, every list action — Delete, Sync/Update/Remove, rename, drag reorder, Name sort, and Import itself — locks, and the toolbar shows an **Importing…** indicator in place of the Name-button feedback. For a **single** file (or a Hub download): while a triangle is showing, the new entry is inserted at its correct alphabetical position instead of added to the bottom of the list; re-importing over an existing label (same name) is treated as an update and keeps that label's current position. Either way, a brief "Imported {name}" / "Updated {name}" message appears next to the Name button for a few seconds, and the affected row scrolls into view. For a **batch of two or more** files, the toolbar shows a summary instead once the batch finishes — "Imported N files (success N, failure N)" — with no per-name feedback and no row auto-scrolled or auto-selected.
+
+A second line under each row starts with a **Keymap Write** / **View Only** type label, then the Hub actions:
+
+- **Keymap Write** / **View Only**: whether this label set also qualifies to bulk-rewrite the keymap (see **Applying a Key Label to the Keymap** below) — the same eligibility check the footer's Keyboard Layout select tags each option with. QWERTY always shows **View Only**, since its map is never `keymapApplicable`
 - **Open**: open the entry's Hub page in the system browser (only when the row is linked to a Hub post)
 - **Upload**: publish a new Hub post from this local entry (only for entries that have not been uploaded yet)
 - **Update**: push the current local content to the existing Hub post (owner only)
@@ -1586,13 +1596,13 @@ A second line under each row exposes the Hub actions:
 
 If the Hub freshness check finds a row whose post has been deleted upstream, the Updated column reads **`(removed)`** in red instead of a timestamp; clicking Sync on such a row will fail because the Hub no longer serves it.
 
-QWERTY shows no Hub actions and cannot be deleted, but it can be reordered like any other row.
+QWERTY shows its **View Only** type label but no Hub actions, and cannot be deleted — though it can still be reordered like any other row.
 
 **Find on Hub tab**
 
 ![Key Labels — Find on Hub](screenshots/key-labels-hub.png)
 
-Searches Pipette Hub for label sets. Type 2 or more characters to start an automatic search (debounced); the **Search** button and **Enter** still work as manual triggers. Results show the label name, the uploader, and either a **Download** action or an **Installed** marker when the same name is already present locally. Re-importing a file with a name that already exists overwrites the local entry in place (`.json` content replaced, the Hub link is preserved).
+Searches Pipette Hub for label sets. Type 2 or more characters to start an automatic search (debounced); the **Search** button and **Enter** still work as manual triggers. Results are listed alphabetically by name. Results show the label name, the uploader, and either a **Download** action or an **Installed** marker when the same name is already present locally. Re-importing a file with a name that already exists overwrites the local entry in place (`.json` content replaced, the Hub link is preserved).
 
 **Authoring a Key Label**
 
@@ -1622,6 +1632,9 @@ In the example above, `"KC_GRAVE": "KC_LALT"` makes the editor render whichever 
 | `name` | Yes | Display name shown in the modal, in the Settings → Defaults dropdown, and in the Keycodes Overlay Panel |
 | `map` | Yes | `QMK keycode id → label string`. Used as the keycap legend in the Keymap Editor whenever this label set is active |
 | `compositeLabels` | No | Same shape as `map`, but for composite keycodes (e.g. `LSFT(KC_2)`, `LT(0,KC_A)`, `MT(MOD_LCTL,KC_ESC)`). Used to override the inner / outer text of the composite key. Omit the field if you don't need any composite override |
+| `keymapApplicable` | No | Optional boolean. Opt-in marker meaning this label set is a pure QWERTY-keycode permutation (e.g. Colemak, Dvorak) and can also be used to bulk-rewrite the actual keymap, not just the display legends — see **Applying a Key Label to the Keymap** below. Omit or set `false` for label sets that aren't a clean 1:1 character swap (multi-line shift/altgr legends, keycode-passthrough values, non-Latin layouts, …) |
+
+You don't need a `compositeLabels` entry just to have a composite key's inner (tap/base) symbol reflect your pack: a plain `map` entry for the inner basic keycode already applies there too — `"KC_8": "(\n8"` shows `(` over `8` both for a plain `KC_8` key **and** for the tap/base half of `LSFT(KC_8)`, `LT1(KC_8)`, etc. `compositeLabels` is only needed when the composite as a whole should show something different from that automatic inner substitution (e.g. a custom combined legend, or overriding just the outer/modifier half).
 
 A value can also be a plain QMK keycode id — the editor passes it through `keycodeLabel()` so something like `"LALT(KC_L)": "KC_LALT"` resolves to the canonical "LAlt" label without you having to spell the legend out by hand. The same shortcut works in `map`, so `"KC_8": "KC_LALT"` would render the cap as "LAlt".
 
@@ -1647,6 +1660,48 @@ Composite keycodes (LT, MT, modifier+key, …) render the inner key inside an in
 
 `name` is also the uniqueness key inside the local store: importing a `.json` whose name already exists overwrites the matching entry in place (the Hub post link, if any, is preserved). To start a brand-new entry, change the `name` before importing.
 
+**Applying a Key Label to the Keymap**
+
+Switching the **Keyboard Layout** dropdown in the footer never opens a dialog by itself — it always just changes the display. For a label set marked `keymapApplicable` whose map is a clean, closed QWERTY permutation (Colemak, Dvorak, Eucalyn, …), picking it also reveals two vertical index tabs attached to the right edge of the Keymap Editor:
+
+- **The pack's own name** (top) — a read-only *simulation* of that pack's legends, with the changed keys tinted the **simulated** colour (`key-label-simulated`). Nothing here is clickable: no key selection, no popover, no multi-select, no picker paste — this tab exists purely to preview what a Rewrite would produce
+- **QWERTY (Default)** (bottom) — the real keymap, unaffected by the selected pack, fully editable exactly as before
+
+The simulation tab is selected by default whenever the tabs appear. Switching keyboards resets the selection back to the simulation tab; switching only layers or picking a different pack does not.
+
+![Simulation and Default Tabs](screenshots/key-label-simulation-tabs.png)
+
+**The layer-indicator row reads "Preview - Layer N" while the simulation tab is active** (e.g. "Preview - Layer 0"), so it stays visually distinct from the plain "Layer N" label the Default tab and every other keymap view use. **Apply lives at the right end of that same row** — an **Apply** button that opens the Rewrite confirmation dialog:
+
+![Apply Key Label to Keymap](screenshots/key-label-keymap-apply-modal.png)
+
+- **Apply?** — a destructive one-shot: bulk-rewrites every layer's keycodes (and encoders, where applicable) to match the label set, then clears the undo/redo history outright. It is not recorded as an Undo step — there is nothing to revert afterward, on the same undo/redo stack or any other
+- **Cancel** — closes the dialog without changing anything; the simulation/QWERTY (Default) tabs stay exactly as they were
+
+The dialog also shows a save recommendation: back up the current keymap first, before confirming. Rewrite replaces keycodes on every layer and clears the undo/redo history in the same stroke, so a previously saved backup is the only way back to the pre-Rewrite keymap (see **Limitations** below).
+
+After a successful Rewrite, the keys that were actually changed briefly flash the same blue used for key selection before fading back, so you can see at a glance what changed.
+
+**A successful Rewrite (or one that finds nothing left to change) resets the Keyboard Layout dropdown back to QWERTY (Default), and the tabs disappear.** The keycap legends switch to the raw, untranslated keycode each key now actually sends, with no remap colouring — the same clean, undecorated state a snapshot / `.vil` restore leaves. Picking that same arrangement again afterward brings the tabs right back, since the dropdown no longer has any record of what was last rewritten.
+
+**The picker only follows the active label set for JIS-type/deviation packs.** A label set that qualifies as a clean, closed QWERTY permutation (the same eligibility check that gates the simulation tabs above) only swaps *which* key sends a given character, and every one of those characters already appears somewhere in the picker — so the picker intentionally keeps its standard legends regardless of which tab is active. A label set that doesn't qualify (JIS shift-pair legends, kana, any partial/non-closed swap) has no tabs at all: picking it converts both the Keymap Editor and the key picker's legends in place, tinted the **actual** colour (`key-label-remap`) — a truthful legend, since the key really does produce what's shown. A theme pack can define its own `key-label-simulated`; if it doesn't, Pipette derives one automatically from that pack's `key-label-remap` (see §6.4 below).
+
+**QWERTY (Default) is always display-only.** Selecting it from the dropdown never touches the keymap and never shows any tabs — it only switches which legends are shown, back to raw and uncoloured. There is no "restore rewrite" offered by picking it; once a Rewrite has landed, only a previously saved `.vil` file or snapshot can bring back the keymap it replaced (see **Limitations** below).
+
+**Rewriting directly from a keymap that already holds a different rewritten arrangement applies the newly picked table as-is, without composing against what came before.** Because a Rewrite always applies the target's own QWERTY-baseline table directly against whatever keycodes the keymap currently holds, rewriting a second time onto a keymap that isn't actually still QWERTY underneath (for example because an earlier Rewrite, or hand edits, already changed it) can produce the wrong result — and there is no Undo left to fall back on once it lands, since a Rewrite already clears the undo/redo history in the same step. **Reload a saved QWERTY backup before rewriting to a different arrangement**, so the target table is always applied against the QWERTY baseline it was designed for; this is exactly what the confirm dialog's save recommendation is for.
+
+The desktop app always re-validates the map itself before offering the tabs/Apply, even when `keymapApplicable` is set in the file — a label set with shift-pair legends, non-Latin characters, keycode-passthrough values (like the `"KC_GRAVE": "KC_LALT"` example above), or a map that isn't **closed** (every replacement character's key must itself remap somewhere, even if only back to itself — a map that sends key A's character to key B but never says what key B should now send would duplicate one character and lose another) fails validation, and picking it behaves exactly like a JIS-type deviation pack (or a plain unflagged label set): a truthful in-place conversion, no tabs, no Apply.
+
+**Selecting a different pack — or picking QWERTY (Default) — while the confirm dialog is open closes the dialog instead of letting it act on a keymap you've already moved away from.** The dialog always concerns the pack that was active when Apply was pressed; changing the selection underneath it discards the pending request.
+
+**Limitations**
+
+- **Rewrite cannot be undone.** The moment any key is actually rewritten, Pipette clears the undo/redo history instead of adding a revertible step — there is no Undo entry for a Rewrite, clean or partial, and manual edits made afterward simply start a fresh history from scratch. The only way back to the pre-Rewrite keymap is a previously saved `.vil` file or snapshot; this is exactly why the confirm dialog recommends saving one first.
+- Manual per-key edits made before a Rewrite are skipped by its safety check: it only touches a position whose keycode is still part of the arrangement's own QWERTY-baseline permutation, so a key you've already edited by hand to something outside that set is left alone.
+- If a Rewrite fails partway through (e.g. a device write error), the keymap is left in a mixed state — some positions rewritten, some not — and the Keyboard Layout dropdown's selection (and the tabs) are left exactly as they were (it does not reset to QWERTY (Default), since the keymap now matches neither arrangement). The undo/redo history is still cleared if any key was actually written before the failure, so recovery is again a previously saved backup, not Undo.
+
+On Pipette Hub, the flag round-trips as `keymap_applicable` in the upload / download body alongside `map` and `composite_labels`.
+
 ### 6.3 Language Packs Manage
 
 The Tools tab shows a **Language Packs** row displaying the currently active UI language. Click **Edit** to open the Language Packs modal.
@@ -1657,25 +1712,30 @@ English is built-in; every other language is imported from a local `.json` file 
 
 ![Language Packs — Installed](screenshots/language-packs-installed.png)
 
-Lists every language pack on this device. Each row has a **check circle** on the left — click it to switch the active UI language immediately. The active row is highlighted with an accent border.
+Lists every language pack on this device. Each row has a **check circle** on the left — click it to switch the active UI language immediately. The active row is highlighted with an accent border. A drag grip sits at the left edge of every row, including built-in English — it can be dragged and reordered like any imported pack (its translations still ship with the app; only its position in the list lives in the pack store).
 
 Each row shows:
 
 - **Name** (click to rename inline)
-- **Updated timestamp** (`YYYY-MM-DD HH:mm`)
+- **Author** — the uploader's name when the pack came from Hub, blank for local-only packs. Built-in English always shows "pipette"
+- **Updated timestamp** (`YYYY-MM-DD HH:mm`) — the Hub-side last-update time, mirroring what the Hub website displays; blank until the pack has been uploaded. Built-in English shows its own build date instead, since it isn't a Hub-linked pack
 - **Version** chip when the pack covers every key of the current English baseline, or a **not set keys** button that opens a modal listing the missing translation keys
 - **Export** / **Delete** actions on the first line
-- **Open** / **Upload** / **Update** / **Sync** / **Remove** Hub actions on the second line (same pattern as Key Labels §6.2)
+- **Open** / **Upload** / **Update** / **Sync** / **Remove** Hub actions on the second line (same pattern as Key Labels §6.2, including owner-only gating on Delete's Hub-post cascade as well as on Update/Remove)
 
 A **pulsing green dot** next to the Sync button indicates that the Hub-side post is newer than the local copy (freshness check runs once per 5 minutes when the modal is open).
 
-The **Import** button in the toolbar opens a file dialog to import a `.json` language pack. Re-importing a pack with the same `name` overwrites the existing entry.
+Drag the grip handle to reorder the list, including built-in English — the order syncs across devices and is reflected anywhere the pack list is used. A **Name** button at the left of the toolbar (opposite Import) sorts every row alphabetically instead, English included — click once for ascending, click again for descending.
+
+The Name button's three states (ascending/descending triangle, or a plain "Name" once you drag a row by hand) and what happens on a **single**-file import or Hub download — the new pack is inserted at its correct alphabetical position while a triangle is showing, an overwrite of an existing pack keeps its position, and a brief "Imported {name}" / "Updated {name}" message appears next to the Name button with the row scrolled into view — work exactly as described for Key Labels (§6.2); downloading from Hub follows the same placement rule.
+
+The **Import** button in the toolbar opens a file dialog that accepts **one or more** `.json` language packs at once. Re-importing a pack with the same `name` overwrites the existing entry. While the import runs, the list locks and the toolbar shows an **Importing…** indicator; a batch of two or more files shows a summary once it finishes — "Imported N files (success N, failure N)" — instead of the per-name feedback, and no row is auto-scrolled into view (see Key Labels §6.2 for the full behavior).
 
 **Find on Hub tab**
 
 ![Language Packs — Find on Hub](screenshots/language-packs-hub.png)
 
-Searches Pipette Hub for language packs. Type 2 or more characters to start an automatic search (debounced). Results show the pack name, version, uploader, and either a **Download** action or an **Installed** marker.
+Searches Pipette Hub for language packs. Type 2 or more characters to start an automatic search (debounced). Results are listed alphabetically by name. Results show the pack name, version, uploader, and either a **Download** action or an **Installed** marker.
 
 **Authoring a Language Pack**
 
@@ -1717,25 +1777,30 @@ Theme packs override the application's colour palette. The built-in Light / Dark
 
 ![Theme Packs — Installed](screenshots/theme-packs-installed.png)
 
-Lists every theme pack on this device. Each row has a **radio circle** on the left — click it to apply that theme pack immediately. Click the active row again to deselect it and revert to the built-in theme. The three built-in options (Light / Dark / System) appear at the top.
+Lists every theme pack on this device. Each row has a **radio circle** on the left — click it to apply that theme pack immediately. Click the active row again to deselect it and revert to the built-in theme. The three built-in options (Light / Dark / System) appear as a separate selector bar above the list, not as rows in it, so they have no drag grip of their own.
 
 Each row shows:
 
 - **Name** (click to rename inline)
-- **Updated timestamp** (`YYYY-MM-DD HH:mm`)
+- **Author** — the uploader's name when the pack came from Hub, blank for local-only packs
+- **Updated timestamp** (`YYYY-MM-DD HH:mm`) — the Hub-side last-update time, mirroring what the Hub website displays; blank until the pack has been uploaded
 - **Version** chip
 - **.json** export shortcut and **Delete** button on the first line
-- **Open** / **Upload** / **Update** / **Sync** / **Remove** Hub actions on the second line (same pattern as Key Labels §6.2)
+- **Open** / **Upload** / **Update** / **Sync** / **Remove** Hub actions on the second line (same pattern as Key Labels §6.2, including owner-only gating on Delete's Hub-post cascade as well as on Update/Remove)
 
 A **pulsing green dot** next to the Sync button indicates that the Hub-side post is newer than the local copy (freshness check runs once per 5 minutes when the modal is open).
 
-The **Import** button in the toolbar opens a file dialog to import a `.json` theme pack. Re-importing a pack with the same `name` overwrites the existing entry.
+Drag the grip handle on the left of each row to reorder theme packs — the order syncs across devices. A **Name** button at the left of the toolbar (opposite Import) sorts the list alphabetically instead — click once for ascending, click again for descending.
+
+The Name button's three states (ascending/descending triangle, or a plain "Name" once you drag a row by hand) and what happens on a **single**-file import or Hub download — the new pack is inserted at its correct alphabetical position while a triangle is showing, an overwrite of an existing pack keeps its position, and a brief "Imported {name}" / "Updated {name}" message appears next to the Name button with the row scrolled into view — work exactly as described for Key Labels (§6.2); downloading from Hub follows the same placement rule.
+
+The **Import** button in the toolbar opens a file dialog that accepts **one or more** `.json` theme packs at once. Re-importing a pack with the same `name` overwrites the existing entry. While the import runs, the list locks and the toolbar shows an **Importing…** indicator; a batch of two or more files shows a summary once it finishes — "Imported N files (success N, failure N)" — instead of the per-name feedback, and no row is auto-scrolled into view (see Key Labels §6.2 for the full behavior).
 
 **Find on Hub tab**
 
 ![Theme Packs — Find on Hub](screenshots/theme-packs-hub.png)
 
-Searches Pipette Hub for theme packs. Type 2 or more characters to start an automatic search (debounced). Each result shows the pack name, version, uploader, a **Preview** button, and either a **Download** action or an **Installed** marker.
+Searches Pipette Hub for theme packs. Type 2 or more characters to start an automatic search (debounced). Results are listed alphabetically by name. Each result shows the pack name, version, uploader, a **Preview** button, and either a **Download** action or an **Installed** marker.
 
 Click **Preview** to temporarily apply the theme's colours without installing. The preview resets when you close the modal, switch to the Installed tab, or click **Preview** again to toggle it off.
 
@@ -1775,6 +1840,7 @@ A theme pack `.json` defines a `name`, `version`, and a `colors` object mapping 
     "key-label": "#eceff4",
     "key-sublabel": "#d8dee9",
     "key-label-remap": "#88c0d0",
+    "key-label-simulated": "#b48ead",
     "key-bg-multi-selected": "#434c5e",
     "tab-bg-active": "#3b4252",
     "tab-text": "#7b88a1",
@@ -1793,9 +1859,9 @@ A theme pack `.json` defines a `name`, `version`, and a `colors` object mapping 
 | `name` | Yes | Display name and uniqueness key for overwrite-on-import |
 | `version` | Yes | Semver string (e.g. `1.0.0`) |
 | `colorScheme` | Yes | `"light"` or `"dark"` — declares the intended brightness of the pack |
-| `colors` | Yes | Object mapping all 35 colour tokens to CSS colour values (`#hex`, `rgb()`, or `hsl()`) |
+| `colors` | Yes | Object mapping colour tokens to CSS colour values (`#hex`, `rgb()`, or `hsl()`) |
 
-All 35 colour tokens are required. Export any installed pack (row → `.json`) to get a complete template. Ready-to-use example theme packs (Kanagawa Wave / Dragon / Lotus and Solarized Light / Dark) are also available in the [`sample-packs/themes/`](../sample-packs/themes/) directory in the repository.
+35 colour tokens are required — export any installed pack (row → `.json`) to get a complete template. One additional token, `key-label-simulated` (the permutation-pack Display Only tint — see §6.2 above), is **optional**: if a pack omits it, Pipette automatically derives one from that pack's `key-label-remap` (a hue-rotated complement, clamped for readability against the pack's own `colorScheme`) so every pack still gets a distinct simulated tint even without authoring one by hand. Ready-to-use example theme packs (Kanagawa Wave / Dragon / Lotus and Solarized Light / Dark) are also available in the [`sample-packs/themes/`](../sample-packs/themes/) directory in the repository — every sample pack defines its own `key-label-simulated` explicitly.
 
 ### 6.5 Zoom (UI Scale)
 
@@ -1994,12 +2060,13 @@ Inline selectors for common per-session preferences. A `|` separator divides the
 
 - **Language**: Switch the UI language. Opens a dropdown of built-in languages and installed language packs (see §6.3)
 - **Theme**: Switch the color theme. Options include System, Light, Dark, and any installed theme packs (see §6.4)
-- **Key Labels**: Switch the key label set for the current keyboard. Options reflect the installed Key Labels store in drag order (see §6.2)
+- **Key Labels**: Switch the key label set for the current keyboard. Options reflect the installed Key Labels store in drag order (see §6.2). Each option in the open dropdown carries a trailing **Write** / **View** tag — the short form of the Key Labels modal's **Keymap Write** / **View Only** type label — so you can tell which sets can bulk-rewrite the keymap before picking one
 - **Edit / Done**: Toggle edit mode. Replaces the selectors with **Language Packs**, **Theme Packs**, and **Key Labels** management modal buttons for installing, syncing, or reordering entries
 
 **Action buttons** (right side)
 
 - **Key Tester**: Toggle button for Matrix Tester mode (requires matrix tester support; hidden when Typing Test is active)
+- **Analyze**: Jumps straight to the Analyze page (§1.4) for the connected keyboard; hidden when Typing Test is active. Back returns to the editor
 - **Typing View**: Toggle button to enter view-only mode — a compact window showing only the keyboard layout (see §4.3). Requires matrix tester support; hidden when Typing Test is active
 - **Typing Test**: Toggle button for Typing Test mode (requires matrix tester support)
 - **Disconnect button**: Disconnects from the keyboard and returns to the device selection screen (hidden while Typing Test is active)
